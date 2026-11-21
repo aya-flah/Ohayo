@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "author": "Sonae team",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "tank", "top": -150, "left": -40, "attrs": { "distance": "18" } },
+    { "type": "wokwi-relay-module", "id": "pump", "top": 40, "left": 230, "attrs": {} },
+    { "type": "wokwi-servo", "id": "valve", "top": 160, "left": 240, "attrs": {} },
+    { "type": "wokwi-led", "id": "ledGrid", "top": -120, "left": 200, "attrs": { "color": "green", "label": "Grid on" } },
+    { "type": "wokwi-led", "id": "ledCut", "top": -120, "left": 240, "attrs": { "color": "red", "label": "STEG cut" } },
+    { "type": "wokwi-led", "id": "ledPump", "top": -120, "left": 280, "attrs": { "color": "yellow", "label": "Pumping" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -60, "left": 195, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": -60, "left": 235, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r3", "top": -60, "left": 275, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-pushbutton", "id": "cutButton", "top": 230, "left": -170, "attrs": { "color": "red", "label": "STEG cut" } },
+    { "type": "wokwi-slide-switch", "id": "gridLine", "top": 150, "left": -170, "attrs": { "value": "1" } },
+    { "type": "wokwi-potentiometer", "id": "solar", "top": -60, "left": -230, "attrs": { "value": "2600" } },
+    { "type": "wokwi-potentiometer", "id": "flow", "top": 40, "left": -230, "attrs": { "value": "1800" } },
+    { "type": "wokwi-ds1307", "id": "rtc", "top": 300, "left": 40, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled", "top": 300, "left": 220, "attrs": { "i2cAddress": "0x3c" } }
+  ],
+  "connections": [
+    ["esp:TX0", "$serialMonitor:RX", "", []],
+    ["esp:RX0", "$serialMonitor:TX", "", []],
+
+    ["tank:VCC", "esp:VIN", "red", []],
+    ["tank:GND", "esp:GND.1", "black", []],
+    ["tank:TRIG", "esp:D25", "green", []],
+    ["tank:ECHO", "esp:D34", "blue", []],
+
+    ["pump:VCC", "esp:VIN", "red", []],
+    ["pump:GND", "esp:GND.1", "black", []],
+    ["pump:IN", "esp:D26", "orange", []],
+
+    ["valve:V+", "esp:VIN", "red", []],
+    ["valve:GND", "esp:GND.1", "black", []],
+    ["valve:PWM", "esp:D13", "orange", []],
+
+    ["esp:D32", "r1:1", "green", []],
+    ["r1:2", "ledGrid:A", "green", []],
+    ["ledGrid:C", "esp:GND.2", "black", []],
+    ["esp:D33", "r2:1", "red", []],
+    ["r2:2", "ledCut:A", "red", []],
+    ["ledCut:C", "esp:GND.2", "black", []],
+    ["esp:D4", "r3:1", "gold", []],
+    ["r3:2", "ledPump:A", "gold", []],
+    ["ledPump:C", "esp:GND.2", "black", []],
+
+    ["cutButton:1.l", "esp:D14", "red", []],
+    ["cutButton:2.l", "esp:GND.1", "black", []],
+
+    ["gridLine:2", "esp:VP", "violet", []],
+    ["gridLine:1", "esp:3V3", "red", []],
+    ["gridLine:3", "esp:GND.1", "black", []],
+
+    ["solar:SIG", "esp:VN", "gold", []],
+    ["solar:VCC", "esp:3V3", "red", []],
+    ["solar:GND", "esp:GND.1", "black", []],
+    ["flow:SIG", "esp:D35", "blue", []],
+    ["flow:VCC", "esp:3V3", "red", []],
+    ["flow:GND", "esp:GND.1", "black", []],
+
+    ["rtc:5V", "esp:VIN", "red", []],
+    ["rtc:GND", "esp:GND.2", "black", []],
+    ["rtc:SDA", "esp:D21", "blue", []],
+    ["rtc:SCL", "esp:D22", "purple", []],
+    ["oled:VCC", "esp:3V3", "red", []],
+    ["oled:GND", "esp:GND.2", "black", []],
+    ["oled:SDA", "esp:D21", "blue", []],
+    ["oled:SCL", "esp:D22", "purple", []]
+  ],
+  "dependencies": {}
+}

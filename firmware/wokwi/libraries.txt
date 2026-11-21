@@ -1,0 +1,7 @@
+# Libraries for the wokwi.com web editor (paste into the Library Manager tab)
+PubSubClient
+ArduinoJson
+ESP32Servo
+RTClib
+Adafruit SSD1306
+Adafruit GFX Library

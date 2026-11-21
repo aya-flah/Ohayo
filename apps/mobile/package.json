@@ -1,0 +1,22 @@
+{
+  "name": "@sonae/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sonae Android app: Capacitor wrapping the website build from apps/web/dist.",
+  "scripts": {
+    "add": "cap add android",
+    "sync": "cap sync android",
+    "open": "cap open android",
+    "apk": "cd android && gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.0"
+  }
+}

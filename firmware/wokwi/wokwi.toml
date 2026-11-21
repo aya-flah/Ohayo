@@ -1,0 +1,5 @@
+# For the Wokwi VS Code extension: build with `pio run -e wokwi` first.
+[wokwi]
+version = 1
+firmware = '../.pio/build/wokwi/firmware.bin'
+elf = '../.pio/build/wokwi/firmware.elf'
