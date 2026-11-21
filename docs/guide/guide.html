@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sonae team guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --reservoir: #0B3C5D;
+    --water: #2A7DE1;
+    --water-pale: #E6F0FB;
+    --water-mid: #9CC3F2;
+    --stone: #EEF3F4;
+    --olive: #5E7F1F;
+    --olive-pale: #EEF4E2;
+    --sun: #E9A400;
+    --sun-pale: #FDF4DC;
+    --cut: #D6342C;
+    --cut-pale: #FBE9E8;
+    --ink: #14232F;
+    --ink-2: #4A5A67;
+    --rule: #D5DEE3;
+    --serif: "Shippori Mincho B1", "Yu Mincho", "YuMincho", serif;
+    --sans: "Zen Kaku Gothic New", "Yu Gothic", "Segoe UI", Arial, sans-serif;
+  }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: #fff;
+  }
+  .page {
+    width: 210mm;
+    height: 297mm;
+    position: relative;
+    overflow: hidden;
+    padding: 19mm 18mm 20mm 27mm;
+    break-after: page;
+    page-break-after: always;
+  }
+  .page:last-child { break-after: auto; page-break-after: auto; }
+
+  /* The signature: a tank gauge that fills as you read */
+  .gauge { position: absolute; left: 0; top: 0; bottom: 0; width: 10mm; background: var(--stone); }
+  .gauge .fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: calc(var(--p) * 100%);
+    background: var(--water);
+    border-top: 1.4mm solid var(--water-mid);
+  }
+  .gauge .num {
+    position: absolute; left: 0; right: 0; bottom: 6mm;
+    text-align: center; color: #fff; font: 700 9pt var(--sans);
+  }
+  .foot {
+    position: absolute; left: 27mm; right: 18mm; bottom: 9mm;
+    display: flex; justify-content: space-between;
+    font-size: 8.5pt; color: var(--ink-2);
+  }
+
+  h1 {
+    font-family: var(--serif); font-weight: 800;
+    font-size: 27pt; line-height: 1.18; letter-spacing: -0.005em;
+    color: var(--reservoir); margin: 0 0 5mm;
+  }
+  h2 {
+    font-family: var(--serif); font-weight: 800;
+    font-size: 14pt; color: var(--reservoir); margin: 7mm 0 2.5mm;
+  }
+  .lead { font-size: 12.5pt; line-height: 1.6; margin: 0 0 7mm; max-width: 152mm; }
+  p, li, td, th, dd, dt { font-size: 10.5pt; line-height: 1.6; }
+  p { margin: 0 0 3mm; }
+  ul, ol { margin: 0; padding-left: 5mm; }
+  li { margin-bottom: 1.6mm; }
+  .small { font-size: 9pt; color: var(--ink-2); line-height: 1.5; }
+  .jp { font-family: "Shippori Mincho B1", "Yu Mincho", serif; }
+  strong { font-weight: 700; }
+
+  .box { border-left: 1.2mm solid var(--water); background: var(--water-pale); padding: 4mm 5mm; border-radius: 0 2mm 2mm 0; }
+  .box.olive { border-color: var(--olive); background: var(--olive-pale); }
+  .box.cut { border-color: var(--cut); background: var(--cut-pale); }
+  .box.sun { border-color: var(--sun); background: var(--sun-pale); }
+  .box p:last-child, .box ul:last-child, .box ol:last-child { margin-bottom: 0; }
+
+  .big-line {
+    font-family: var(--serif); font-weight: 800; font-size: 16pt; line-height: 1.45;
+    color: var(--reservoir); margin: 6mm 0 0; max-width: 150mm;
+  }
+
+  svg text { font-family: var(--sans); }
+  .icon { width: 9mm; height: 9mm; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Cover */
+  .cover { padding-top: 24mm; }
+  .cover-mark { font-family: var(--serif); font-weight: 800; font-size: 118pt; line-height: 1; color: var(--reservoir); margin: 0 0 2mm -2mm; }
+  .cover-name { font-family: var(--serif); font-weight: 800; font-size: 40pt; color: var(--ink); margin: 0; line-height: 1.1; }
+  .cover-tag { font-size: 16pt; margin: 3mm 0 1mm; }
+  .cover-proverb { font-size: 10.5pt; color: var(--ink-2); margin: 0 0 9mm; }
+  .cover-line { font-family: var(--serif); font-weight: 600; font-size: 17pt; line-height: 1.45; color: var(--reservoir); max-width: 140mm; margin: 0 0 6mm; }
+  .cover-art { width: 100%; height: auto; display: block; margin: 2mm 0 6mm; }
+  .cover-meta { position: absolute; left: 27mm; bottom: 24mm; font-size: 11pt; line-height: 1.6; color: var(--ink-2); max-width: 140mm; margin: 0; }
+
+  /* Numbered sequence */
+  .seq { display: grid; grid-template-columns: 14mm 11mm 1fr; column-gap: 4mm; row-gap: 5mm; align-items: start; margin: 2mm 0 4mm; }
+  .seq .n { font-family: var(--serif); font-weight: 800; font-size: 26pt; line-height: 1; color: var(--water); }
+  .seq .t { font-family: var(--serif); font-weight: 800; font-size: 13pt; color: var(--reservoir); margin: 0 0 1mm; }
+  .seq p { margin: 0; }
+
+  /* Timeline */
+  .tl { position: relative; margin: 3mm 0 6mm; }
+  .tl-row { display: grid; grid-template-columns: 36mm 8mm 1fr; align-items: start; margin-bottom: 4.2mm; }
+  .tl-time { font-family: var(--serif); font-weight: 800; font-size: 11pt; color: var(--reservoir); line-height: 1.5; }
+  .tl-rail { position: relative; height: 100%; }
+  .tl-dot { width: 3.4mm; height: 3.4mm; border-radius: 50%; background: var(--water); margin: 1.4mm auto 0; position: relative; z-index: 1; }
+  .tl-dot.cut { background: var(--cut); }
+  .tl-dot.sun { background: var(--sun); }
+  .tl-dot.olive { background: var(--olive); }
+  .tl::before { content: ""; position: absolute; left: calc(36mm + 4mm - 0.3mm); top: 2mm; bottom: 6mm; width: 0.6mm; background: var(--rule); }
+  .tl-text p { margin: 0; }
+  .sms { display: inline-block; background: var(--ink); color: #fff; border-radius: 3mm; padding: 1mm 3mm; font-size: 10pt; margin: 1mm 0; }
+
+  /* In / engine / out */
+  .flow { display: grid; grid-template-columns: 1fr 9mm 46mm 9mm 1fr; align-items: start; margin: 2mm 0 6mm; }
+  .flow .engine, .flow .chev { align-self: center; }
+  .flow h3 { font-family: var(--serif); font-size: 12pt; color: var(--reservoir); margin: 0 0 2mm; }
+  .flow ul { padding-left: 4.5mm; }
+  .flow li { font-size: 10pt; margin-bottom: 1.2mm; }
+  .engine { border: 0.6mm solid var(--water); background: var(--water-pale); border-radius: 3mm; padding: 5mm 4mm; text-align: center; }
+  .engine .name { font-family: var(--serif); font-weight: 800; font-size: 15pt; color: var(--reservoir); }
+  .engine p { font-size: 9.5pt; margin: 2mm 0 0; }
+  .chev { width: 9mm; height: 9mm; }
+
+  /* Quadrants */
+  .quad { display: grid; grid-template-columns: 1fr 1fr; margin: 2mm 0 5mm; }
+  .quad > div { padding: 5mm 6mm 5mm 0; }
+  .quad > div:nth-child(1) { border-right: 0.3mm solid var(--rule); border-bottom: 0.3mm solid var(--rule); }
+  .quad > div:nth-child(2) { border-bottom: 0.3mm solid var(--rule); padding-left: 6mm; }
+  .quad > div:nth-child(3) { border-right: 0.3mm solid var(--rule); }
+  .quad > div:nth-child(4) { padding-left: 6mm; }
+  .quad h3 { font-family: var(--serif); font-weight: 800; font-size: 13pt; color: var(--reservoir); margin: 2mm 0 0.5mm; }
+  .quad .adds { font-weight: 700; font-size: 10.5pt; margin: 0 0 1.5mm; }
+  .quad p { font-size: 10pt; }
+
+  /* Yui flow */
+  .yui { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 4mm; margin: 2mm 0 6mm; }
+  .yui > div { border-top: 1mm solid var(--olive); padding-top: 3mm; }
+  .yui > div:nth-child(2) { border-color: var(--water); }
+  .yui > div:nth-child(3) { border-color: var(--reservoir); }
+  .yui > div:nth-child(4) { border-color: var(--sun); }
+  .yui .step { font-family: var(--serif); font-weight: 800; font-size: 12pt; color: var(--reservoir); margin: 1.5mm 0 1mm; }
+  .yui p { font-size: 9.6pt; line-height: 1.5; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 9mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 5mm; }
+  th { text-align: left; font-weight: 700; color: var(--reservoir); border-bottom: 0.5mm solid var(--reservoir); padding: 1.8mm 2mm 1.8mm 0; font-size: 10pt; }
+  td { border-bottom: 0.3mm solid var(--rule); padding: 2mm 2mm 2mm 0; vertical-align: top; }
+  td.nowrap { white-space: nowrap; padding-right: 6mm; }
+
+  .repo { font-size: 10pt; }
+  .repo code, code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9.5pt; color: var(--reservoir); }
+
+  .wire { border: 0.4mm solid var(--rule); border-radius: 3mm; padding: 4mm; margin: 2mm 0 6mm; }
+  .wire .strip { display: grid; grid-template-columns: repeat(61, 1fr); gap: 0.35mm; height: 10mm; align-items: end; margin-bottom: 1.5mm; }
+  .wire .strip span { background: var(--sun); opacity: .35; }
+  .wire .strip span.hot { opacity: .9; }
+  .wire .strip span.cutday { background: var(--cut); opacity: .9; }
+  .wire .cap { font-size: 8.8pt; color: var(--ink-2); margin-bottom: 4mm; }
+  .wire .twocol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; }
+  .wire .colhead { font-family: var(--serif); font-weight: 800; font-size: 12pt; margin-bottom: 2mm; }
+  .wire .kpi { display: flex; justify-content: space-between; border-bottom: 0.3mm dashed var(--rule); padding: 1.4mm 0; font-size: 9.6pt; }
+  .wire .kpi span:last-child { color: var(--ink-2); }
+
+  .roles { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 4mm; margin: 2mm 0 5mm; }
+  .roles .r { border-left: 1mm solid var(--water); padding-left: 3.5mm; }
+  .roles .r h3 { font-family: var(--serif); font-weight: 800; font-size: 12pt; color: var(--reservoir); margin: 0 0 1mm; }
+  .roles .r p { font-size: 9.8pt; margin: 0 0 1.5mm; }
+  .roles .r .who { font-size: 9.5pt; color: var(--ink-2); }
+
+  .sched { display: grid; grid-template-columns: 34mm 1fr; row-gap: 1.6mm; margin: 1mm 0 5mm; }
+  .sched div { font-size: 10pt; line-height: 1.45; }
+  .sched .when { font-family: var(--serif); font-weight: 800; color: var(--reservoir); }
+  .sched .gate { font-weight: 700; }
+
+  .pitch { display: grid; grid-template-columns: 14mm 1fr; row-gap: 2.2mm; margin: 1mm 0 5mm; }
+  .pitch .at { font-family: var(--serif); font-weight: 800; color: var(--water); font-size: 11pt; }
+  .pitch div { font-size: 10.2pt; line-height: 1.5; }
+
+  dl.gloss { display: grid; grid-template-columns: 1fr 1fr; column-gap: 9mm; margin: 2mm 0 0; }
+  dl.gloss div { break-inside: avoid; margin-bottom: 2.6mm; }
+  dl.gloss dt { font-weight: 700; color: var(--reservoir); font-size: 10pt; }
+  dl.gloss dd { margin: 0; font-size: 9.6pt; line-height: 1.45; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover" style="--p:.067">
+  <div class="gauge"><div class="fill"></div><div class="num">1</div></div>
+  <div class="cover-mark jp">備え</div>
+  <p class="cover-name">Sonae</p>
+  <p class="cover-tag">Prepared, nothing to fear.</p>
+  <p class="cover-proverb"><span class="jp">備えあれば憂いなし</span> (sonae areba urei nashi) is a Japanese proverb.</p>
+  <p class="cover-line">When STEG cuts the power, the water is already up in the tank.</p>
+  <svg class="cover-art" viewBox="0 0 640 262" role="img" aria-label="A pump fills a high tank while there is power; during the cut, water flows to the fields by gravity">
+    <line x1="0" y1="222" x2="640" y2="222" stroke="#D5DEE3" stroke-width="1.5"/>
+    <circle cx="566" cy="58" r="20" fill="#FDF4DC" stroke="#E9A400" stroke-width="2.5"/>
+    <g stroke="#E9A400" stroke-width="2.5" stroke-linecap="round">
+      <line x1="566" y1="24" x2="566" y2="16"/><line x1="566" y1="100" x2="566" y2="92"/>
+      <line x1="532" y1="58" x2="524" y2="58"/><line x1="600" y1="58" x2="608" y2="58"/>
+      <line x1="542" y1="34" x2="536" y2="28"/><line x1="590" y1="82" x2="596" y2="88"/>
+      <line x1="590" y1="34" x2="596" y2="28"/><line x1="542" y1="82" x2="536" y2="88"/>
+    </g>
+    <g stroke="#14232F" stroke-width="2" fill="none" stroke-linejoin="round">
+      <path d="M70 222 L92 72 L114 222"/><path d="M77 178 H107 M82 140 H102 M86 108 H98"/>
+      <path d="M62 96 H122"/><path d="M92 72 V62"/>
+    </g>
+    <circle cx="92" cy="56" r="6.5" fill="#D6342C"/>
+    <path d="M114 198 H232" stroke="#4A5A67" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <g stroke="#D6342C" stroke-width="2.5" stroke-linecap="round">
+      <line x1="166" y1="190" x2="180" y2="206"/><line x1="180" y1="190" x2="166" y2="206"/>
+    </g>
+    <path d="M180 222 V240 H260 V222" fill="#E6F0FB" stroke="#2A7DE1" stroke-width="2"/>
+    <rect x="232" y="190" width="20" height="16" rx="2" fill="#14232F"/>
+    <path d="M242 190 V96 H266" fill="none" stroke="#2A7DE1" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <g stroke="#14232F" stroke-width="2" fill="none">
+      <path d="M262 222 L282 124 M338 222 L318 124 M268 190 H332 M273 160 H327"/>
+    </g>
+    <rect x="266" y="40" width="68" height="84" rx="7" fill="#FFFFFF" stroke="#2A7DE1" stroke-width="2.5"/>
+    <rect x="270" y="58" width="60" height="62" rx="4" fill="#E6F0FB"/>
+    <path d="M270 58 q7.5 -4 15 0 t15 0 t15 0 t15 0" fill="none" stroke="#2A7DE1" stroke-width="2"/>
+    <path d="M334 110 H372 V192 H600" fill="none" stroke="#2A7DE1" stroke-width="3"/>
+    <circle cx="372" cy="150" r="7" fill="#FFFFFF" stroke="#14232F" stroke-width="2"/>
+    <line x1="367" y1="150" x2="377" y2="150" stroke="#14232F" stroke-width="2"/>
+    <g fill="#2A7DE1"><circle cx="446" cy="200" r="2.6"/><circle cx="508" cy="200" r="2.6"/><circle cx="570" cy="200" r="2.6"/></g>
+    <g fill="#EEF4E2" stroke="#5E7F1F" stroke-width="1.8">
+      <rect x="420" y="207" width="52" height="13" rx="2"/><rect x="482" y="207" width="52" height="13" rx="2"/><rect x="544" y="207" width="52" height="13" rx="2"/>
+    </g>
+    <text x="180" y="257" font-size="12" fill="#4A5A67">Pump early, while there is power</text>
+    <text x="420" y="242" font-size="12" fill="#4A5A67">Water by gravity during the cut</text>
+  </svg>
+  <p class="cover-meta">A guide for the team building Sonae at the Kizuna 2026 hackathon. Fifteen minutes to read: the idea, the features, who builds what, and how we pitch it.</p>
+  <div class="foot"><span>Sonae team guide</span><span>Version 1, 21 November 2026</span></div>
+</section>
+
+<!-- 2. PROBLEM -->
+<section class="page" style="--p:.133">
+  <div class="gauge"><div class="fill"></div><div class="num">2</div></div>
+  <h1>No power, no water.</h1>
+  <p class="lead">Summer 2026 was the hottest ever recorded in Tunisia. When the grid could not keep up, power cuts stopped the pumps, and farmers ran out of water for their fields.</p>
+  <svg viewBox="0 0 640 232" width="100%" role="img" aria-label="Record heat leads to crops being lost">
+    <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#14232F"/></marker></defs>
+    <g fill="#FFFFFF" stroke="#14232F" stroke-width="1.5">
+      <rect x="16" y="16" width="176" height="56" rx="10"/><rect x="232" y="16" width="176" height="56" rx="10"/><rect x="448" y="16" width="176" height="56" rx="10"/>
+      <rect x="16" y="152" width="176" height="56" rx="10"/><rect x="232" y="152" width="176" height="56" rx="10"/>
+    </g>
+    <rect x="448" y="152" width="176" height="56" rx="10" fill="#FBE9E8" stroke="#D6342C" stroke-width="2"/>
+    <g fill="none" stroke="#14232F" stroke-width="1.5">
+      <path d="M192 44 H228" marker-end="url(#a2)"/><path d="M408 44 H444" marker-end="url(#a2)"/>
+      <path d="M536 72 V112 H104 V148" marker-end="url(#a2)"/>
+      <path d="M192 180 H228" marker-end="url(#a2)"/><path d="M408 180 H444" marker-end="url(#a2)"/>
+    </g>
+    <g font-size="14" text-anchor="middle" fill="#14232F">
+      <text x="104" y="49">Record heat</text><text x="320" y="49">Air conditioners on</text><text x="536" y="49">Grid at its limit</text>
+      <text x="104" y="185">STEG cuts power</text><text x="320" y="185">Pumps stop</text>
+    </g>
+    <text x="536" y="185" font-size="14" text-anchor="middle" fill="#D6342C" font-weight="700">Crops are lost</text>
+  </svg>
+  <h2>In numbers</h2>
+  <ul>
+    <li>Peak demand in July 2026: about <strong>6,400 MW</strong> (an estimate), up from 5,175 MW in 2025.</li>
+    <li>Peak hours run from <strong>13:00 to 17:00</strong>, exactly when pumps run for daytime irrigation.</li>
+    <li>In Kairouan, pepper plots <strong>rotted</strong> when irrigation stopped (UTAP, July 2026).</li>
+    <li>A backup generator costs <strong>50,000 to 100,000 TND</strong>. Most farmers can't afford one.</li>
+  </ul>
+  <div class="box" style="margin-top:6mm">
+    <p><strong>Who we help: the GDA.</strong> A GDA (Groupement de Développement Agricole) is a farmers' association that shares one well, one pump and one pipe network. Tunisia has about 2,500 of them. When the pump stops, every farmer in the GDA loses water at the same time.</p>
+  </div>
+  <p class="small" style="margin-top:6mm">Sources: Webdo, 8 Sep 2026; Tunisie Numérique, 16 Jul 2026; Business News, 24 Jul 2026; Webmanagercenter, 2020. Links are in the plan doc.</p>
+  <div class="foot"><span>Sonae team guide</span><span>The problem</span></div>
+</section>
+
+<!-- 3. IDEA -->
+<section class="page" style="--p:.2">
+  <div class="gauge"><div class="fill"></div><div class="num">3</div></div>
+  <h1>Our idea: the water tank is a battery.</h1>
+  <p class="lead">Electricity is hard to store. Water is easy to store. So Sonae pumps while there is energy, and lets the water flow down later, when the power is gone.</p>
+  <div class="seq">
+    <div class="n">1</div>
+    <svg class="icon" viewBox="0 0 32 32" stroke="#2A7DE1"><rect x="5" y="7" width="22" height="20" rx="3"/><path d="M5 13h22M11 4v6M21 4v6"/><circle cx="16" cy="20" r="3"/></svg>
+    <div><p class="t">Look ahead</p><p>Sonae reads tomorrow's weather and the power cuts STEG has announced.</p></div>
+
+    <div class="n">2</div>
+    <svg class="icon" viewBox="0 0 32 32" stroke="#E9A400"><rect x="17" y="5" width="10" height="14" rx="2"/><path d="M8 27V11m0 0l-4 4m4-4l4 4"/><path d="M17 12h10"/></svg>
+    <div><p class="t">Pump early</p><p>It fills the high tank while power exists: at midday with the sun, at night, or just before a cut.</p></div>
+
+    <div class="n">3</div>
+    <svg class="icon" viewBox="0 0 32 32" stroke="#2A7DE1"><rect x="5" y="4" width="12" height="12" rx="2"/><path d="M11 16v6"/><path d="M22 14c0 0-4 5-4 8a4 4 0 0 0 8 0c0-3-4-8-4-8z"/></svg>
+    <div><p class="t">Water by gravity</p><p>When the cut comes, water flows down from the tank to the fields. The pump is not needed.</p></div>
+
+    <div class="n">4</div>
+    <svg class="icon" viewBox="0 0 32 32" stroke="#5E7F1F"><circle cx="16" cy="16" r="11"/><path d="M16 9v7l5 3"/></svg>
+    <div><p class="t">Share fairly</p><p>Every farmer gets a turn by SMS, and the most fragile crops go first.</p></div>
+  </div>
+  <p class="big-line">If you remember one sentence: Sonae makes sure the water is already up there before the power goes out, and that every farmer gets a fair turn.</p>
+  <div class="box sun" style="margin-top:9mm">
+    <p><strong>Does it really work?</strong> A tank 10 m up gives about 1 bar of pressure. That is enough for furrows and low-pressure drip. If a GDA has no high tank, Sonae still moves pumping away from the hours when cuts happen.</p>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>The idea</span></div>
+</section>
+
+<!-- 4. A DAY -->
+<section class="page" style="--p:.267">
+  <div class="gauge"><div class="fill"></div><div class="num">4</div></div>
+  <h1>A day with Sonae.</h1>
+  <p class="lead">This is our demo story. Hédi grows tomatoes in a GDA near Kairouan. Learn it by heart: we tell it in the pitch.</p>
+  <div class="tl">
+    <div class="tl-row"><div class="tl-time">Monday 14:00</div><div class="tl-rail"><div class="tl-dot cut"></div></div><div class="tl-text"><p>The forecast says 46 °C tomorrow. STEG announces a cut from 10:00 to 16:00.</p></div></div>
+    <div class="tl-row"><div class="tl-time">Monday 14:05</div><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-text"><p>Sonae makes a new plan: pump tonight and from 06:00 to 10:00, so the tank is full at 10:00.</p></div></div>
+    <div class="tl-row"><div class="tl-time">Monday 20:00</div><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-text"><p>Every farmer gets an SMS. Hédi's says:</p><span class="sms">Dourek ghodwa 5h–7h, parcelle 3</span><p class="small">Your turn tomorrow, 5 to 7 am, plot 3.</p></div></div>
+    <div class="tl-row"><div class="tl-time">Tuesday 05:00</div><div class="tl-rail"><div class="tl-dot olive"></div></div><div class="tl-text"><p>Hédi's tomatoes are flowering, their most fragile stage, so they are watered first, in the cool morning.</p></div></div>
+    <div class="tl-row"><div class="tl-time">Tuesday 10:00</div><div class="tl-rail"><div class="tl-dot cut"></div></div><div class="tl-text"><p>The power cut starts. The pump stops. The tank is full.</p></div></div>
+    <div class="tl-row"><div class="tl-time">10:00 to 16:00</div><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-text"><p>The other farmers' turns run by gravity from the tank.</p></div></div>
+    <div class="tl-row"><div class="tl-time">Tuesday 16:00</div><div class="tl-rail"><div class="tl-dot sun"></div></div><div class="tl-text"><p>Power returns. Sonae refills the tank and records every litre delivered.</p></div></div>
+  </div>
+  <div class="box olive">
+    <p><strong>The result:</strong> no crop lost, no diesel burned, and no argument about whose turn it was.</p>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>The demo story</span></div>
+</section>
+
+<!-- 5. MAIN FEATURE -->
+<section class="page" style="--p:.333">
+  <div class="gauge"><div class="fill"></div><div class="num">5</div></div>
+  <h1>The main feature: the 48-hour plan.</h1>
+  <p class="lead">Everything else in Sonae exists to make this plan better. If a feature does not help the plan, we don't build it.</p>
+  <div class="flow">
+    <div>
+      <h3>What goes in</h3>
+      <ul>
+        <li><strong>Weather:</strong> heat, sun and rain, from Open-Meteo</li>
+        <li><strong>STEG cuts:</strong> typed in, or read by the AI from a screenshot</li>
+        <li><strong>Crops:</strong> who grows what, on how much land, how thirsty</li>
+        <li><strong>Equipment:</strong> tank size, pump power, solar panels</li>
+      </ul>
+    </div>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="#2A7DE1" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4l8 8-8 8"/></svg>
+    <div class="engine">
+      <div class="name">Sonae engine</div>
+      <p>The same code runs on the server, on the phone and on the Node.</p>
+    </div>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="#2A7DE1" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4l8 8-8 8"/></svg>
+    <div>
+      <h3>What comes out</h3>
+      <ul>
+        <li>When to pump, and with which energy</li>
+        <li>The tank level, hour by hour</li>
+        <li>Turns: who irrigates when</li>
+        <li>One SMS for each farmer</li>
+        <li>Alerts when water will be short</li>
+      </ul>
+    </div>
+  </div>
+  <h2>How it decides</h2>
+  <div class="seq" style="grid-template-columns: 9mm 1fr; row-gap: 3mm;">
+    <div class="n" style="font-size:16pt">1</div><p>Work out how much water each plot needs. A hotter day means more water.</p>
+    <div class="n" style="font-size:16pt">2</div><p>Put the turns in the cool hours: early morning and evening.</p>
+    <div class="n" style="font-size:16pt">3</div><p>Make sure the tank is full before each turn and before each cut.</p>
+    <div class="n" style="font-size:16pt">4</div><p>Use the cheapest energy first: sun, then the grid, and diesel only if nothing else works.</p>
+    <div class="n" style="font-size:16pt">5</div><p>Give a reason for every decision, like "Pumping 06:00 to 10:00 because of the cut at 10:00".</p>
+  </div>
+  <div class="box" style="margin-top:4mm">
+    <p><strong>No hardware? It still works.</strong> The manager types the tank level into the app, and farmers get their SMS. The Node only makes it automatic and measured.</p>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>The main feature</span></div>
+</section>
+
+<!-- 6. EXTENSIONS -->
+<section class="page" style="--p:.4">
+  <div class="gauge"><div class="fill"></div><div class="num">6</div></div>
+  <h1>Four extensions, each one helps the plan.</h1>
+  <p class="lead">The plan is the heart. These four make it run by itself, make it trusted, let neighbours share, and make it easy to talk to.</p>
+  <div class="quad">
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#2A7DE1"><rect x="9" y="9" width="14" height="14" rx="2"/><path d="M13 5v4M19 5v4M13 23v4M19 23v4M5 13h4M5 19h4M23 13h4M23 19h4"/></svg>
+      <h3>Sonae Node and 3D twin</h3>
+      <p class="adds">Makes the plan run by itself.</p>
+      <p>A small box (an ESP32) on the pump and tank measures the water level, the flow and the solar power, and runs the plan even when offline. A 3D model of the farm in the app moves with its data.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#0B3C5D"><path d="M7 5h14l4 4v18H7z"/><path d="M11 17l3 3 6-6"/></svg>
+      <h3>Water Ledger</h3>
+      <p class="adds">Makes the plan trusted.</p>
+      <p>Every delivered turn is recorded in litres, in a log nobody can secretly change. Its daily fingerprint is stored on the blockchain. Fair bills, fewer disputes.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#5E7F1F"><path d="M6 11h18l-4-4M26 21H8l4 4"/></svg>
+      <h3>Yui exchange</h3>
+      <p class="adds">Lets neighbours share.</p>
+      <p>Farmers share or sell spare water and solar energy, paid through a smart contract on the Sepolia test network. No middleman. See the next page.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#0B3C5D"><path d="M5 7h22v14H14l-6 5v-5H5z"/><path d="M10 14h12"/></svg>
+      <h3>Ask Sonae (Claude AI)</h3>
+      <p class="adds">Makes the plan easy to talk to.</p>
+      <p>Reads STEG notices from a screenshot, answers "what if" questions in Derja or French, and writes the SMS.</p>
+    </div>
+  </div>
+  <p class="small">Not this weekend: crop photo diagnosis, voice calls, an agrivoltaics calculator. The culture game is dropped.</p>
+  <div class="foot"><span>Sonae team guide</span><span>Extensions</span></div>
+</section>
+
+<!-- 7. YUI -->
+<section class="page" style="--p:.467">
+  <div class="gauge"><div class="fill"></div><div class="num">7</div></div>
+  <h1>Yui: neighbours sharing water and energy.</h1>
+  <p class="lead">Yui (<span class="jp">結</span>) is the Japanese village tradition of neighbours helping each other with farm work. In Sonae, a farmer with spare water or solar energy can share or sell it to a neighbour, with no middleman taking a cut.</p>
+  <div class="yui">
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#5E7F1F"><path d="M5 5h10l12 12-10 10L5 15z"/><circle cx="10.5" cy="10.5" r="2"/></svg>
+      <p class="step">1. List</p>
+      <p>Ali has 5,000 litres to spare this week. He posts an offer with a price.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#2A7DE1"><rect x="7" y="14" width="18" height="13" rx="2"/><path d="M11 14v-4a5 5 0 0 1 10 0v4"/></svg>
+      <p class="step">2. Pay</p>
+      <p>Sami pays with MetaMask. The money is locked in the smart contract, not sent to Ali yet.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#0B3C5D"><path d="M5 22a11 11 0 0 1 22 0"/><path d="M16 22l6-7"/></svg>
+      <p class="step">3. Deliver</p>
+      <p>The water flows. The Node's flow meter measures it, or Sami confirms it arrived.</p>
+    </div>
+    <div>
+      <svg class="icon" viewBox="0 0 32 32" stroke="#E9A400"><rect x="7" y="14" width="18" height="13" rx="2"/><path d="M11 14v-4a5 5 0 0 1 9.5-2"/></svg>
+      <p class="step">4. Release</p>
+      <p>The contract pays Ali. If nothing arrives in time, Sami gets his money back.</p>
+    </div>
+  </div>
+  <div class="cols">
+    <div>
+      <h2 style="margin-top:0">Why a blockchain here?</h2>
+      <ul>
+        <li>Nobody in the middle takes a cut.</li>
+        <li>Nobody can change the record afterwards.</li>
+        <li>The rules (lock, release, refund) are code, not promises.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Try it yourself (website)</h2>
+      <ol>
+        <li>Install the MetaMask extension in Chrome and create a test account.</li>
+        <li>Switch MetaMask to the Sepolia test network.</li>
+        <li>Get free test ETH from a Sepolia faucet.</li>
+        <li>Open the Exchange page in Sonae and press "Connect wallet".</li>
+        <li>Post an offer with one account, buy it with a second, then confirm delivery.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="box cut" style="margin-top:6mm">
+    <p><strong>Test ETH has no value.</strong> Never use a real wallet for the demo, and never share a private key, not even with the team.</p>
+  </div>
+  <p class="small" style="margin-top:4mm">Selling electricity between private people needs approval in Tunisia, so we show it on a test network.</p>
+  <div class="foot"><span>Sonae team guide</span><span>Yui exchange</span></div>
+</section>
+
+<!-- 8. HOW IT'S BUILT -->
+<section class="page" style="--p:.533">
+  <div class="gauge"><div class="fill"></div><div class="num">8</div></div>
+  <h1>How it's built.</h1>
+  <p class="lead">One plan, kept in three places: the server, the app and the Node. If one is cut off, the others keep going.</p>
+  <svg viewBox="0 0 640 330" width="100%" role="img" aria-label="Sonae architecture">
+    <defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4A5A67"/></marker></defs>
+    <g fill="none" stroke="#4A5A67" stroke-width="1.4">
+      <path d="M190 45 H226" marker-end="url(#a8)"/>
+      <path d="M410 45 H446" marker-start="url(#a8)" marker-end="url(#a8)"/>
+      <path d="M320 80 V126" marker-start="url(#a8)" marker-end="url(#a8)"/>
+      <path d="M100 130 V105 H270 V84" marker-end="url(#a8)"/>
+      <path d="M370 80 V105 H540 V126" marker-end="url(#a8)"/>
+      <path d="M410 165 H446" marker-start="url(#a8)" marker-end="url(#a8)"/>
+      <path d="M320 200 V246" marker-end="url(#a8)"/>
+      <path d="M540 250 V204" marker-end="url(#a8)"/>
+    </g>
+    <g fill="#FFFFFF" stroke="#D5DEE3" stroke-width="1.5">
+      <rect x="10" y="10" width="180" height="70" rx="8"/>
+      <rect x="450" y="10" width="180" height="70" rx="8"/>
+      <rect x="450" y="130" width="180" height="70" rx="8"/>
+      <rect x="230" y="250" width="180" height="70" rx="8"/>
+      <rect x="450" y="250" width="180" height="70" rx="8"/>
+    </g>
+    <g fill="#E6F0FB" stroke="#2A7DE1" stroke-width="2.2">
+      <rect x="230" y="10" width="180" height="70" rx="8"/>
+      <rect x="10" y="130" width="180" height="70" rx="8"/>
+      <rect x="230" y="130" width="180" height="70" rx="8"/>
+    </g>
+    <g text-anchor="middle" fill="#14232F">
+      <text x="100" y="40" font-size="13" font-weight="700">Open-Meteo</text><text x="100" y="60" font-size="11.5" fill="#4A5A67">weather: heat, sun, rain</text>
+      <text x="320" y="40" font-size="13" font-weight="700">Sonae server</text><text x="320" y="60" font-size="11.5" fill="#4A5A67">engine, ledger, AI, oracle</text>
+      <text x="540" y="40" font-size="13" font-weight="700">Claude Opus 5.5</text><text x="540" y="60" font-size="11.5" fill="#4A5A67">reads, explains, writes</text>
+      <text x="100" y="160" font-size="13" font-weight="700">Sonae Node + Wokwi</text><text x="100" y="180" font-size="11.5" fill="#4A5A67">measures, runs the plan</text>
+      <text x="320" y="160" font-size="13" font-weight="700">Website + Android app</text><text x="320" y="180" font-size="11.5" fill="#4A5A67">plan, 3D twin, Yui</text>
+      <text x="540" y="160" font-size="13" font-weight="700">Sepolia contracts</text><text x="540" y="180" font-size="11.5" fill="#4A5A67">ledger anchor, Yui escrow</text>
+      <text x="320" y="280" font-size="13" font-weight="700">Farmers' phones</text><text x="320" y="300" font-size="11.5" fill="#4A5A67">SMS in Derja, any phone</text>
+      <text x="540" y="280" font-size="13" font-weight="700">MetaMask</text><text x="540" y="300" font-size="11.5" fill="#4A5A67">signs Yui payments</text>
+    </g>
+    <g font-size="11" fill="#4A5A67">
+      <text x="150" y="99">MQTT</text>
+      <text x="328" y="108">HTTPS</text>
+      <text x="420" y="99">confirms delivery</text>
+      <text x="428" y="158" text-anchor="middle">Yui</text>
+      <text x="328" y="228">SMS</text>
+      <text x="548" y="230">signs</text>
+    </g>
+  </svg>
+  <h2>One repo for everything</h2>
+  <table class="repo">
+    <tr><td class="nowrap"><code>apps/web</code></td><td>The website (React). It installs like an app and works offline.</td></tr>
+    <tr><td class="nowrap"><code>apps/mobile</code></td><td>The same website wrapped as an Android app with Capacitor. One code, two apps.</td></tr>
+    <tr><td class="nowrap"><code>apps/api</code></td><td>The server (Node.js): plans, SMS, AI, ledger, the delivery oracle.</td></tr>
+    <tr><td class="nowrap"><code>packages/engine</code></td><td>The planner. Everyone uses this same package.</td></tr>
+    <tr><td class="nowrap"><code>firmware</code></td><td>The ESP32 code. It runs in Wokwi and on the real board.</td></tr>
+    <tr><td class="nowrap"><code>contracts</code></td><td>The smart contracts for Yui and the ledger, on Sepolia.</td></tr>
+  </table>
+  <p class="small">Code: github.com/aya-flah/Ohayo</p>
+  <div class="foot"><span>Sonae team guide</span><span>Architecture</span></div>
+</section>
+
+<!-- 9. OFFLINE + SECURITY -->
+<section class="page" style="--p:.6">
+  <div class="gauge"><div class="fill"></div><div class="num">9</div></div>
+  <h1>Works offline. Stays safe.</h1>
+  <p class="lead">A power cut often means no internet too. Sonae is built for that day.</p>
+  <div class="cols">
+    <div>
+      <h2 style="margin-top:0">Without internet</h2>
+      <ul>
+        <li>Farmers only need SMS, and SMS works without internet.</li>
+        <li>The app keeps the plan on the phone and can make a new one offline.</li>
+        <li>The manager's phone can send the SMS itself.</li>
+        <li>The Node runs the plan from its memory, with its own clock.</li>
+        <li>Everything syncs when the internet comes back.</li>
+        <li>Needs internet: fresh weather, the AI, the blockchain.</li>
+      </ul>
+      <div class="box sun" style="margin-top:5mm">
+        <p><strong>Pitch trick:</strong> switch on airplane mode during the demo. The app keeps working.</p>
+      </div>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Security</h2>
+      <ul>
+        <li>Each Node signs every message with a secret key, so fake data is rejected.</li>
+        <li>Only managers can control pumps, and every command is logged.</li>
+        <li>Safety rules live on the Node: stop the pump when the tank is full or the well runs dry.</li>
+        <li>The Claude key stays on the server, never in the app. Spending stops at $20.</li>
+        <li>The AI cannot switch pumps or send SMS by itself.</li>
+        <li>The smart contracts are tested, refund after a deadline and have an emergency pause.</li>
+        <li>We keep only a farmer's name, phone and plot (Tunisian law 2004-63).</li>
+      </ul>
+    </div>
+  </div>
+  <p class="big-line" style="margin-top:10mm">AI proposes, the engine checks, a person approves, the device enforces.</p>
+  <div class="foot"><span>Sonae team guide</span><span>Offline and security</span></div>
+</section>
+
+<!-- 10. CLAUDE -->
+<section class="page" style="--p:.667">
+  <div class="gauge"><div class="fill"></div><div class="num">10</div></div>
+  <h1>Where we use Claude.</h1>
+  <p class="lead">Claude Opus 5.5 does the language work: reading, explaining and writing. It never makes the plan itself.</p>
+  <table>
+    <tr><th style="width:30%">Feature</th><th>What it does</th><th style="width:20%">Cost</th></tr>
+    <tr><td><strong>STEG notice reader</strong></td><td>Reads a notice or a screenshot in Arabic or French and returns the cut's time and zone.</td><td>About $0.02 each</td></tr>
+    <tr><td><strong>Ask Sonae</strong></td><td>Answers "what if" questions and explains the plan in Derja or French, using the engine as a tool.</td><td>$0.15 to $0.30 a chat</td></tr>
+    <tr><td><strong>SMS writer</strong></td><td>Writes SMS templates in Derja, in Latin letters, 160 characters at most.</td><td>About $0.20, once</td></tr>
+    <tr><td><strong>Season report</strong></td><td>Writes a one-page report for the CRDA after the season or the Replay.</td><td>About $0.17 each</td></tr>
+  </table>
+  <div class="cols" style="margin-top:4mm">
+    <div class="box cut">
+      <p><strong>What the AI does not do</strong></p>
+      <ul>
+        <li>Make the plan: the engine does.</li>
+        <li>Switch pumps.</li>
+        <li>Send SMS without a person approving.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <p><strong>Budget</strong></p>
+      <p>$24 of credit, with a hard stop at $20. The demo answers are saved in advance, so the demo works even without internet.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>Claude AI</span></div>
+</section>
+
+<!-- 11. HARDWARE -->
+<section class="page" style="--p:.733">
+  <div class="gauge"><div class="fill"></div><div class="num">11</div></div>
+  <h1>The hardware, real or simulated.</h1>
+  <p class="lead">Tonight we build the Node in Wokwi, a free online ESP32 simulator. If we get the parts, we flash the same code onto the real board.</p>
+  <svg viewBox="0 0 640 250" width="100%" role="img" aria-label="Tabletop prototype">
+    <line x1="10" y1="212" x2="630" y2="212" stroke="#D5DEE3" stroke-width="1.5"/>
+    <rect x="30" y="20" width="120" height="56" rx="6" fill="#E6F0FB" stroke="#2A7DE1" stroke-width="2"/>
+    <text x="90" y="45" font-size="13" font-weight="700" text-anchor="middle" fill="#14232F">ESP32 Node</text>
+    <text x="90" y="63" font-size="10.5" text-anchor="middle" fill="#4A5A67">the brain</text>
+    <g><circle cx="48" cy="90" r="5" fill="#5E7F1F"/><circle cx="64" cy="90" r="5" fill="#D6342C"/><circle cx="80" cy="90" r="5" fill="#E9A400"/><rect x="94" y="84" width="14" height="12" rx="2" fill="#14232F"/></g>
+    <text x="30" y="113" font-size="10.5" fill="#4A5A67">LEDs + cut button</text>
+    <rect x="30" y="124" width="76" height="20" rx="4" fill="#FFFFFF" stroke="#14232F" stroke-width="1.5"/>
+    <text x="68" y="138" font-size="10" text-anchor="middle" fill="#14232F">power bank</text>
+    <rect x="36" y="160" width="90" height="52" rx="3" fill="#FFFFFF" stroke="#2A7DE1" stroke-width="2"/>
+    <rect x="40" y="178" width="82" height="30" fill="#E6F0FB"/>
+    <text x="81" y="232" font-size="10.5" text-anchor="middle" fill="#4A5A67">lower bucket (the well)</text>
+    <path d="M126 196 H150" stroke="#2A7DE1" stroke-width="2.5"/>
+    <rect x="150" y="186" width="26" height="20" rx="2" fill="#14232F"/>
+    <text x="163" y="232" font-size="10.5" text-anchor="middle" fill="#4A5A67">12 V pump</text>
+    <path d="M163 186 V80 H250" fill="none" stroke="#2A7DE1" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <g stroke="#14232F" stroke-width="2" fill="none"><path d="M258 212 L270 130 M332 212 L320 130 M262 180 H328"/></g>
+    <rect x="250" y="44" width="90" height="86" rx="6" fill="#FFFFFF" stroke="#2A7DE1" stroke-width="2.5"/>
+    <rect x="254" y="66" width="82" height="60" rx="3" fill="#E6F0FB"/>
+    <path d="M150 34 H285" fill="none" stroke="#4A5A67" stroke-width="1.3" stroke-dasharray="3 3"/>
+    <text x="164" y="28" font-size="10" fill="#4A5A67">wires to every sensor</text>
+    <rect x="285" y="32" width="20" height="12" rx="2" fill="#14232F"/>
+    <text x="350" y="40" font-size="10.5" fill="#4A5A67">HC-SR04 reads the level</text>
+    <path d="M340 112 H392 V190 H610" fill="none" stroke="#2A7DE1" stroke-width="3"/>
+    <rect x="384" y="124" width="16" height="22" rx="2" fill="#FFFFFF" stroke="#14232F" stroke-width="1.8"/>
+    <text x="408" y="139" font-size="10.5" fill="#4A5A67">YF-S401 counts litres</text>
+    <circle cx="392" cy="166" r="7" fill="#FFFFFF" stroke="#14232F" stroke-width="2"/>
+    <line x1="387" y1="166" x2="397" y2="166" stroke="#14232F" stroke-width="2"/>
+    <text x="408" y="170" font-size="10.5" fill="#4A5A67">servo valve</text>
+    <g fill="#EEF4E2" stroke="#5E7F1F" stroke-width="1.8"><rect x="440" y="198" width="50" height="13" rx="2"/><rect x="500" y="198" width="50" height="13" rx="2"/><rect x="560" y="198" width="50" height="13" rx="2"/></g>
+    <text x="525" y="232" font-size="10.5" text-anchor="middle" fill="#4A5A67">crop plots</text>
+    <path d="M520 40 L600 40 L588 82 L508 82 Z" fill="#E6F0FB" stroke="#0B3C5D" stroke-width="2"/>
+    <path d="M534 40 L522 82 M548 40 L536 82 M562 40 L550 82 M576 40 L564 82 M590 40 L578 82 M512 61 H594" stroke="#0B3C5D" stroke-width="1"/>
+    <text x="554" y="102" font-size="10.5" text-anchor="middle" fill="#4A5A67">6 V solar + INA219</text>
+  </svg>
+  <table style="margin-top:3mm">
+    <tr><th style="width:34%">Part</th><th>Its job</th></tr>
+    <tr><td>ESP32</td><td>The brain: reads the sensors and runs the plan</td></tr>
+    <tr><td>HC-SR04</td><td>Measures how full the tank is</td></tr>
+    <tr><td>YF-S401</td><td>Counts the litres that flow to the plots</td></tr>
+    <tr><td>INA219 + 6 V solar panel</td><td>Measures the solar power available</td></tr>
+    <tr><td>DS3231</td><td>Keeps the time when there is no internet</td></tr>
+    <tr><td>12 V pump + relay</td><td>Lifts water to the tank, switched on and off by the ESP32</td></tr>
+    <tr><td>Servo + small valve</td><td>Opens the gravity line to the plots</td></tr>
+    <tr><td>LEDs + button + power bank</td><td>Show the grid and pump state; the button fakes a cut; the power bank keeps the Node alive</td></tr>
+  </table>
+  <div class="box">
+    <p><strong>The magic moment:</strong> unplug the 12 V adapter. That is a real power cut. The pump stops, the Node stays on, sees the cut and opens the valve, and the water keeps flowing by gravity. In the app, the 3D farm shows the same thing live.</p>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>Hardware</span></div>
+</section>
+
+<!-- 12. REPLAY -->
+<section class="page" style="--p:.8">
+  <div class="gauge"><div class="fill"></div><div class="num">12</div></div>
+  <h1>The winning screen: Summer 2026 Replay.</h1>
+  <p class="lead">We replay Kairouan's real summer 2026 weather twice, without Sonae and with Sonae. The jury sees the difference on a summer they lived through.</p>
+  <div class="wire">
+    <div class="strip" id="strip"></div>
+    <div class="cap">In the app, this strip shows June to September 2026 daily highs from real weather data, with modelled power cuts in red.</div>
+    <div class="twocol">
+      <div>
+        <div class="colhead" style="color:#4A5A67">Without Sonae</div>
+        <div class="kpi"><span>Days without enough water</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Water delivered, % of need</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Plots under stress</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Diesel, litres and TND</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Energy used at peak hours</span><span>from the simulation</span></div>
+      </div>
+      <div>
+        <div class="colhead" style="color:#2A7DE1">With Sonae</div>
+        <div class="kpi"><span>Days without enough water</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Water delivered, % of need</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Plots under stress</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Diesel, litres and TND</span><span>from the simulation</span></div>
+        <div class="kpi"><span>Energy used at peak hours</span><span>from the simulation</span></div>
+      </div>
+    </div>
+  </div>
+  <h2>Three rules for the numbers</h2>
+  <ul>
+    <li>Only numbers that come out of our simulation go on the slides. No invented figures.</li>
+    <li>STEG publishes no outage log, so the cuts are modelled, and we say so on screen.</li>
+    <li>A judge can change one setting, like the tank size, and rerun it live.</li>
+  </ul>
+  <p class="small" style="margin-top:4mm">This picture only shows the layout. The bars in it are not real data.</p>
+  <div class="foot"><span>Sonae team guide</span><span>Summer 2026 Replay</span></div>
+</section>
+
+<!-- 13. WHO DOES WHAT -->
+<section class="page" style="--p:.867">
+  <div class="gauge"><div class="fill"></div><div class="num">13</div></div>
+  <h1>Who does what, and when.</h1>
+  <div class="roles">
+    <div class="r"><h3>P1, engine and data</h3><p>The planner, the weather data, the Summer Replay.</p><p class="who">Name: ______________________</p></div>
+    <div class="r"><h3>P2, app</h3><p>Website and Android app, screens, offline mode, login, the Exchange page, the APK.</p><p class="who">Name: ______________________</p></div>
+    <div class="r"><h3>P3, hardware and 3D</h3><p>Wokwi, the ESP32 code, MQTT, the 3D twin.</p><p class="who">Name: ______________________</p></div>
+    <div class="r"><h3>P4, AI, blockchain and pitch</h3><p>Claude features, the Sepolia contracts and oracle, the deck, presenting.</p><p class="who">Name: ______________________</p></div>
+  </div>
+  <h2>The timeline</h2>
+  <div class="sched">
+    <div class="when">Sat 16:00</div><div>Each part works on its own</div>
+    <div class="when">Sat 19:30</div><div>The parts are connected for the first time</div>
+    <div class="when">Sat 21:00</div><div class="gate">Checkpoint 1: a plan from real weather, Wokwi live</div>
+    <div class="when">Sat 21:30</div><div>Finish every Must feature by 00:30</div>
+    <div class="when">Night</div><div>Sleep in two shifts; the presenter sleeps first</div>
+    <div class="when">Sun 09:30</div><div class="gate">Checkpoint 2: full run-through with the mentors</div>
+    <div class="when">Sun 10:30</div><div class="gate">Feature freeze</div>
+    <div class="when">Sun 11:30</div><div class="gate">Submit, 30 minutes early</div>
+    <div class="when">Sun 12:30</div><div>Pre-jury; finalist pitches at 15:00</div>
+  </div>
+  <div class="box cut">
+    <p><strong>Three hard rules</strong></p>
+    <ol>
+      <li>After 10:30, bug fixes only.</li>
+      <li>Submit at 11:30, not at 11:59.</li>
+      <li>Only numbers from our simulation go in the pitch.</li>
+    </ol>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>Team and timeline</span></div>
+</section>
+
+<!-- 14. PITCH -->
+<section class="page" style="--p:.933">
+  <div class="gauge"><div class="fill"></div><div class="num">14</div></div>
+  <h1>The pitch in eight steps.</h1>
+  <p class="lead">Five minutes: most of it on the plan and the Replay, a little on the extensions.</p>
+  <div class="pitch">
+    <div class="at">0:00</div><div><strong>Hook.</strong> "July 2026, Kairouan: pepper plots rotted when irrigation stopped."</div>
+    <div class="at">0:30</div><div><strong>Insight.</strong> Electricity is hard to store; water is easy. The real problem is timing.</div>
+    <div class="at">1:00</div><div><strong>Solution.</strong> Sonae turns the tank into a battery: plan, SMS, gravity.</div>
+    <div class="at">1:30</div><div><strong>Live demo.</strong> STEG screenshot, new plan, press the cut, water by gravity, the SMS, the ledger. Then airplane mode.</div>
+    <div class="at">3:00</div><div><strong>Replay.</strong> Summer 2026, without and with Sonae.</div>
+    <div class="at">3:45</div><div><strong>Extensions.</strong> Node, Ledger, Yui, Ask Sonae.</div>
+    <div class="at">4:15</div><div><strong>Business.</strong> GDAs pay a subscription and buy the Node. Partners: CRDA, UTAP, STEG. A pilot before summer 2027.</div>
+    <div class="at">4:45</div><div><strong>Close.</strong> "Sonae areba urei nashi: prepared, nothing to fear." Then, in Derja: "Coupure? El ma deja fou9."</div>
+  </div>
+  <h2>Questions the jury will ask</h2>
+  <table>
+    <tr><th style="width:36%">Question</th><th>Short answer</th></tr>
+    <tr><td>What if there's no high tank?</td><td>We still move pumping away from cut hours and peak hours.</td></tr>
+    <tr><td>How do you know about cuts in advance?</td><td>STEG announces planned cuts and the AI reads them. A water reserve covers surprise cuts.</td></tr>
+    <tr><td>Why a blockchain?</td><td>A record nobody can change, and payments with no middleman.</td></tr>
+    <tr><td>What if the AI is wrong?</td><td>The AI never makes the plan. The engine does, and a person approves.</td></tr>
+    <tr><td>What if farmers have no smartphone?</td><td>They only need SMS.</td></tr>
+  </table>
+  <div class="foot"><span>Sonae team guide</span><span>The pitch</span></div>
+</section>
+
+<!-- 15. GLOSSARY -->
+<section class="page" style="--p:1">
+  <div class="gauge"><div class="fill"></div><div class="num">15</div></div>
+  <h1>Words we use.</h1>
+  <dl class="gloss">
+    <div><dt>Bansui (<span class="jp">番水</span>)</dt><dd>The Japanese practice of taking turns for irrigation water. Our turn scheduler copies it.</dd></div>
+    <div><dt>CRDA</dt><dd>The regional agriculture office (Commissariat Régional au Développement Agricole).</dd></div>
+    <div><dt>Derja</dt><dd>Tunisian Arabic. Our SMS use Latin letters: 160 characters fit in one SMS, against 70 in Arabic script.</dd></div>
+    <div><dt>ESP32</dt><dd>A small, cheap computer board with Wi-Fi. The brain of the Node.</dd></div>
+    <div><dt>Escrow</dt><dd>Money locked by the smart contract until the delivery is confirmed.</dd></div>
+    <div><dt>ET0</dt><dd>How much water plants lose to the air in a day. Hot, sunny and windy days mean more.</dd></div>
+    <div><dt>GDA</dt><dd>A farmers' association that runs a shared well, pump and pipe network.</dd></div>
+    <div><dt>Gravity irrigation</dt><dd>Water flowing down from a high tank, with no pump.</dd></div>
+    <div><dt>Kc</dt><dd>A crop's thirst factor at its current growth stage.</dd></div>
+    <div><dt>Ledger</dt><dd>A list of records that nobody can secretly change.</dd></div>
+    <div><dt>MetaMask</dt><dd>A browser wallet. It signs blockchain payments.</dd></div>
+    <div><dt>MQTT</dt><dd>A light way for devices to send messages to a server.</dd></div>
+    <div><dt>Oracle</dt><dd>The trusted meter (our Node and server) that tells the contract what was delivered.</dd></div>
+    <div><dt>PWA</dt><dd>A website that installs like an app and works offline.</dd></div>
+    <div><dt>Sepolia</dt><dd>Ethereum's free test network. Its test ETH has no value.</dd></div>
+    <div><dt>Smart contract</dt><dd>A program on the blockchain that holds the rules and the money.</dd></div>
+    <div><dt>Sonae (<span class="jp">備え</span>)</dt><dd>"Being prepared". Our name.</dd></div>
+    <div><dt>STEG</dt><dd>Tunisia's national electricity and gas company.</dd></div>
+    <div><dt>UTAP</dt><dd>The Tunisian union of farmers and fishers.</dd></div>
+    <div><dt>Wokwi</dt><dd>A free online simulator for ESP32 and Arduino boards.</dd></div>
+    <div><dt>Yui (<span class="jp">結</span>)</dt><dd>The Japanese village tradition of neighbours helping each other. Our sharing feature.</dd></div>
+  </dl>
+  <div class="box" style="margin-top:4mm">
+    <p><strong>Need more detail?</strong> The full plan is the doc "Sonae Master Plan" (ask the team lead for the link). The code is at github.com/aya-flah/Ohayo.</p>
+  </div>
+  <div class="foot"><span>Sonae team guide</span><span>Glossary</span></div>
+</section>
+
+<script>
+  // Layout-only heat strip for the Replay wireframe (not data).
+  (function () {
+    var strip = document.getElementById('strip');
+    if (!strip) return;
+    var heights = [40,48,55,52,60,66,58,62,70,74,68,72,80,86,78,82,90,95,88,84,92,96,90,86,80,84,88,92,98,94,90,86,82,88,92,96,100,94,90,86,80,76,82,86,90,84,78,72,70,66,62,68,64,60,56,52,58,54,50,46,44];
+    var cuts = [17,21,29,36,37,44];
+    heights.forEach(function (h, i) {
+      var s = document.createElement('span');
+      s.style.height = h + '%';
+      if (cuts.indexOf(i) !== -1) s.className = 'cutday';
+      else if (h >= 86) s.className = 'hot';
+      strip.appendChild(s);
+    });
+  })();
+</script>
+</body>
+</html>

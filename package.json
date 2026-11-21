@@ -1,0 +1,27 @@
+{
+  "name": "sonae",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sonae (備え): outage-proof irrigation planning for Tunisian GDAs, with water/energy sharing on Sepolia.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:api": "npm run dev -w apps/api",
+    "test": "npm run test -w packages/engine",
+    "build:web": "npm run build -w apps/web",
+    "mobile:sync": "npm run build -w apps/web && npm run sync -w apps/mobile",
+    "mobile:open": "npm run open -w apps/mobile",
+    "contracts:install": "npm --prefix contracts install",
+    "contracts:test": "npm --prefix contracts test",
+    "contracts:node": "npm --prefix contracts run node",
+    "contracts:deploy:local": "npm --prefix contracts run deploy:local",
+    "contracts:deploy:sepolia": "npm --prefix contracts run deploy:sepolia",
+    "weather:fetch": "node data/fetch-weather.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

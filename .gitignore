@@ -1,0 +1,48 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+build/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# env and secrets: never commit keys
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# contracts
+contracts/cache/
+contracts/artifacts/
+contracts/typechain-types/
+contracts/ignition/deployments/chain-31337/
+
+# android (Capacitor) build outputs
+apps/mobile/android/.gradle/
+apps/mobile/android/build/
+apps/mobile/android/app/build/
+apps/mobile/android/local.properties
+apps/mobile/android/.idea/
+apps/mobile/android/captures/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# firmware
+firmware/.pio/
+firmware/.vscode/
+
+# api data
+apps/api/data/*.db
+apps/api/data/*.db-*
+
+# os / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.log
