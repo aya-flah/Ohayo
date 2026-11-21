@@ -1,5 +1,11 @@
 {
-  "chains": {},
+  "chains": {
+    "11155111": {
+      "exchange": "0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D",
+      "ledger": "0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA",
+      "block": 12184729
+    }
+  },
   "exchangeAbi": [
     {
       "inputs": [

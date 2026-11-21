@@ -13,7 +13,10 @@ async function main() {
   const oracle = process.env.ORACLE_ADDRESS && ethers.isAddress(process.env.ORACLE_ADDRESS) ? process.env.ORACLE_ADDRESS : deployer.address;
   const { chainId } = await ethers.provider.getNetwork();
 
-  console.log(`Deploying to ${network.name} (chain ${chainId}) from ${deployer.address}`);
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log(`Deploying to ${network.name} (chain ${chainId}) from ${deployer.address} (${ethers.formatEther(balance)} ETH)`);
+  if (balance === 0n) throw new Error(`${deployer.address} has no ETH on ${network.name}. Get test ETH from a faucet first.`);
+
   const exchange = await ethers.deployContract("SonaeExchange", [deployer.address, oracle]);
   await exchange.waitForDeployment();
   const ledger = await ethers.deployContract("LedgerAnchor", [deployer.address, oracle]);
@@ -25,6 +28,8 @@ async function main() {
     chainId: Number(chainId),
     exchange: await exchange.getAddress(),
     ledger: await ledger.getAddress(),
+    exchangeTx: exchange.deploymentTransaction()?.hash ?? null,
+    ledgerTx: ledger.deploymentTransaction()?.hash ?? null,
     deployer: deployer.address,
     oracle,
     block,
@@ -35,6 +40,10 @@ async function main() {
   fs.writeFileSync(path.join(dir, `${network.name}.json`), JSON.stringify(record, null, 2));
   console.log("SonaeExchange:", record.exchange);
   console.log("LedgerAnchor: ", record.ledger);
+  if (record.chainId === 11155111) {
+    console.log(`Etherscan: https://sepolia.etherscan.io/address/${record.exchange}`);
+    console.log(`           https://sepolia.etherscan.io/address/${record.ledger}`);
+  }
 
   await writeWebBundle();
 }

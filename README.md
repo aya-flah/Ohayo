@@ -47,6 +47,15 @@ npm run contracts:deploy:sepolia        # needs contracts/.env (test wallet + RP
 
 Then open the Yui page with MetaMask on Sepolia (or on `localhost:8545`, chain 31337).
 
+**Live on Sepolia** since 21 November 2026, with the source verified on Sourcify:
+
+| Contract | Address | Source |
+| --- | --- | --- |
+| `SonaeExchange` (Yui escrow) | [`0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D`](https://sepolia.etherscan.io/address/0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D) | [Sourcify](https://repo.sourcify.dev/11155111/0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D) |
+| `LedgerAnchor` | [`0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA`](https://sepolia.etherscan.io/address/0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA) | [Sourcify](https://repo.sourcify.dev/11155111/0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA) |
+
+The deployer wallet `0x60Ea5C4b78A5b1b613Bc6B2f7dD093c3f854F0AD` is the admin and the delivery oracle. To check its balance, run `npm --prefix contracts run whoami:sepolia`. To publish the source again, run `npm --prefix contracts run verify:sepolia`; it also verifies on Etherscan when `ETHERSCAN_API_KEY` is set.
+
 ### Android app
 
 ```bash

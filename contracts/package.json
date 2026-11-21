@@ -9,6 +9,8 @@
     "node": "hardhat node",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "whoami:sepolia": "hardhat run scripts/whoami.ts --network sepolia",
+    "verify:sepolia": "hardhat run scripts/verify.ts --network sepolia",
     "export": "hardhat run scripts/export.ts"
   },
   "devDependencies": {

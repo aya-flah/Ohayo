@@ -114,7 +114,7 @@ function Yui() {
     try {
       const hash = await fn();
       setToast(`${label}: waiting for the block…`);
-      await waitForTransactionReceipt(wagmiConfig, { hash, chainId });
+      await waitForTransactionReceipt(wagmiConfig, { hash, chainId: chainId as (typeof wagmiConfig.chains)[number]['id'] | undefined });
       setToast(`${label}: done.`);
       tap('medium');
       offersQ.refetch();

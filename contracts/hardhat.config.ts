@@ -21,7 +21,10 @@ const config: HardhatUserConfig = {
       ? { sepolia: { url: SEPOLIA_RPC_URL, accounts: [DEPLOYER_PRIVATE_KEY], chainId: 11155111 } }
       : {}),
   },
-  etherscan: { apiKey: ETHERSCAN_API_KEY ?? "" },
+  // Etherscan verification needs a free API key. Sourcify needs none, but the plugin still calls
+  // Sourcify's removed v1 API, so scripts/verify.ts talks to Sourcify v2 itself.
+  etherscan: { enabled: Boolean(ETHERSCAN_API_KEY), apiKey: ETHERSCAN_API_KEY ?? "" },
+  sourcify: { enabled: false },
 };
 
 export default config;
