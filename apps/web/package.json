@@ -1,0 +1,44 @@
+{
+  "name": "@sonae/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Sonae website (PWA): the 48-hour plan, 3D twin, Yui exchange and Summer Replay. Same build powers the Android app.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@fontsource/shippori-mincho-b1": "^5.2.0",
+    "@fontsource/zen-kaku-gothic-new": "^5.2.0",
+    "@react-three/drei": "^10.7.0",
+    "@react-three/fiber": "^9.3.0",
+    "@sonae/engine": "0.1.0",
+    "@sonae/shared": "0.1.0",
+    "@tanstack/react-query": "^5.90.0",
+    "motion": "^12.23.0",
+    "mqtt": "^5.14.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.9.0",
+    "three": "^0.180.0",
+    "viem": "^2.37.0",
+    "wagmi": "^2.17.0",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.0",
+    "vite-plugin-pwa": "^1.0.0"
+  }
+}

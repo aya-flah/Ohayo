@@ -1,0 +1,225 @@
+@import "tailwindcss";
+@import "./palette.css";
+@import "@fontsource/zen-kaku-gothic-new/latin-400.css";
+@import "@fontsource/zen-kaku-gothic-new/latin-500.css";
+@import "@fontsource/zen-kaku-gothic-new/latin-700.css";
+@import "@fontsource/shippori-mincho-b1/latin-600.css";
+@import "@fontsource/shippori-mincho-b1/latin-800.css";
+
+/* Semantic tokens: components use these, never raw palette steps. */
+:root {
+  --bg: oklch(97.5% 0.006 234);
+  --surface: #ffffff;
+  --surface-2: oklch(95.5% 0.01 234);
+  --ink: var(--color-stone-950);
+  --ink-2: var(--color-stone-600);
+  --ink-3: var(--color-stone-400);
+  --line: oklch(91% 0.012 234);
+  --accent: var(--color-water-600);
+  --accent-strong: var(--color-water-700);
+  --accent-soft: oklch(94% 0.03 245);
+  --on-accent: #ffffff;
+  --water: var(--color-water-500);
+  --water-soft: var(--color-water-100);
+  --solar: var(--color-sun-300);
+  --solar-soft: oklch(95% 0.05 85);
+  --cut: var(--color-cut-500);
+  --cut-soft: oklch(95% 0.03 30);
+  --ok: var(--color-olive-600);
+  --ok-soft: oklch(95% 0.05 126);
+  --grid: var(--color-water-700);
+  --diesel: var(--color-stone-700);
+
+  /* Motion tokens (vectorlab motion rules): 100 / 150 / 200 / 300 ms only for chrome. */
+  --motion-100: 100ms;
+  --motion-150: 150ms;
+  --motion-200: 200ms;
+  --motion-300: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(17% 0.02 245);
+    --surface: oklch(21% 0.022 245);
+    --surface-2: oklch(25% 0.024 245);
+    --ink: var(--color-stone-50);
+    --ink-2: var(--color-stone-300);
+    --ink-3: var(--color-stone-500);
+    --line: oklch(30% 0.022 245);
+    --accent: var(--color-water-300);
+    --accent-strong: var(--color-water-200);
+    --accent-soft: oklch(28% 0.06 255);
+    --on-accent: var(--color-water-950);
+    --water: var(--color-water-400);
+    --water-soft: oklch(32% 0.08 250);
+    --solar: var(--color-sun-200);
+    --solar-soft: oklch(30% 0.06 70);
+    --cut: var(--color-cut-400);
+    --cut-soft: oklch(28% 0.07 28);
+    --ok: var(--color-olive-300);
+    --ok-soft: oklch(28% 0.06 126);
+    --grid: var(--color-water-300);
+    --diesel: var(--color-stone-300);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: oklch(17% 0.02 245);
+  --surface: oklch(21% 0.022 245);
+  --surface-2: oklch(25% 0.024 245);
+  --ink: var(--color-stone-50);
+  --ink-2: var(--color-stone-300);
+  --ink-3: var(--color-stone-500);
+  --line: oklch(30% 0.022 245);
+  --accent: var(--color-water-300);
+  --accent-strong: var(--color-water-200);
+  --accent-soft: oklch(28% 0.06 255);
+  --on-accent: var(--color-water-950);
+  --water: var(--color-water-400);
+  --water-soft: oklch(32% 0.08 250);
+  --solar: var(--color-sun-200);
+  --solar-soft: oklch(30% 0.06 70);
+  --cut: var(--color-cut-400);
+  --cut-soft: oklch(28% 0.07 28);
+  --ok: var(--color-olive-300);
+  --ok-soft: oklch(28% 0.06 126);
+  --grid: var(--color-water-300);
+  --diesel: var(--color-stone-300);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "Zen Kaku Gothic New", "Yu Gothic", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Shippori Mincho B1", "Yu Mincho", "Noto Serif JP", Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-water: var(--water);
+  --color-water-soft: var(--water-soft);
+  --color-solar: var(--solar);
+  --color-solar-soft: var(--solar-soft);
+  --color-danger: var(--cut);
+  --color-danger-soft: var(--cut-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-grid: var(--grid);
+  --color-diesel: var(--diesel);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+}
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 10px;
+    padding: 0.55rem 0.95rem;
+    font-weight: 500;
+    font-size: 14px;
+    transition:
+      background-color var(--motion-150) var(--ease-out),
+      border-color var(--motion-150) var(--ease-out),
+      opacity var(--motion-150) var(--ease-out);
+  }
+  .btn-primary {
+    background: var(--accent-strong);
+    color: var(--on-accent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent);
+  }
+  .btn-quiet {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--ink-3);
+  }
+  .btn:disabled {
+    opacity: 0.5;
+  }
+  .field {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .field:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .label {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

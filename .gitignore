@@ -41,6 +41,9 @@ firmware/.vscode/
 apps/api/data/*.db
 apps/api/data/*.db-*
 
+# local tool config
+.claude/
+
 # os / editors
 .DS_Store
 Thumbs.db

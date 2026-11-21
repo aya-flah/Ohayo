@@ -1,0 +1,83 @@
+/*
+ * Sonae palette: generated with the ui-color-palette tools (OKLCH, Tailwind
+ * scale, algorithm v3) from five source colours:
+ *   water #2A7DE1 · olive #5E7F1F · sun #E9A400 · cut #D6342C · stone #5F6F78
+ * "Cut" red is reserved for STEG power cuts and critical alerts.
+ */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* water */
+  --color-water-source: oklch(59% 0.171 255);
+  --color-water-950: oklch(16% 0.111 264);
+  --color-water-900: oklch(24% 0.131 263);
+  --color-water-800: oklch(32% 0.147 261);
+  --color-water-700: oklch(40% 0.158 259);
+  --color-water-600: oklch(48% 0.166 256);
+  --color-water-500: oklch(56% 0.168 255);
+  --color-water-400: oklch(64% 0.166 255);
+  --color-water-300: oklch(71% 0.151 254);
+  --color-water-200: oklch(78% 0.115 246);
+  --color-water-100: oklch(85% 0.085 232);
+  --color-water-50: oklch(93% 0.063 207);
+
+  /* olive */
+  --color-olive-source: oklch(55% 0.127 126);
+  --color-olive-950: oklch(16% 0.049 136);
+  --color-olive-900: oklch(24% 0.068 132);
+  --color-olive-800: oklch(32% 0.088 130);
+  --color-olive-700: oklch(40% 0.106 128);
+  --color-olive-600: oklch(47% 0.123 126);
+  --color-olive-500: oklch(55% 0.124 126);
+  --color-olive-400: oklch(64% 0.124 127);
+  --color-olive-300: oklch(71% 0.118 126);
+  --color-olive-200: oklch(79% 0.112 127);
+  --color-olive-100: oklch(88% 0.105 126);
+  --color-olive-50: oklch(95% 0.094 126);
+
+  /* sun */
+  --color-sun-source: oklch(76% 0.159 78);
+  --color-sun-950: oklch(16% 0.067 29);
+  --color-sun-900: oklch(24% 0.080 38);
+  --color-sun-800: oklch(32% 0.091 46);
+  --color-sun-700: oklch(40% 0.102 54);
+  --color-sun-600: oklch(48% 0.112 61);
+  --color-sun-500: oklch(56% 0.124 67);
+  --color-sun-400: oklch(64% 0.137 72);
+  --color-sun-300: oklch(72% 0.149 78);
+  --color-sun-200: oklch(79% 0.141 77);
+  --color-sun-100: oklch(87% 0.128 82);
+  --color-sun-50: oklch(93% 0.108 94);
+
+  /* cut */
+  --color-cut-source: oklch(57% 0.200 28);
+  --color-cut-950: oklch(20% 0.084 29);
+  --color-cut-900: oklch(28% 0.116 29);
+  --color-cut-800: oklch(35% 0.145 29);
+  --color-cut-700: oklch(41% 0.172 29);
+  --color-cut-600: oklch(48% 0.195 28);
+  --color-cut-500: oklch(55% 0.195 28);
+  --color-cut-400: oklch(63% 0.193 28);
+  --color-cut-300: oklch(71% 0.181 28);
+  --color-cut-200: oklch(75% 0.143 29);
+  --color-cut-100: oklch(81% 0.104 31);
+  --color-cut-50: oklch(88% 0.065 38);
+
+  /* stone */
+  --color-stone-source: oklch(53% 0.024 233);
+  --color-stone-950: oklch(15% 0.017 234);
+  --color-stone-900: oklch(24% 0.019 232);
+  --color-stone-800: oklch(32% 0.021 231);
+  --color-stone-700: oklch(40% 0.022 233);
+  --color-stone-600: oklch(47% 0.023 234);
+  --color-stone-500: oklch(55% 0.024 232);
+  --color-stone-400: oklch(64% 0.023 232);
+  --color-stone-300: oklch(71% 0.022 236);
+  --color-stone-200: oklch(79% 0.021 233);
+  --color-stone-100: oklch(87% 0.020 233);
+  --color-stone-50: oklch(95% 0.018 234);
+}
