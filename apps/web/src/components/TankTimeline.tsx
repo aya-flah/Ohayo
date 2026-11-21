@@ -1,10 +1,7 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { localHour, toMs, type Plan, type PlanInput } from '@sonae/shared';
 import { clock, dayLabel } from '../lib/format';
 
-const W = 960;
-const X0 = 64;
-const X1 = 944;
 const PUMP = { y: 22, h: 26 };
 const TANK = { y: 70, h: 128 };
 const TURNS = { y: 214, h: 22 };
@@ -20,6 +17,28 @@ interface Props {
 /** The 48-hour picture: pump hours by energy, the tank curve, the turns and the STEG cut. */
 export function TankTimeline({ plan, input, cursor, onCursor }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  // Lay the chart out at its real pixel width so text stays 11-12 px on phones.
+  const [W, setW] = useState(960);
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (el) setW(Math.max(320, Math.round(el.getBoundingClientRect().width)));
+  }, []);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => setW(Math.max(320, Math.round(el.getBoundingClientRect().width)));
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+  const narrow = W < 620;
+  const X0 = narrow ? 48 : 64;
+  const X1 = W - 16;
   const H = plan.pump.length;
   const slotW = (X1 - X0) / H;
   const cap = input.gda.tank.capacityM3;
@@ -46,11 +65,11 @@ export function TankTimeline({ plan, input, cursor, onCursor }: Props) {
       line: `M${pts.join('L')}`,
       area: `M${x(0)},${TANK.y + TANK.h}L${pts.join('L')}L${x(plan.tank.length - 1)},${TANK.y + TANK.h}Z`,
     };
-  }, [plan, cap]);
+  }, [plan, cap, W]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ticks = plan.pump
     .map((s, i) => ({ i, h: localHour(s.time) }))
-    .filter((t) => t.h % 6 === 0);
+    .filter((t) => t.h % (narrow ? 12 : 6) === 0);
   const midnights = plan.pump.map((s, i) => ({ i, s })).filter(({ s }) => localHour(s.time) === 0);
 
   const levelAt = (c: number) => {
@@ -77,10 +96,11 @@ export function TankTimeline({ plan, input, cursor, onCursor }: Props) {
     : null;
 
   return (
+    <div ref={wrapRef} className="w-full min-w-0">
     <svg
       ref={svgRef}
       viewBox={`0 0 ${W} 296`}
-      className="w-full h-auto touch-none select-none"
+      className="block h-auto w-full touch-none select-none"
       role="img"
       aria-label={`48-hour plan: pump hours by energy source, tank level and irrigation turns${cutLabel ? `, ${cutLabel}` : ''}`}
       onPointerDown={(e) => {
@@ -206,6 +226,7 @@ export function TankTimeline({ plan, input, cursor, onCursor }: Props) {
         <circle cx={x(cursor)} cy={yLevel(levelAt(cursor))} r={6} fill="var(--surface)" stroke="var(--water)" strokeWidth="3" />
       </g>
     </svg>
+    </div>
   );
 }
 

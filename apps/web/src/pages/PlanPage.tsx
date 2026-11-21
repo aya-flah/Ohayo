@@ -132,8 +132,8 @@ export default function PlanPage() {
 
       {/* The one orchestrated moment: scrub or play the 48 hours and watch the tank. */}
       <section className="card mt-6 p-4 md:p-6">
-        <div className="grid items-center gap-6 lg:grid-cols-[1fr_150px]">
-          <div>
+        <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_150px]">
+          <div className="min-w-0">
             <TankTimeline plan={plan} input={input} cursor={cursor} onCursor={(c) => { setPlaying(false); setCursor(c); }} />
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-ink-2">
               <button
