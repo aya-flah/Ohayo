@@ -1,0 +1,22 @@
+{
+  "name": "@sonae/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Sonae's 48-hour pump-ahead planner and the Summer Replay simulator. Pure TypeScript.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@sonae/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

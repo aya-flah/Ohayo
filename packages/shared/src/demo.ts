@@ -18,7 +18,9 @@ export const DEMO_GDA: GDA = {
   diesel: { available: true, litersPerHour: 5, costTNDPerLiter: 2.2 },
   // Demo tariff: check real STEG agricultural tariffs before quoting.
   tariff: { gridTNDPerKWh: 0.22, peakTNDPerKWh: 0.32, peakHours: [13, 17] },
-  gravityFlowM3h: 60,
+  // Matched to the pump: if turns drew faster than the pump fills, the tank
+  // could never be full when a cut starts.
+  gravityFlowM3h: 40,
 };
 
 export const DEMO_FARMERS: Farmer[] = [
@@ -40,18 +42,20 @@ const DAY = 24 * HOUR;
 export function demoPlots(nowMs: number): Plot[] {
   const planted = (daysAgo: number) => toTunisISO(nowMs - daysAgo * DAY);
   return [
-    { id: 'p1', farmerId: 'f-hedi', name: 'Plot 1', crop: 'tomato', areaM2: 6000, plantedOn: planted(80), method: 'drip', fairnessDebt: 0 },
-    { id: 'p2', farmerId: 'f-amira', name: 'Plot 2', crop: 'pepper', areaM2: 5000, plantedOn: planted(50), method: 'drip', fairnessDebt: 0 },
-    { id: 'p3', farmerId: 'f-sami', name: 'Plot 3', crop: 'melon', areaM2: 4000, plantedOn: planted(70), method: 'furrow', fairnessDebt: 0 },
-    { id: 'p4', farmerId: 'f-ali', name: 'Plot 4', crop: 'olive', areaM2: 10000, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
-    { id: 'p5', farmerId: 'f-nour', name: 'Plot 5', crop: 'tomato', areaM2: 5000, plantedOn: planted(40), method: 'furrow', fairnessDebt: 0 },
-    { id: 'p6', farmerId: 'f-karim', name: 'Plot 6', crop: 'potato', areaM2: 4000, plantedOn: planted(60), method: 'furrow', fairnessDebt: 0 },
-    { id: 'p7', farmerId: 'f-leila', name: 'Plot 7', crop: 'pepper', areaM2: 4000, plantedOn: planted(95), method: 'drip', fairnessDebt: 0 },
-    { id: 'p8', farmerId: 'f-youssef', name: 'Plot 8', crop: 'olive', areaM2: 8000, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
-    { id: 'p9', farmerId: 'f-mounir', name: 'Plot 9', crop: 'melon', areaM2: 3000, plantedOn: planted(30), method: 'drip', fairnessDebt: 0 },
-    { id: 'p10', farmerId: 'f-salma', name: 'Plot 10', crop: 'tomato', areaM2: 4000, plantedOn: planted(110), method: 'drip', fairnessDebt: 0 },
-    { id: 'p11', farmerId: 'f-hedi', name: 'Plot 11', crop: 'pepper', areaM2: 2000, plantedOn: planted(60), method: 'drip', fairnessDebt: 0 },
-    { id: 'p12', farmerId: 'f-amira', name: 'Plot 12', crop: 'olive', areaM2: 5000, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
+    // 3 ha in total: about 300 m³ a day at the peak of a heatwave.
+    // Hédi lost a turn in last week's cut, so bansui fairness owes him one.
+    { id: 'p1', farmerId: 'f-hedi', name: 'Plot 1', crop: 'tomato', areaM2: 3000, plantedOn: planted(80), method: 'drip', fairnessDebt: 1 },
+    { id: 'p2', farmerId: 'f-amira', name: 'Plot 2', crop: 'pepper', areaM2: 2500, plantedOn: planted(50), method: 'drip', fairnessDebt: 0 },
+    { id: 'p3', farmerId: 'f-sami', name: 'Plot 3', crop: 'melon', areaM2: 2000, plantedOn: planted(70), method: 'furrow', fairnessDebt: 0 },
+    { id: 'p4', farmerId: 'f-ali', name: 'Plot 4', crop: 'olive', areaM2: 5000, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
+    { id: 'p5', farmerId: 'f-nour', name: 'Plot 5', crop: 'tomato', areaM2: 2500, plantedOn: planted(40), method: 'furrow', fairnessDebt: 0 },
+    { id: 'p6', farmerId: 'f-karim', name: 'Plot 6', crop: 'potato', areaM2: 2000, plantedOn: planted(60), method: 'furrow', fairnessDebt: 0 },
+    { id: 'p7', farmerId: 'f-leila', name: 'Plot 7', crop: 'pepper', areaM2: 2000, plantedOn: planted(95), method: 'drip', fairnessDebt: 0 },
+    { id: 'p8', farmerId: 'f-youssef', name: 'Plot 8', crop: 'olive', areaM2: 4000, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
+    { id: 'p9', farmerId: 'f-mounir', name: 'Plot 9', crop: 'melon', areaM2: 1500, plantedOn: planted(30), method: 'drip', fairnessDebt: 0 },
+    { id: 'p10', farmerId: 'f-salma', name: 'Plot 10', crop: 'tomato', areaM2: 2000, plantedOn: planted(110), method: 'drip', fairnessDebt: 0 },
+    { id: 'p11', farmerId: 'f-hedi', name: 'Plot 11', crop: 'pepper', areaM2: 1000, plantedOn: planted(60), method: 'drip', fairnessDebt: 0 },
+    { id: 'p12', farmerId: 'f-amira', name: 'Plot 12', crop: 'olive', areaM2: 2500, plantedOn: planted(200), method: 'drip', fairnessDebt: 0 },
   ];
 }
 
