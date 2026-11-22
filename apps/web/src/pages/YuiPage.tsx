@@ -9,6 +9,7 @@ import { IconLeaf, IconLock, IconSun } from '../components/Icons';
 import { fmt } from '../lib/format';
 import { EASE, GlassCard, PageHeader, Pill, Rise, Stagger } from '../components/ui';
 import { tap, useOnline } from '../lib/device';
+import { useLab } from '../lib/api';
 
 const queryClient = new QueryClient();
 
@@ -151,7 +152,8 @@ function Yui() {
   const [toast, setToast] = useState<string | null>(null);
   const [groveId, setGroveId] = useState(1);
   const [m3, setM3] = useState(15);
-  const [lab, setLab] = useState('pH 4.9 · K 4.1 g/L · pond reading 23 Nov');
+  const lastLab = useLab((s) => s.last);
+  const [lab, setLab] = useState(lastLab?.summary ?? 'pH 4.9 · K 4.1 g/L · pond reading 23 Nov');
   const [buyLot, setBuyLot] = useState<number | null>(null);
   const [buyT, setBuyT] = useState(5);
   const [batch, setBatch] = useState('EVOO-2026-017');

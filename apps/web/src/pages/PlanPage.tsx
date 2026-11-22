@@ -7,6 +7,8 @@ import { DEFAULT_CURSOR, useScene } from '../lib/scene';
 import { useOnline, tap } from '../lib/device';
 import { fmt } from '../lib/format';
 import { PondGauge } from '../components/PondGauge';
+import { MyMillSheet } from '../components/MyMillSheet';
+import { forecastAt } from '../lib/api';
 import { IconClose, IconCoin, IconDrop, IconLeaf, IconMessage, IconPause, IconPlay, IconPlus, IconSun } from '../components/Icons';
 import { EASE, GlassCard, PageHeader, Pill, Range, Rise, Segmented, Sheet, Stagger, Stat } from '../components/ui';
 
@@ -107,8 +109,19 @@ function PhoneBubble({ to, text }: { to: string; text: string }) {
 
 export default function PlanPage() {
   const { input, plan, baseline } = useZPlan();
-  const { scenario, setScenario, liveWeather, setLiveWeather, liveFetchedAt, storms, addStorm, removeStorm } = useZitoun();
+  const { scenario, setScenario, liveWeather, setLiveWeather, liveFetchedAt, storms, addStorm, removeStorm, myMill, setMyMill, myWeather, setMyWeather } = useZitoun();
   const online = useOnline();
+  const [millOpen, setMillOpen] = useState(false);
+  const myKey = `${myMill.lat},${myMill.lng}`;
+  useEffect(() => {
+    if (scenario !== 'mine' || !online || myWeather?.key === myKey) return;
+    forecastAt(myMill.lat, myMill.lng)
+      .then((d) => {
+        setMyWeather({ key: myKey, days: d.slice(2) });
+        setLiveError(null);
+      })
+      .catch((e) => setLiveError(e instanceof Error ? e.message : 'Forecast unavailable'));
+  }, [scenario, online, myKey, myMill.lat, myMill.lng, myWeather?.key, setMyWeather]);
   const [selected, setSelected] = useState(0);
   const [cursor, setCursor] = useState(DEFAULT_CURSOR);
   const [playing, setPlaying] = useState(false);
@@ -218,6 +231,7 @@ export default function PlanPage() {
               options={[
                 { value: 'demo', label: 'Storm demo' },
                 { value: 'live', label: 'Live forecast' },
+                { value: 'mine', label: 'My mill', tone: 'ok' },
               ]}
             />
             <button className="btn btn-quiet" onClick={() => setStormOpen(true)}>
@@ -226,7 +240,19 @@ export default function PlanPage() {
           </div>
         }
       >
+        {scenario === 'mine' ? (
+          <>
+            Your own plan for <b className="text-ink">{myMill.name}</b> in {myMill.town}: {myMill.groves.length} groves, {myMill.trucks} tanker{myMill.trucks > 1 ? 's' : ''}, the real forecast for {myMill.town}.{' '}
+            <button className="font-semibold text-[var(--water)] underline-offset-2 hover:underline" onClick={() => setMillOpen(true)}>
+              Edit your mill
+            </button>
+            {!myWeather && <span className="mt-2 block text-[14px] text-ink-3">{liveError ? `Forecast unavailable (${liveError}); showing the demo week.` : online ? `Fetching the ${myMill.town} forecast…` : 'Offline: showing the demo week.'}</span>}
+          </>
+        ) : (
+          <>
         Three maâsras are pressing and their ponds keep rising. Sonae sends each tanker to the nearest grove that can safely take margine, pauses when rain is coming, and keeps every pond below the brim. Doing nothing would spill <b className="text-ink">{fmt(baseline.kpis.overflowM3)} m³</b> into the wadis this week.
+          </>
+        )}
         {scenario === 'live' && (
           <span className="mt-2 block text-[14px] text-ink-3">
             {liveError ? `Live forecast unavailable (${liveError}); showing the demo week.` : liveFetchedAt ? `Open-Meteo forecast for Sfax, fetched ${new Date(liveFetchedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.` : online ? 'Fetching the Sfax forecast…' : 'Offline: showing the demo week.'}
@@ -496,6 +522,8 @@ export default function PlanPage() {
           )}
         </div>
       </div>
+
+      <MyMillSheet open={millOpen} onClose={() => setMillOpen(false)} value={myMill} onSave={(m) => setMyMill(m)} />
 
       <Sheet open={stormOpen} onClose={() => setStormOpen(false)} label="Add rain to the forecast" className="max-w-[460px]">
         <h2 className="text-[21px] font-extrabold">Add rain to the forecast</h2>

@@ -323,3 +323,74 @@ export function replayZitounSeason(weather: DayWeather[], rules: ZitounRules, op
     hectares: groves.filter((g) => !groveBlock(g, rules)).reduce((s, g) => s + g.areaHa, 0),
   };
 }
+
+/* ── From a lab analysis to a safe dose ─────────────────────────────── */
+
+export interface MargineLab {
+  ph: number | null;
+  /** Potassium as K (g/L = kg/m³). */
+  potassiumGL: number | null;
+  /** Total polyphenols (g/L), the part that is toxic to soil life in large doses. */
+  polyphenolsGL: number | null;
+  /** Electrical conductivity (dS/m): salinity. */
+  ecDsM: number | null;
+}
+
+export interface MargineAdvice {
+  spreadable: boolean;
+  /** Season dose this margine allows (m³/ha), never above the rules' cap. */
+  maxM3PerHa: number;
+  k2oKgPerM3: number | null;
+  /** What a full dose gives a hectare (kg K₂O/ha). */
+  k2oKgPerHa: number | null;
+  reasons: string[];
+}
+
+/**
+ * Indicative thresholds (to confirm with the regional lab and the decree): very acidic, very salty
+ * or very phenolic margine gets a smaller dose; extreme values are not spread at all.
+ */
+export function margineAdvice(lab: MargineLab, rules: ZitounRules): MargineAdvice {
+  const reasons: string[] = [];
+  let factor = 1;
+  let spreadable = true;
+  if (lab.ph !== null) {
+    if (lab.ph < 3.5) {
+      spreadable = false;
+      reasons.push(`pH ${lab.ph} is extremely acidic: neutralise (lime) before spreading.`);
+    } else if (lab.ph < 4.5) {
+      factor = Math.min(factor, 0.7);
+      reasons.push(`pH ${lab.ph} is acidic: dose reduced by 30%.`);
+    } else reasons.push(`pH ${lab.ph} is in the usual range for margine.`);
+  }
+  if (lab.polyphenolsGL !== null) {
+    if (lab.polyphenolsGL > 15) {
+      spreadable = false;
+      reasons.push(`Polyphenols ${lab.polyphenolsGL} g/L are very high: let the pond age or treat it first.`);
+    } else if (lab.polyphenolsGL > 8) {
+      factor = Math.min(factor, 0.6);
+      reasons.push(`Polyphenols ${lab.polyphenolsGL} g/L are high: dose reduced by 40%.`);
+    } else reasons.push(`Polyphenols ${lab.polyphenolsGL} g/L are manageable for the soil.`);
+  }
+  if (lab.ecDsM !== null) {
+    if (lab.ecDsM > 25) {
+      spreadable = false;
+      reasons.push(`Salinity ${lab.ecDsM} dS/m is too high for olive soils.`);
+    } else if (lab.ecDsM > 15) {
+      factor = Math.min(factor, 0.6);
+      reasons.push(`Salinity ${lab.ecDsM} dS/m is high: dose reduced by 40%.`);
+    }
+  }
+  const k2o = lab.potassiumGL !== null ? Math.round(lab.potassiumGL * 1.2046 * 10) / 10 : null;
+  let maxM3PerHa = spreadable ? Math.round(rules.capM3PerHa * factor) : 0;
+  // Never give a grove far more potassium than it can use in a season.
+  if (spreadable && k2o && k2o > 0) {
+    const kCap = Math.round((rules.k2oNeedKgPerHa * 2) / k2o);
+    if (kCap < maxM3PerHa) {
+      maxM3PerHa = kCap;
+      reasons.push(`Rich in potassium (${k2o} kg K₂O/m³): ${kCap} m³/ha already covers twice what olive trees need.`);
+    }
+  }
+  if (k2o !== null) reasons.push(`Each m³ brings about ${k2o} kg of K₂O, fertiliser the farmer does not buy.`);
+  return { spreadable, maxM3PerHa, k2oKgPerM3: k2o, k2oKgPerHa: k2o !== null ? Math.round(k2o * maxM3PerHa) : null, reasons };
+}

@@ -15,7 +15,52 @@ import {
   type ZitounRules,
 } from '@sonae/shared';
 
-export type ZScenario = 'demo' | 'live';
+export type ZScenario = 'demo' | 'live' | 'mine';
+
+/** A real mill entered by its manager: the plan then uses its own numbers and its local forecast. */
+export interface MyGrove {
+  owner: string;
+  areaHa: number;
+  slopePct: number;
+  distWellM: number;
+  distWadiM: number;
+  /** Road distance from the mill (km). */
+  distKm: number;
+  appliedM3: number;
+}
+
+export interface MyMill {
+  name: string;
+  town: string;
+  lat: number;
+  lng: number;
+  pondCapacityM3: number;
+  pondM3: number;
+  marginePerDayM3: number;
+  grignonT: number;
+  grignonPerDayT: number;
+  trucks: number;
+  truckM3: number;
+  groves: MyGrove[];
+}
+
+export const DEFAULT_MY_MILL: MyMill = {
+  name: 'My maâsra',
+  town: 'Sfax',
+  lat: 34.74,
+  lng: 10.76,
+  pondCapacityM3: 800,
+  pondM3: 560,
+  marginePerDayM3: 25,
+  grignonT: 20,
+  grignonPerDayT: 6,
+  trucks: 1,
+  truckM3: 15,
+  groves: [
+    { owner: 'Grove 1', areaHa: 8, slopePct: 2, distWellM: 500, distWadiM: 300, distKm: 2, appliedM3: 0 },
+    { owner: 'Grove 2', areaHa: 12, slopePct: 4, distWellM: 900, distWadiM: 600, distKm: 3.5, appliedM3: 100 },
+  ],
+};
 
 export interface Storm {
   id: string;
@@ -27,11 +72,15 @@ interface Persisted {
   scenario: ZScenario;
   rules: ZitounRules;
   storms: Storm[];
+  myMill: MyMill;
 }
 
 interface ZState extends Persisted {
   liveWeather: DayWeather[] | null;
   liveFetchedAt: string | null;
+  myWeather: { key: string; days: DayWeather[] } | null;
+  setMyMill: (m: MyMill) => void;
+  setMyWeather: (w: { key: string; days: DayWeather[] }) => void;
   setScenario: (s: ZScenario) => void;
   setRules: (r: ZitounRules) => void;
   resetRules: () => void;
@@ -57,8 +106,8 @@ const initial = load();
 export const useZitoun = create<ZState>((set, get) => {
   const persist = () => {
     try {
-      const { scenario, rules, storms } = get();
-      localStorage.setItem(KEY, JSON.stringify({ scenario, rules, storms }));
+      const { scenario, rules, storms, myMill } = get();
+      localStorage.setItem(KEY, JSON.stringify({ scenario, rules, storms, myMill }));
     } catch {
       /* storage blocked: the app still works, it just forgets */
     }
@@ -69,6 +118,13 @@ export const useZitoun = create<ZState>((set, get) => {
     storms: initial.storms ?? [],
     liveWeather: null,
     liveFetchedAt: null,
+    myMill: initial.myMill ?? DEFAULT_MY_MILL,
+    myWeather: null,
+    setMyMill: (myMill) => {
+      set({ myMill });
+      persist();
+    },
+    setMyWeather: (myWeather) => set({ myWeather }),
     setScenario: (scenario) => {
       set({ scenario });
       persist();
@@ -97,8 +153,43 @@ const todayTunis = () => new Date(Date.now() + 3_600_000).toISOString().slice(0,
 
 /** The plan input for the current scenario, with any storms the user added. */
 export function useZInput(): ZitounInput {
-  const { scenario, rules, storms, liveWeather } = useZitoun();
+  const { scenario, rules, storms, liveWeather, myMill, myWeather } = useZitoun();
   return useMemo(() => {
+    if (scenario === 'mine' && myWeather && myWeather.days.length >= PLAN_DAYS) {
+      const weather = myWeather.days.slice(0, PLAN_DAYS + 1).map((w, i) => {
+        const extra = storms.filter((s) => s.day === i).reduce((sum, s) => sum + s.mm, 0);
+        return extra ? { ...w, rainMm: w.rainMm + extra, et0Mm: Math.min(w.et0Mm, 0.9) } : w;
+      });
+      return {
+        start: weather[0]!.date,
+        days: PLAN_DAYS,
+        mills: [
+          {
+            id: 'mine',
+            name: myMill.name,
+            town: myMill.town,
+            pos: [-2, -4] as [number, number],
+            pondCapacityM3: myMill.pondCapacityM3,
+            pondM3: Math.min(myMill.pondM3, myMill.pondCapacityM3),
+            pondAreaM2: Math.round(myMill.pondCapacityM3 / 1.5),
+            marginePerDayM3: myMill.marginePerDayM3,
+            grignonT: myMill.grignonT,
+            grignonPerDayT: myMill.grignonPerDayT,
+            trucks: Math.max(1, Math.round(myMill.trucks)),
+            truckM3: Math.max(1, myMill.truckM3),
+          },
+        ],
+        groves: myMill.groves.map((g, i) => {
+          const a = (i / Math.max(1, myMill.groves.length)) * Math.PI * 2 + 0.6;
+          const r = Math.min(22, Math.max(5, g.distKm / rules.kmPerUnit));
+          return { id: `my${i}`, owner: g.owner || `Grove ${i + 1}`, phone: '', areaHa: Math.max(0.5, g.areaHa), pos: [-2 + Math.cos(a) * r, -4 + Math.sin(a) * r * 0.8] as [number, number], slopePct: g.slopePct, distWellM: g.distWellM, distWadiM: g.distWadiM, soil: 'loam' as const, appliedM3: g.appliedM3 };
+        }),
+        buyers: DEMO_BUYERS,
+        weather,
+        rules,
+        pressing: true,
+      };
+    }
     const live = scenario === 'live' && liveWeather && liveWeather.length >= PLAN_DAYS;
     const start = live ? liveWeather[0]!.date : DEMO_START;
     const base = live ? liveWeather.slice(0, PLAN_DAYS + 1) : demoWeather(DEMO_START, PLAN_DAYS + 1);
@@ -107,7 +198,7 @@ export function useZInput(): ZitounInput {
       return extra ? { ...w, rainMm: w.rainMm + extra, et0Mm: Math.min(w.et0Mm, 0.9) } : w;
     });
     return { start, days: PLAN_DAYS, mills: DEMO_MILLS, groves: DEMO_GROVES, buyers: DEMO_BUYERS, weather, rules, pressing: true };
-  }, [scenario, rules, storms, liveWeather]);
+  }, [scenario, rules, storms, liveWeather, myMill, myWeather]);
 }
 
 export function useZPlan(): { input: ZitounInput; plan: ZitounPlan; baseline: ZitounPlan } {

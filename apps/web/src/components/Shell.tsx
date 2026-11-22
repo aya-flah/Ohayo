@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
-import { IconDrop, IconMoon, IconPlan, IconProcess, IconReplay, IconSettings, IconSunMode, IconTwin, IconWifiOff, IconYui } from './Icons';
+import { IconDrop, IconLeaf, IconMoon, IconPlan, IconProcess, IconReplay, IconSettings, IconSunMode, IconTwin, IconWifiOff, IconYui } from './Icons';
 import { useOnline, usePrefersReducedMotion, tap } from '../lib/device';
 import { useSonae } from '../lib/store';
 import { DEFAULT_CURSOR, poseFor, useFieldMode, useRegionState, useScene } from '../lib/scene';
@@ -16,9 +16,9 @@ const NAV = [
   { to: '/', label: 'Plan', jp: '計画', icon: IconPlan },
   { to: '/twin', label: 'Twin', jp: '双子', icon: IconTwin },
   { to: '/process', label: 'Process', jp: '工程', icon: IconProcess },
+  { to: '/check', label: 'Check', jp: '診', icon: IconLeaf },
   { to: '/yui', label: 'Yui', jp: '結', icon: IconYui },
   { to: '/replay', label: 'Replay', jp: '再生', icon: IconReplay },
-  { to: '/settings', label: 'Settings', jp: '設定', icon: IconSettings },
 ];
 
 const navIndex = (path: string) => Math.max(0, NAV.findIndex((n) => (n.to === '/' ? path === '/' : path.startsWith(n.to))));
@@ -370,6 +370,9 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="lg:hidden">
               <StatusCluster compact />
             </div>
+            <NavLink to="/settings" onClick={() => tap()} className={({ isActive }) => `glass glass-soft grid h-12 w-12 place-items-center rounded-full transition-transform duration-200 active:scale-90 ${isActive ? 'text-[var(--water)]' : 'text-ink'}`} aria-label="Settings" title="Settings">
+              <IconSettings width={21} height={21} />
+            </NavLink>
             <ModeToggle />
           </div>
         </div>

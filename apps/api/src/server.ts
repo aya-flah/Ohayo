@@ -8,6 +8,7 @@ import { plan, turnSms } from '@sonae/engine';
 import { DEMO_FARMERS, DEMO_GDA, demoForecast, demoOutages, demoPlots, toMs, OutageSchema, type PlanInput } from '@sonae/shared';
 import { ask, readNotice, BudgetExceededError } from './ai';
 import { spend } from './budget';
+import { readLab, zitounAsk } from './zitoun-ai';
 import { confirmDelivery, oracleReady } from './oracle';
 
 const app = Fastify({ logger: { level: 'info' }, bodyLimit: 6 * 1024 * 1024 });
@@ -86,6 +87,39 @@ app.post('/ai/notice', { config: { rateLimit: { max: 10, timeWindow: '1 minute' 
 app.post('/ai/ask', { config: { rateLimit: { max: 6, timeWindow: '1 minute' } } }, async (req) => {
   const { question } = z.object({ question: z.string().min(3).max(1000) }).parse(req.body);
   return ask(question, demoInput());
+});
+
+/* ── Sonae Zitoun ─────────────────────────────────────────────────── */
+
+const LabBody = z.object({
+  text: z.string().max(20_000).optional(),
+  imageBase64: z.string().max(8_000_000).optional(),
+  imageType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
+  pdfBase64: z.string().max(8_000_000).optional(),
+});
+
+app.post('/zitoun/lab', { config: { rateLimit: { max: 8, timeWindow: '1 minute' } } }, async (req) => {
+  const body = LabBody.parse(req.body);
+  if (!body.text && !body.imageBase64 && !body.pdfBase64) {
+    const err = new Error('Send the lab report as text, a photo or a PDF.') as Error & { statusCode: number };
+    err.statusCode = 400;
+    throw err;
+  }
+  return readLab(body);
+});
+
+const AskBody = z.object({
+  messages: z.array(z.object({ role: z.enum(['user', 'assistant']), text: z.string().min(1).max(2000) })).min(1).max(20),
+});
+
+app.post('/zitoun/ask', { config: { rateLimit: { max: 8, timeWindow: '1 minute' } } }, async (req) => {
+  const { messages } = AskBody.parse(req.body);
+  if (messages[messages.length - 1]!.role !== 'user') {
+    const err = new Error('The last message must be the question.') as Error & { statusCode: number };
+    err.statusCode = 400;
+    throw err;
+  }
+  return zitounAsk(messages);
 });
 
 app.get('/admin/ai-spend', async (req) => {

@@ -29,7 +29,7 @@ export const useScene = create<SceneStore>((set) => ({
 }));
 
 export const poseFor = (path: string): ScenePose =>
-  path.startsWith('/twin') ? 'twin' : path.startsWith('/process') ? 'process' : path.startsWith('/yui') ? 'yui' : path.startsWith('/replay') ? 'replay' : path.startsWith('/settings') ? 'settings' : 'plan';
+  path.startsWith('/twin') ? 'twin' : path.startsWith('/process') ? 'process' : path.startsWith('/yui') || path.startsWith('/check') ? 'yui' : path.startsWith('/replay') ? 'replay' : path.startsWith('/settings') ? 'settings' : 'plan';
 
 /* ── What the region looks like at one moment ───────────────────────── */
 

@@ -6,6 +6,7 @@ import PlanPage from './pages/PlanPage';
 const TwinPage = lazy(() => import('./pages/TwinPage'));
 const YuiPage = lazy(() => import('./pages/YuiPage'));
 const ProcessPage = lazy(() => import('./pages/ProcessPage'));
+const CheckPage = lazy(() => import('./pages/CheckPage'));
 const ReplayPage = lazy(() => import('./pages/ReplayPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/" element={<PlanPage />} />
           <Route path="/twin" element={<TwinPage />} />
           <Route path="/process" element={<ProcessPage />} />
+          <Route path="/check" element={<CheckPage />} />
           <Route path="/yui" element={<YuiPage />} />
           <Route path="/replay" element={<ReplayPage />} />
           <Route path="/settings" element={<SettingsPage />} />

@@ -1,0 +1,13 @@
+{
+  "totalUSD": 0.066671,
+  "byFeature": {
+    "lab": {
+      "calls": 2,
+      "usd": 0.026444
+    },
+    "zitoun-ask": {
+      "calls": 3,
+      "usd": 0.040227
+    }
+  }
+}

@@ -109,3 +109,20 @@ describe('Zitoun planner', () => {
     expect(dayBlock(weather, 4, DEFAULT_RULES)).toMatch(/rain/);
   });
 });
+
+describe('margine lab advice', () => {
+  it('gives the full cap to ordinary margine and limits potassium-rich margine', async () => {
+    const { margineAdvice } = await import('../src');
+    const ok = margineAdvice({ ph: 5, potassiumGL: 1, polyphenolsGL: 5, ecDsM: 10 }, DEFAULT_RULES);
+    expect(ok.spreadable).toBe(true);
+    expect(ok.maxM3PerHa).toBe(50);
+    const rich = margineAdvice({ ph: 5, potassiumGL: 5, polyphenolsGL: 5, ecDsM: 10 }, DEFAULT_RULES);
+    expect(rich.maxM3PerHa).toBeLessThan(50);
+  });
+  it('refuses extreme margine and reduces acidic or phenolic margine', async () => {
+    const { margineAdvice } = await import('../src');
+    expect(margineAdvice({ ph: 3, potassiumGL: 3, polyphenolsGL: 5, ecDsM: 10 }, DEFAULT_RULES).spreadable).toBe(false);
+    expect(margineAdvice({ ph: 5, potassiumGL: 1, polyphenolsGL: 20, ecDsM: 10 }, DEFAULT_RULES).maxM3PerHa).toBe(0);
+    expect(margineAdvice({ ph: 4.2, potassiumGL: 1, polyphenolsGL: 10, ecDsM: 10 }, DEFAULT_RULES).maxM3PerHa).toBe(30);
+  });
+});
