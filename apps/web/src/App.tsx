@@ -14,6 +14,7 @@ const ReplayPage = lazy(() => import('./pages/ReplayPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const Process3DPage = lazy(() => import('./pages/Process3DPage'));
 const VideoPage = lazy(() => import('./pages/VideoPage'));
+const CertificatePage = lazy(() => import('./pages/CertificatePage'));
 
 function Loading() {
   return (
@@ -30,6 +31,15 @@ function Loading() {
 export default function App() {
   const location = useLocation();
   // The 3D process on its own (for the QR code): no site menus around it.
+  if (location.pathname.startsWith('/certificate/')) {
+    return (
+      <Suspense fallback={null}>
+        <Routes location={location}>
+          <Route path="/certificate/:id" element={<CertificatePage />} />
+        </Routes>
+      </Suspense>
+    );
+  }
   if (location.pathname === '/video') {
     return (
       <Suspense fallback={null}>

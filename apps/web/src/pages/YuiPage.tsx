@@ -121,7 +121,7 @@ const rememberBatch = (hash: string, name: string) => {
     /* private mode: the card just shows the hash */
   }
 };
-const certLink = (id: number) => `${window.location.origin}/yui?cert=${id}`;
+const certLink = (id: number) => `${window.location.origin}/certificate/${id}`;
 
 /** The bottle label: a QR that opens this page on the certificate, plus what the chain proves. */
 function CertificateCard({ id, c, onClose }: { id: number; c: Certificate; onClose: () => void }) {
@@ -154,13 +154,13 @@ function CertificateCard({ id, c, onClose }: { id: number; c: Certificate; onClo
         <p className="mt-1.5 text-[14px] text-ink-2">
           {fmt(c.litres)} L of oil from mill {short(c.mill)}, issued {when(c.issuedAt)}. {fmt(Number(c.deliveredM3))} m³ of margine confirmed on approved groves in {c.loads} loads, no lost load.
         </p>
-        <p className="mt-1.5 text-[13px] text-ink-2">Scan it: the code opens this page and checks the certificate on the chain, with no account.</p>
+        <p className="mt-1.5 text-[13px] text-ink-2">Scan it: the code opens the certificate, read live from the chain, with no account.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <a className="btn btn-primary" href={png || undefined} download={`sonae-certificate-${id}.png`} aria-disabled={!png}>
             Download QR
           </a>
           <a className="btn" href={link} target="_blank" rel="noreferrer">
-            Open verify link
+            Open the certificate
           </a>
           <button className="btn" onClick={onClose}>
             Close

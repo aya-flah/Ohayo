@@ -871,5 +871,12 @@
  "Show the live numbers": "ライブの数値を表示",
  "Hide the live numbers": "ライブの数値を隠す",
  "Read the explanation": "説明を読む",
- "Hide the explanation": "説明を隠す"
+ "Hide the explanation": "説明を隠す",
+ "Show steps": "ステップを表示",
+ "Tap the card to hide it and see the whole 3D": "カードをタップすると非表示になり、3D全体が見えます",
+ "Tap the card to hide the steps and see the whole 3D": "カードをタップするとステップが隠れ、3D全体が見えます",
+ "Open the certificate": "証明書を開く",
+ "Scan it: the code opens the certificate, read live from the chain, with no account.": "スキャンすると、ブロックチェーンから読み込んだ証明書が開きます（アカウント不要）。",
+ "Download PDF": "PDFをダウンロード",
+ "Open in the ledger": "台帳で開く"
 }

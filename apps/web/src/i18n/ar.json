@@ -875,5 +875,12 @@
  "Show the live numbers": "عرض الأرقام المباشرة",
  "Hide the live numbers": "إخفاء الأرقام المباشرة",
  "Read the explanation": "اقرأ الشرح",
- "Hide the explanation": "إخفاء الشرح"
+ "Hide the explanation": "إخفاء الشرح",
+ "Show steps": "عرض الخطوات",
+ "Tap the card to hide it and see the whole 3D": "المس البطاقة لإخفائها ورؤية المشهد ثلاثي الأبعاد كاملًا",
+ "Tap the card to hide the steps and see the whole 3D": "المس البطاقة لإخفاء الخطوات ورؤية المشهد ثلاثي الأبعاد كاملًا",
+ "Open the certificate": "فتح الشهادة",
+ "Scan it: the code opens the certificate, read live from the chain, with no account.": "امسح الرمز: يفتح الشهادة مباشرة من البلوكشين، دون حساب.",
+ "Download PDF": "تنزيل PDF",
+ "Open in the ledger": "فتح في السجل"
 }

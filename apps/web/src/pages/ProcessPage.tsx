@@ -14,6 +14,19 @@ export default function ProcessPage() {
   const [info, setInfo] = useState(false);
   const compact = useCompactScreen();
   const show = !compact || info;
+  // Phones: tap the step card to hide the card and the step bar, so the whole 3D shows.
+  const [hideSteps, setHideSteps] = useState(false);
+  const stepsHidden = compact && hideSteps;
+  const hideOnTap = (e: React.MouseEvent) => {
+    if (!compact || (e.target as Element).closest('button, a')) return;
+    tap();
+    setHideSteps(true);
+  };
+  const togglePlay = () => {
+    tap();
+    if (!playing && step >= last) setStep(0);
+    setPlaying(!playing);
+  };
 
   useEffect(() => {
     if (!playing) return;
@@ -35,8 +48,50 @@ export default function ProcessPage() {
 
   return (
     <div className="relative -mx-4 md:-mx-8" style={{ height: 'calc(100dvh - max(12px, env(safe-area-inset-top)) - 92px)' }}>
-      {/* Step card */}
+      {/* Hidden steps: a pill with play/pause and the way back */}
+      <AnimatePresence>
+        {stepsHidden && (
+          <motion.div
+            className="pointer-events-auto absolute inset-x-0 bottom-[calc(max(12px,env(safe-area-inset-bottom))+var(--dock-h))] z-10 flex justify-center"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: EASE } }}
+            exit={{ opacity: 0, y: 10, transition: { duration: 0.15 } }}
+          >
+            <div className="glass glass-edge glass-strong flex items-center gap-1.5 rounded-full p-1.5">
+              <button
+                className="grid h-10 w-10 place-items-center rounded-full text-white"
+                style={{ background: 'linear-gradient(135deg, var(--olive), color-mix(in oklab, var(--olive) 45%, #1d2a10))' }}
+                onClick={togglePlay}
+                aria-label={playing ? 'Pause the walkthrough' : 'Play the walkthrough'}
+              >
+                {playing ? <IconPause width={16} height={16} /> : <IconPlay width={16} height={16} />}
+              </button>
+              <button
+                className="flex h-10 items-center gap-2 rounded-full px-3.5 text-[14px] font-bold"
+                onClick={() => {
+                  tap();
+                  setHideSteps(false);
+                }}
+              >
+                <span className="num text-ink-2">
+                  {step + 1}/{STEPS.length}
+                </span>
+                Show steps
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M6 15l6-6 6 6" />
+                </svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+      {!stepsHidden && (
       <motion.div
+        key="card"
+        onClick={hideOnTap}
+        exit={{ opacity: 0, y: -16, transition: { duration: 0.18 } }}
         className="glass glass-edge pointer-events-auto absolute left-3 right-3 top-0 max-h-[52%] overflow-y-auto overscroll-contain rounded-[20px] px-4 py-3 md:left-8 md:right-auto md:w-[390px] md:rounded-[24px] md:p-5"
         initial={{ opacity: 0, x: -30, filter: 'blur(10px)' }}
         animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
@@ -85,6 +140,7 @@ export default function ProcessPage() {
             )}
           </motion.div>
         </AnimatePresence>
+        {compact && <p className="mt-1 text-[11.5px] text-ink-3">Tap the card to hide the steps and see the whole 3D</p>}
         <div className={`mt-4 gap-2 ${compact ? 'hidden' : 'hidden md:flex'}`}>
           <button className="btn btn-quiet btn-sm" disabled={step === 0} onClick={() => go(step - 1)}>
             Back
@@ -94,9 +150,16 @@ export default function ProcessPage() {
           </button>
         </div>
       </motion.div>
+      )}
+      </AnimatePresence>
 
       {/* Step dock */}
+      <AnimatePresence>
+      {!stepsHidden && (
       <motion.div
+        key="dock"
+        onClick={hideOnTap}
+        exit={{ opacity: 0, y: 20, transition: { duration: 0.18 } }}
         className="glass glass-edge glass-strong pointer-events-auto absolute inset-x-3 bottom-[calc(max(12px,env(safe-area-inset-bottom))+var(--dock-h))] flex items-center gap-3 rounded-[26px] p-2.5 md:inset-x-auto lg:bottom-6 md:left-1/2 md:w-[min(860px,calc(100%-4rem))] md:-translate-x-1/2 md:p-3"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -105,11 +168,7 @@ export default function ProcessPage() {
         <button
           className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-white transition-transform duration-200 active:scale-90"
           style={{ background: 'linear-gradient(135deg, var(--olive), color-mix(in oklab, var(--olive) 45%, #1d2a10))', boxShadow: '0 8px 24px -8px var(--olive)' }}
-          onClick={() => {
-            tap();
-            if (!playing && step >= last) setStep(0);
-            setPlaying(!playing);
-          }}
+          onClick={togglePlay}
           aria-label={playing ? 'Pause the walkthrough' : 'Play the walkthrough'}
         >
           {playing ? <IconPause width={20} height={20} /> : <IconPlay width={20} height={20} />}
@@ -139,6 +198,8 @@ export default function ProcessPage() {
           })}
         </ol>
       </motion.div>
+      )}
+      </AnimatePresence>
     </div>
   );
 }

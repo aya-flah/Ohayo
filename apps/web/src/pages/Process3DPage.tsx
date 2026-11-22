@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { SHORT, STEP_SECONDS, STEPS, TRACK, useProcess } from '../lib/process';
-import { tap, usePrefersReducedMotion } from '../lib/device';
+import { tap, useCompactScreen, usePrefersReducedMotion } from '../lib/device';
 import { LangPicker } from '../components/LangPicker';
 import { IconPause, IconPlay } from '../components/Icons';
 import { EASE } from '../components/ui';
@@ -23,6 +23,10 @@ export default function Process3DPage() {
   const reduced = usePrefersReducedMotion();
   const [more, setMore] = useState(false);
   const [ready, setReady] = useState(false);
+  // Phones: tap the card to hide it and see the whole 3D; a small pill brings it back.
+  const compact = useCompactScreen();
+  const [hidden, setHidden] = useState(false);
+  const swiped = useRef(false);
   const last = STEPS.length - 1;
   const s = STEPS[step]!;
   const tone = TRACK[s.track].tone;
@@ -88,13 +92,23 @@ export default function Process3DPage() {
   const startX = useRef<number | null>(null);
   const onDown = (e: React.PointerEvent) => {
     startX.current = e.clientX;
+    swiped.current = false;
   };
   const onUp = (e: React.PointerEvent) => {
     if (startX.current === null) return;
     const dx = e.clientX - startX.current;
     startX.current = null;
     const rtl = document.documentElement.dir === 'rtl';
-    if (Math.abs(dx) > 50) go(step + ((dx < 0) !== rtl ? 1 : -1));
+    if (Math.abs(dx) > 50) {
+      swiped.current = true;
+      go(step + ((dx < 0) !== rtl ? 1 : -1));
+    }
+  };
+  const onCardClick = (e: React.MouseEvent) => {
+    if (!compact || swiped.current) return;
+    if ((e.target as Element).closest('button, a')) return;
+    tap();
+    setHidden(true);
   };
 
   return (
@@ -148,14 +162,56 @@ export default function Process3DPage() {
         </div>
       </div>
 
+      {/* Hidden steps: a small pill keeps the step, play/pause, and the way back */}
+      <AnimatePresence>
+        {compact && hidden && (
+          <motion.div
+            className="absolute inset-x-0 z-30 flex justify-center"
+            style={{ bottom: 'max(12px, env(safe-area-inset-bottom))' }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: EASE } }}
+            exit={{ opacity: 0, y: 12, transition: { duration: 0.15 } }}
+          >
+            <div className="glass glass-edge glass-strong flex items-center gap-1.5 rounded-full p-1.5 text-ink">
+              <button
+                className="grid h-10 w-10 place-items-center rounded-full text-white"
+                style={{ background: 'linear-gradient(135deg, var(--olive), color-mix(in oklab, var(--olive) 45%, #1d2a10))' }}
+                onClick={toggle}
+                aria-label={playing ? 'Pause' : 'Play'}
+              >
+                {playing ? <IconPause width={16} height={16} /> : <IconPlay width={16} height={16} />}
+              </button>
+              <button
+                className="flex h-10 items-center gap-2 rounded-full px-3.5 text-[14px] font-bold"
+                onClick={() => {
+                  tap();
+                  setHidden(false);
+                }}
+              >
+                <span className="num text-ink-2">
+                  {step + 1}/{STEPS.length}
+                </span>
+                Show steps
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M6 15l6-6 6 6" />
+                </svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Step card */}
+      <AnimatePresence>
+      {!(compact && hidden) && (
       <motion.section
         className="p3d-card glass glass-edge glass-strong absolute z-30 flex touch-pan-y flex-col rounded-[22px] px-3.5 py-3 text-ink md:rounded-[24px] md:p-5"
         initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
+        animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE } }}
+        exit={{ opacity: 0, y: 24, transition: { duration: 0.18 } }}
         onPointerDown={onDown}
         onPointerUp={onUp}
+        onClick={onCardClick}
         aria-live="polite"
       >
         <div className="flex items-center justify-between gap-3">
@@ -239,7 +295,10 @@ export default function Process3DPage() {
           </button>
         </div>
         <p className="mt-2 hidden text-center text-[12px] text-ink-3 lg:block">Drag the scene to look around · arrow keys change step</p>
+        {compact && <p className="mt-1.5 text-center text-[11.5px] text-ink-3">Tap the card to hide it and see the whole 3D</p>}
       </motion.section>
+      )}
+      </AnimatePresence>
     </div>
   );
 }
