@@ -203,17 +203,17 @@ function DesktopNav() {
       {NAV.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative" title={label}>
           {({ isActive }) => (
-            <span className={`relative z-[1] flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 text-[15px] min-[1560px]:px-4 font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
+            <span className={`relative z-[1] flex min-h-[48px] min-w-[62px] flex-col items-center justify-center gap-0.5 whitespace-nowrap rounded-[18px] px-2.5 text-[11.5px] font-semibold min-[1560px]:min-h-[44px] min-[1560px]:min-w-0 min-[1560px]:flex-row min-[1560px]:gap-2 min-[1560px]:rounded-full min-[1560px]:px-4 min-[1560px]:text-[15px] transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
               {isActive && (
                 <motion.span
                   layoutId="nav-liquid"
-                  className="absolute inset-0 -z-[1] rounded-full"
+                  className="absolute inset-0 -z-[1] rounded-[18px] min-[1560px]:rounded-full"
                   style={{ background: 'linear-gradient(135deg, var(--water), color-mix(in oklab, var(--water) 55%, var(--water-deep)))', boxShadow: '0 1px 0 rgb(255 255 255 / .35) inset, 0 10px 30px -8px var(--water)' }}
                   transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                 />
               )}
               <Icon width={19} height={19} />
-              <span className="sr-only min-[1560px]:not-sr-only">{label}</span>
+              <span>{label}</span>
             </span>
           )}
         </NavLink>
@@ -406,7 +406,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="hidden">
               <StatusCluster />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden xl:block">
               <StatusCluster compact />
             </div>
             <AccountButton />
