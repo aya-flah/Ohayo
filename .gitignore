@@ -49,3 +49,6 @@ apps/api/data/*.db-*
 Thumbs.db
 .idea/
 *.log
+
+# AI spend ledger written at runtime by the API
+apps/api/data/
