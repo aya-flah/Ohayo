@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sonae Zitoun: Business Model Canvas (Tunisia)</title>
+<style>
+  @page { size: A3 landscape; margin: 11mm 12mm; }
+  :root { --ink:#17202a; --ink2:#4b5563; --line:#ddd6c8; --margine:#8a5a2b; --olive:#5f7f24; --water:#1b6fae; --chain:#0d7a55; --sun:#c98410; --paper:#fbf9f5; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.38; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16pt; margin-bottom: 7pt; }
+  h1 { font-size: 21pt; line-height: 1; margin: 0; letter-spacing: -0.3pt; }
+  .kicker { color: var(--margine); font-weight: 700; font-size: 10pt; margin-bottom: 3pt; }
+  .tag { color: var(--ink2); font-size: 9.6pt; max-width: 430pt; text-align: right; }
+  .canvas { display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: 1fr 1fr auto; gap: 6pt; height: 249mm; }
+  .b { border: 1.4px solid var(--line); border-radius: 10pt; padding: 8pt 9pt; background: var(--paper); overflow: hidden; }
+  .b h2 { font-size: 11pt; margin: 0 0 1pt; display: flex; align-items: center; gap: 6pt; }
+  .b h2 i { font-style: normal; display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%; font-size: 8pt; color: #fff; background: var(--ink2); }
+  .b .q { color: var(--ink2); font-size: 8.4pt; margin: 0 0 5pt; }
+  .b ul { margin: 0; padding-left: 12pt; }
+  .b li { margin: 0 0 3pt; }
+  .b li b { color: var(--ink); }
+  .b p { margin: 0 0 4pt; }
+  .kp { grid-column: 1 / 3; grid-row: 1 / 3; }
+  .ka { grid-column: 3 / 5; grid-row: 1; }
+  .kr { grid-column: 3 / 5; grid-row: 2; }
+  .vp { grid-column: 5 / 7; grid-row: 1 / 3; background: #f4f8ec; border-color: #cfdcb5; }
+  .cr { grid-column: 7 / 9; grid-row: 1; }
+  .ch { grid-column: 7 / 9; grid-row: 2; }
+  .cs { grid-column: 9 / 11; grid-row: 1 / 3; }
+  .co { grid-column: 1 / 6; grid-row: 3; background: #fcf6ef; border-color: #ead8c2; }
+  .rs { grid-column: 6 / 11; grid-row: 3; background: #eef6fb; border-color: #c4dbec; }
+  .vp h2 i { background: var(--olive); }
+  .co h2 i { background: var(--margine); }
+  .rs h2 i { background: var(--water); }
+  .seg { border-left: 3px solid var(--line); padding-left: 6pt; margin: 0 0 6pt; }
+  .seg b { display: block; }
+  .seg.pay { border-color: var(--water); }
+  .seg.use { border-color: var(--olive); }
+  .seg small { color: var(--ink2); font-size: 8.2pt; }
+  .vpitem { margin: 0 0 5pt; font-size: 9.3pt; }
+  .vpitem b { display: block; font-size: 9.8pt; }
+  .vpitem.big { background: #fff; border: 1px solid #cfdcb5; border-radius: 8pt; padding: 6pt 7pt; }
+  .money { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 14pt; }
+  .money table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .money td { padding: 2pt 0; border-bottom: 1px dotted var(--line); vertical-align: top; }
+  .money td:last-child { text-align: right; white-space: nowrap; font-weight: 650; }
+  .money .h { font-weight: 750; color: var(--water); padding-top: 0; }
+  .co .money .h { color: var(--margine); }
+  .note { color: var(--ink2); font-size: 8.2pt; margin-top: 4pt; }
+  .legend { display: flex; gap: 12pt; font-size: 8.4pt; color: var(--ink2); margin-top: 5pt; }
+  .legend span::before { content: ""; display: inline-block; width: 10pt; height: 3pt; margin-right: 4pt; vertical-align: 2pt; background: var(--line); }
+  .legend .p::before { background: var(--water); }
+  .legend .u::before { background: var(--olive); }
+
+  /* page 2 */
+  .p2 { break-before: page; }
+  .p2 h2 { font-size: 15pt; margin: 0 0 6pt; }
+  .p2 h3 { font-size: 11.5pt; margin: 10pt 0 4pt; }
+  .grid3 { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 14pt; }
+  .card { border: 1.4px solid var(--line); border-radius: 10pt; padding: 9pt 11pt; background: var(--paper); break-inside: avoid; }
+  .card p, .card li { font-size: 9.6pt; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 9.4pt; }
+  table.t th, table.t td { padding: 3.5pt 5pt; border-bottom: 1px solid var(--line); text-align: right; }
+  table.t th:first-child, table.t td:first-child { text-align: left; }
+  table.t th { background: #f3efe6; font-size: 8.8pt; }
+  table.t tr.total td { font-weight: 800; border-top: 1.5px solid var(--ink2); }
+  table.t tr.neg td:last-child, .neg { color: #b03a2e; }
+  .pos { color: var(--chain); font-weight: 800; }
+  .stat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10pt; margin: 4pt 0 10pt; }
+  .stat div { border: 1.4px solid var(--line); border-radius: 10pt; padding: 8pt 10pt; background: #fff; }
+  .stat b { display: block; font-size: 17pt; color: var(--water); line-height: 1.1; }
+  .stat span { font-size: 8.8pt; color: var(--ink2); }
+  .warn { border-left: 4px solid var(--sun); background: #fdf6e7; border-radius: 0 9pt 9pt 0; padding: 6pt 10pt; font-size: 9pt; margin-top: 10pt; }
+  ul.tight { margin: 2pt 0 0; padding-left: 13pt; }
+  ul.tight li { margin: 0 0 3pt; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="kicker">Sonae Zitoun · Business Model Canvas · Tunisian market</div>
+    <h1>Margine to the groves, grignon to the fire, proof on the chain</h1>
+  </div>
+  <div class="tag">A planning, traceability and marketplace platform for Tunisia's olive mills (maâsras), their neighbouring farmers, and the regulator. Launch region: Sfax olive belt, 2026–27 season.</div>
+</header>
+
+<div class="canvas">
+
+  <section class="b kp">
+    <h2><i>8</i>Key partners</h2>
+    <p class="q">Who we can't do it without</p>
+    <ul>
+      <li><b>Regulators:</b> ANPE (environment), the regional agriculture offices (CRDA) and the Ministry of Agriculture: they approve groves and accept the ledger as proof.</li>
+      <li><b>Office National de l'Huile (ONH)</b> and the mill federations: access to mills and an endorsement for the Zero-Spill label.</li>
+      <li><b>Institut de l'Olivier (Sfax)</b> and accredited labs: agronomic validation of doses, margine analyses.</li>
+      <li><b>UTAP / farmer GDAs:</b> reach farmers and organise the receiving groves.</li>
+      <li><b>Tanker operators</b> (private and mill-owned): drivers, GPS and flow meters as the delivery oracle.</li>
+      <li><b>Grignon buyers:</b> pomace-oil extraction units, brickworks, hammams, bakeries, greenhouse heating.</li>
+      <li><b>Telecom:</b> Tunisie Telecom / Ooredoo / Orange bulk SMS for farmers without smartphones.</li>
+      <li><b>Tech:</b> Anthropic (AI), Vercel + Neon (hosting, database), Ethereum ecosystem (public ledger).</li>
+      <li><b>Funding:</b> GIZ, EU and FAO environmental programmes, APIA and BFPME grants, Startup Act label.</li>
+    </ul>
+  </section>
+
+  <section class="b ka">
+    <h2><i>7</i>Key activities</h2>
+    <p class="q">What we must do every day</p>
+    <ul>
+      <li>Daily spreading plan per mill: weather, caps, distances, fullest pond first.</li>
+      <li>Onboarding mills and mapping/approving receiving groves with the CRDA.</li>
+      <li>Running the grignon marketplace and its escrow.</li>
+      <li>Keeping the on-chain ledger and issuing Zero-Spill certificates.</li>
+      <li>AI support: lab reading, Ask Sonae (Arabic, French), season plans.</li>
+      <li>Field support during the harvest (Nov–Feb).</li>
+    </ul>
+  </section>
+
+  <section class="b kr">
+    <h2><i>6</i>Key resources</h2>
+    <p class="q">What we own</p>
+    <ul>
+      <li><b>Planning engine</b> encoding the spreading rules (tested, auditable).</li>
+      <li><b>ZitounLedger</b> smart contract and the Zero-Spill certificate.</li>
+      <li><b>Grove registry</b>: slope, soil, well and wadi distances, season caps.</li>
+      <li>Live platform: web, Android, PWA, Arabic and English.</li>
+      <li>Data: every season's loads, ponds and rain, improving the plans each year.</li>
+      <li>Small team: product, engineering, one agronomist, field agents.</li>
+    </ul>
+  </section>
+
+  <section class="b vp">
+    <h2><i>2</i>Value propositions</h2>
+    <p class="q">Why they choose Sonae</p>
+    <div class="vpitem big"><b>For the mill: never overflow, never get fined</b>A day-by-day plan that tells each tanker where it may legally go, so the pond is emptied before the rain. Compliance proof is ready for any inspection.</div>
+    <div class="vpitem big"><b>For the farmer: free water and potash</b>Margine brings water and about 4 kg of K₂O per m³, delivered to the field, under the legal cap, never before rain. It saves fertiliser money.</div>
+    <div class="vpitem"><b>Grignon becomes income</b>Dried pomace sold as fuel (about 2.5 kg replaces 1 kg of diesel) to verified buyers, with payment held in escrow.</div>
+    <div class="vpitem"><b>For the regulator: proof without paperwork</b>Every load is traced on a public ledger: nobody, us included, can edit it afterwards.</div>
+    <div class="vpitem"><b>Zero-Spill certificate</b>A QR code on the bottle proving the oil was made without polluting: an export and premium argument for Tunisian oil. <i>New: this doesn't exist today.</i></div>
+    <div class="vpitem"><b>Built for Tunisia</b>Arabic and French, SMS in Tunisian darija, live local weather, prices in TND.</div>
+  </section>
+
+  <section class="b cr">
+    <h2><i>4</i>Customer relationships</h2>
+    <p class="q">How we keep them</p>
+    <ul>
+      <li><b>Field onboarding</b> at the mill before the season: pond, trucks, groves.</li>
+      <li><b>Self-service</b> after that: the app, the AI assistant, and SMS for farmers.</li>
+      <li>A personal season plan generated for every account.</li>
+      <li>Harvest-time hotline (WhatsApp / phone).</li>
+      <li>End-of-season report: m³ moved, fines avoided, money saved.</li>
+      <li>Community: GDA meetings, the Zero-Spill label as a badge of pride.</li>
+    </ul>
+  </section>
+
+  <section class="b ch">
+    <h2><i>3</i>Channels</h2>
+    <p class="q">How we reach them</p>
+    <ul>
+      <li><b>Direct sales</b> to mills in Sfax, then Sousse, Mahdia, Monastir and Kairouan, before the November harvest.</li>
+      <li>Through the <b>CRDA and ANPE</b> (compliance campaigns) and mill federations.</li>
+      <li>UTAP and GDA meetings for farmers; word of mouth between neighbours.</li>
+      <li>Web app, Android app and PWA; bulk SMS.</li>
+      <li>Agricultural fairs (e.g. SIAMAP) and olive-oil events; Facebook groups for farmers.</li>
+    </ul>
+  </section>
+
+  <section class="b cs">
+    <h2><i>1</i>Customer segments</h2>
+    <p class="q">Who pays, who benefits</p>
+    <div class="seg pay"><b>Olive mills (maâsras)</b><small>Main paying customer. About 1,700 mills in Tunisia, many traditional and semi-modern ones in the Sahel and Sfax, each storing margine in ponds that can overflow. First target: medium mills (300–2,000 m³ per season).</small></div>
+    <div class="seg pay"><b>Mill cooperatives and SMSA</b><small>Several presses, one account (Coopérative pack).</small></div>
+    <div class="seg use"><b>Olive farmers and GDAs</b><small>Receive margine; free basic use, paid planning extras per hectare.</small></div>
+    <div class="seg pay"><b>Grignon buyers</b><small>Extraction units, brickworks, hammams: pay through the marketplace.</small></div>
+    <div class="seg use"><b>Regulators</b><small>ANPE, CRDA: read the ledger; later a paid dashboard or programme contract.</small></div>
+    <div class="seg pay"><b>Oil exporters and brands</b><small>Pay per Zero-Spill certificate for traceable, eco-labelled batches.</small></div>
+    <div class="legend"><span class="p">pays</span><span class="u">uses / benefits</span></div>
+  </section>
+
+  <section class="b co">
+    <h2><i>9</i>Cost structure</h2>
+    <div class="money">
+      <table>
+        <tr><td class="h" colspan="2">Fixed (per year, launch)</td></tr>
+        <tr><td>Team: 2 developers, 1 agronomist, 1 field agent (part of the year)</td><td>≈ 96,000 TND</td></tr>
+        <tr><td>Hosting, database, domain (Vercel, Neon)</td><td>≈ 1,600 TND</td></tr>
+        <tr><td>Legal, accounting, Startup Act set-up</td><td>≈ 6,000 TND</td></tr>
+        <tr><td>Sales, fairs, field transport</td><td>≈ 14,000 TND</td></tr>
+      </table>
+      <table>
+        <tr><td class="h" colspan="2">Variable (grows with use)</td></tr>
+        <tr><td>AI calls (Claude Opus): ≈ 0.05–0.15 TND per question or lab reading, ≈ 0.3 TND per season plan</td><td>≈ 2,500 TND</td></tr>
+        <tr><td>Bulk SMS: ≈ 0.03 TND each</td><td>≈ 1,800 TND</td></tr>
+        <tr><td>Blockchain fees (production network, cents per load)</td><td>≈ 600 TND</td></tr>
+        <tr><td>Payment fees on the marketplace (D17, Flouci, bank)</td><td>≈ 1.5 %</td></tr>
+      </table>
+    </div>
+    <p class="note">Year-1 total ≈ 125,000 TND. Software costs stay small; people are the main cost. Figures are planning estimates.</p>
+  </section>
+
+  <section class="b rs">
+    <h2><i>5</i>Revenue streams</h2>
+    <div class="money">
+      <table>
+        <tr><td class="h" colspan="2">Mill season packs (main stream)</td></tr>
+        <tr><td>Essentiel: up to 600 m³, then 0.60 TND/m³</td><td>390 TND</td></tr>
+        <tr><td>Pro: up to 2,000 m³, then 0.45 TND/m³</td><td>950 TND</td></tr>
+        <tr><td>Coopérative: up to 6,000 m³, then 0.35 TND/m³</td><td>2,400 TND</td></tr>
+        <tr><td class="h" colspan="2">Farmers</td></tr>
+        <tr><td>Voisin (receive margine, SMS)</td><td>Free</td></tr>
+        <tr><td>Grove / Grove+ planning extras</td><td>35 / 55 TND per ha</td></tr>
+      </table>
+      <table>
+        <tr><td class="h" colspan="2">Transactions</td></tr>
+        <tr><td>Grignon marketplace commission</td><td>5 TND per tonne</td></tr>
+        <tr><td>Traced load fee (on-chain record)</td><td>0.50 TND per m³</td></tr>
+        <tr><td>Zero-Spill certificate for exporters</td><td>≈ 0.01 TND per litre</td></tr>
+        <tr><td class="h" colspan="2">Later</td></tr>
+        <tr><td>Regulator dashboard / programme contract (ANPE, CRDA, donors)</td><td>per region</td></tr>
+        <tr><td>Anonymised season data for research and insurers</td><td>licence</td></tr>
+      </table>
+    </div>
+    <p class="note">A mill pays about what one overflow fine or one emergency tanker day costs. Payment: bank transfer, D17 or Flouci; no payment is taken in the demo.</p>
+  </section>
+</div>
+
+<!-- ───────────── Page 2: numbers behind the canvas ───────────── -->
+<section class="p2">
+  <div class="kicker">Sonae Zitoun · the numbers behind the canvas</div>
+  <h2>Market, unit economics and a three-season plan</h2>
+
+  <div class="stat">
+    <div><b>≈ 1,700</b><span>olive mills in Tunisia, the main paying segment</span></div>
+    <div><b>≈ 1 M m³</b><span>of margine per season (0.7 to 1.5 M depending on the harvest)</span></div>
+    <div><b>≈ 1.5 M ha</b><span>of olive groves that can receive it, under the 50 m³/ha cap</span></div>
+    <div><b>Top 3</b><span>Tunisia's usual rank among world olive-oil producers and exporters</span></div>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h3 style="margin-top:0">Three-season revenue plan (targets)</h3>
+      <table class="t">
+        <tr><th>Stream</th><th>2026–27<br>Sfax pilot</th><th>2027–28<br>Sahel + Sfax</th><th>2028–29<br>National</th></tr>
+        <tr><td>Mills on Sonae</td><td>25</td><td>120</td><td>400</td></tr>
+        <tr><td>Mill packs (avg ≈ 800 TND with overage)</td><td>20,000</td><td>96,000</td><td>320,000</td></tr>
+        <tr><td>Traced loads (0.5 TND/m³)</td><td>15,000</td><td>72,000</td><td>240,000</td></tr>
+        <tr><td>Grignon commission (5 TND/t)</td><td>30,000</td><td>140,000</td><td>450,000</td></tr>
+        <tr><td>Farmer extras</td><td>8,000</td><td>35,000</td><td>110,000</td></tr>
+        <tr><td>Zero-Spill certificates</td><td>3,000</td><td>25,000</td><td>120,000</td></tr>
+        <tr class="total"><td>Revenue (TND)</td><td>76,000</td><td>368,000</td><td>1,240,000</td></tr>
+        <tr><td>Costs (TND)</td><td>125,000</td><td>260,000</td><td>620,000</td></tr>
+        <tr class="total"><td>Result (TND)</td><td class="neg">−49,000</td><td class="pos">+108,000</td><td class="pos">+620,000</td></tr>
+      </table>
+      <p class="note">The pilot loss is covered by a grant or seed round (GIZ / EU programmes, Startup Act, BFPME). Break-even comes in the second season.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Unit economics: one medium mill</h3>
+      <table class="t">
+        <tr><th>Per season</th><th>TND</th></tr>
+        <tr><td>Pro pack (1,800 m³ of margine)</td><td>950</td></tr>
+        <tr><td>Traced loads 1,800 m³ × 0.5</td><td>900</td></tr>
+        <tr><td>Grignon 900 t × 5 TND</td><td>4,500</td></tr>
+        <tr class="total"><td>Sonae revenue per mill</td><td>6,350</td></tr>
+        <tr><td>AI + SMS + chain + support</td><td class="neg">−400</td></tr>
+        <tr class="total"><td>Gross margin per mill</td><td class="pos">≈ 94 %</td></tr>
+      </table>
+      <h3>What the mill gains</h3>
+      <ul class="tight">
+        <li>No overflow fine and no emergency pumping.</li>
+        <li>Grignon sold as fuel instead of piling up.</li>
+        <li>Inspection-ready proof, and the Zero-Spill label for its buyers.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Why now, and why us</h3>
+      <ul class="tight">
+        <li><b>The problem is seasonal and urgent:</b> ponds fill in 3 months, rain storms hit the same weeks.</li>
+        <li><b>Rules exist, proof doesn't:</b> controlled spreading is allowed but hard to check. The ledger gives the check.</li>
+        <li><b>Export pressure:</b> European buyers ask for traceability and environmental proof.</li>
+        <li><b>No direct competitor</b> combines daily planning, traceability and a grignon market for Tunisian mills.</li>
+        <li><b>Working product:</b> live web and Android app, AI in Arabic, contract on a public testnet.</li>
+      </ul>
+      <h3>Main risks and answers</h3>
+      <ul class="tight">
+        <li><b>Mills slow to pay:</b> start free for the pilot, price below one fine.</li>
+        <li><b>Regulator acceptance:</b> pilot co-designed with the Sfax CRDA.</li>
+        <li><b>Seasonality:</b> off-season revenue from certificates, data and regulator contracts.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warn"><b>Before citing figures:</b> market sizes (number of mills, margine volume, grove area) are rounded orders of magnitude from public Tunisian sources and vary with the harvest; check the latest ONH and Ministry of Agriculture numbers. Prices are Sonae's own packs from the app; costs and the three-season plan are planning targets, not results.</div>
+</section>
+
+</body>
+</html>

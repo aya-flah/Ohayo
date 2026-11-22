@@ -60,3 +60,13 @@ scripts/demo-video/segs/
 scripts/demo-video/node_modules/
 scripts/demo-video/marks.json
 scripts/demo-video/package*.json
+
+.vercel
+.env*
+
+# Vercel: generated API bundle and local pulls
+api/index.mjs
+.vercel
+
+# Large public video: served by Vercel (see .vercelignore), not kept in git
+apps/web/public/video/*.mp4

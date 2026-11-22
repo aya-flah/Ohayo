@@ -122,7 +122,7 @@ export default function PlanPage() {
       })
       .catch((e) => setLiveError(e instanceof Error ? e.message : 'Forecast unavailable'));
   }, [scenario, online, myKey, myMill.lat, myMill.lng, myWeather?.key, setMyWeather]);
-  const [selected, setSelected] = useState(0);
+  const [pickedDay, setSelected] = useState(0);
   const [cursor, setCursor] = useState(DEFAULT_CURSOR);
   const [playing, setPlaying] = useState(false);
   const [smsKind, setSmsKind] = useState<'farmer' | 'driver'>('farmer');
@@ -133,8 +133,15 @@ export default function PlanPage() {
   const [openTrip, setOpenTrip] = useState<string | null>(null);
   const setSceneCursor = useScene((s) => s.setCursor);
   const raf = useRef<number | null>(null);
+  const cursorRef = useRef(DEFAULT_CURSOR);
   const N = plan.days.length;
+  // The week can shrink when the scenario changes (storm demo, live forecast, my mill): never point past its last day.
+  const selected = Math.max(0, Math.min(pickedDay, N - 1));
+  useEffect(() => {
+    setCursor((c) => Math.min(c, Math.max(0, N - 0.001)));
+  }, [N]);
 
+  cursorRef.current = cursor;
   useEffect(() => setSceneCursor(Math.min(cursor, N - 0.001)), [cursor, N, setSceneCursor]);
 
   useEffect(() => {
@@ -143,15 +150,16 @@ export default function PlanPage() {
     const step = (t: number) => {
       const dt = (t - last) / 1000;
       last = t;
-      setCursor((c) => {
-        const next = c + (dt * N) / PLAY_SECONDS;
-        if (next >= N) {
-          setPlaying(false);
-          return N - 0.001;
-        }
-        setSelected(Math.floor(next));
-        return next;
-      });
+      // Advance from a ref, not inside a state updater, so play never calls setState while React renders.
+      const next = Math.min(cursorRef.current + (Math.min(dt, 0.25) * N) / PLAY_SECONDS, N);
+      if (next >= N) {
+        setCursor(N - 0.001);
+        setSelected(N - 1);
+        setPlaying(false);
+        return;
+      }
+      setCursor(next);
+      setSelected(Math.floor(next));
       raf.current = requestAnimationFrame(step);
     };
     raf.current = requestAnimationFrame(step);
@@ -186,11 +194,13 @@ export default function PlanPage() {
     if (day.blocked) return { to: 'every farmer on the list', text: rainSms(day.blockReason ?? '', Math.min(selected, 2)) };
     const t0 = day.trips[0];
     if (!t0) return { to: 'nobody', text: 'Sonae: lyoum ma fammech rihla.' };
-    const mill = input.mills.find((m) => m.id === t0.millId)!;
+    const mill = input.mills.find((m) => m.id === t0.millId);
+    if (!mill) return { to: 'nobody', text: 'Sonae: lyoum ma fammech rihla.' };
     if (smsKind === 'driver') {
       return { to: `driver, tanker 1 of ${mill.name}`, text: driverSms(day.trips.filter((t) => t.millId === mill.id && t.truck === 0), input.groves, mill, Math.min(selected, 2)) };
     }
-    const grove = input.groves.find((g) => g.id === t0.groveId)!;
+    const grove = input.groves.find((g) => g.id === t0.groveId);
+    if (!grove) return { to: 'nobody', text: 'Sonae: lyoum ma fammech rihla.' };
     return { to: `${grove.owner}, the evening before`, text: farmerSms(day.trips.filter((t) => t.groveId === grove.id), grove, mill, 1) };
   }, [day, smsKind, input, selected]);
 

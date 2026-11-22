@@ -41,3 +41,29 @@ export async function tap(style: 'light' | 'medium' | 'heavy' = 'light') {
     /* haptics are a nicety */
   }
 }
+
+/** True on phone-width screens (< 768 px): used to keep animations light where GPUs are small. */
+export function useIsPhone(): boolean {
+  const query = '(max-width: 767px)';
+  const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const m = window.matchMedia(query);
+    const on = () => setPhone(m.matches);
+    m.addEventListener('change', on);
+    return () => m.removeEventListener('change', on);
+  }, []);
+  return phone;
+}
+
+/** Phones in either orientation: narrow screens, or short landscape screens. The 3D pages fold their cards here. */
+export function useCompactScreen(): boolean {
+  const query = '(max-width: 767px), (orientation: landscape) and (max-height: 520px)';
+  const [on, setOn] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const m = window.matchMedia(query);
+    const change = () => setOn(m.matches);
+    m.addEventListener('change', change);
+    return () => m.removeEventListener('change', change);
+  }, []);
+  return on;
+}

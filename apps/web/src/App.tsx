@@ -12,6 +12,8 @@ const AccountPage = lazy(() => import('./pages/AccountPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const ReplayPage = lazy(() => import('./pages/ReplayPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const Process3DPage = lazy(() => import('./pages/Process3DPage'));
+const VideoPage = lazy(() => import('./pages/VideoPage'));
 
 function Loading() {
   return (
@@ -27,6 +29,21 @@ function Loading() {
 
 export default function App() {
   const location = useLocation();
+  // The 3D process on its own (for the QR code): no site menus around it.
+  if (location.pathname === '/video') {
+    return (
+      <Suspense fallback={null}>
+        <VideoPage />
+      </Suspense>
+    );
+  }
+  if (location.pathname === '/3d' || location.pathname.startsWith('/3d/')) {
+    return (
+      <Suspense fallback={null}>
+        <Process3DPage />
+      </Suspense>
+    );
+  }
   return (
     <Shell>
       <Suspense fallback={<Loading />}>

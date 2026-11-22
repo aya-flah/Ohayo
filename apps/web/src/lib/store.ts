@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 /** App-wide preferences. The olive plan itself lives in lib/zitoun.ts. */
 export type ThemeChoice = 'system' | 'light' | 'dark';
-export type Lang = 'en' | 'ar';
+export type Lang = 'en' | 'ar' | 'ja';
 
 interface Persisted {
   theme: ThemeChoice;

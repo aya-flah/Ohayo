@@ -2,13 +2,15 @@ import { NavLink, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconDrop, IconLeaf, IconMoon, IconPlan, IconProcess, IconReplay, IconSettings, IconSunMode, IconTwin, IconWifiOff, IconYui } from './Icons';
-import { useOnline, usePrefersReducedMotion, tap } from '../lib/device';
+import { useIsPhone, useOnline, usePrefersReducedMotion, tap } from '../lib/device';
 import { useSonae } from '../lib/store';
 import { DEFAULT_CURSOR, poseFor, useFieldMode, useRegionState, useScene } from '../lib/scene';
 import { useZPlan } from '../lib/zitoun';
 import { useProcess } from '../lib/process';
 import { useSession } from '../lib/session';
 import { EASE } from './ui';
+import { PageErrorBoundary } from './PageErrorBoundary';
+import { LangPicker } from './LangPicker';
 
 const ZitounScene = lazy(() => import('../pages/twin/ZitounScene').then((m) => ({ default: m.ZitounScene })));
 const ProcessScene = lazy(() => import('../pages/twin/ProcessScene').then((m) => ({ default: m.ProcessScene })));
@@ -171,30 +173,6 @@ function AccountButton() {
   );
 }
 
-function LangToggle() {
-  const lang = useSonae((s) => s.lang);
-  const setLang = useSonae((s) => s.setLang);
-  const ar = lang === 'ar';
-  return (
-    <button
-      onClick={() => {
-        tap();
-        setLang(ar ? 'en' : 'ar');
-      }}
-      className="glass glass-soft relative grid h-12 w-12 place-items-center overflow-hidden rounded-full text-ink transition-transform duration-200 active:scale-90"
-      aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'}
-      title={ar ? 'English' : 'العربية'}
-      data-no-translate
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span key={lang} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} transition={{ duration: 0.2, ease: EASE }} className={ar ? 'text-[14px] font-extrabold' : 'text-[19px] font-bold'} style={{ fontFamily: ar ? undefined : '"Noto Sans Arabic Variable", sans-serif' }}>
-          {ar ? 'EN' : 'ع'}
-        </motion.span>
-      </AnimatePresence>
-    </button>
-  );
-}
-
 function ModeToggle() {
   const field = useFieldMode();
   const setTheme = useSonae((s) => s.setTheme);
@@ -251,7 +229,7 @@ function MobileDock() {
         {NAV.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative">
             {({ isActive }) => (
-              <span className={`relative z-[1] flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[22px] text-[11px] font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2'}`}>
+              <span className={`dock-item relative z-[1] flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[22px] text-[11px] font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2'}`}>
                 {isActive && (
                   <motion.span
                     layoutId="dock-liquid"
@@ -263,7 +241,7 @@ function MobileDock() {
                 <motion.span animate={{ y: isActive ? -1 : 0, scale: isActive ? 1.08 : 1 }} transition={{ type: 'spring', stiffness: 500, damping: 26 }}>
                   <Icon width={22} height={22} />
                 </motion.span>
-                {label}
+                <span className="dock-label">{label}</span>
               </span>
             )}
           </NavLink>
@@ -370,6 +348,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const idx = navIndex(location.pathname);
   const prevIdx = useRef(idx);
   const dir = idx - prevIdx.current;
+  const phone = useIsPhone();
   useEffect(() => {
     prevIdx.current = idx;
   }, [idx]);
@@ -405,13 +384,13 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="relative min-h-screen">
       <Intro />
       <Backdrop />
-      <TideSweep key={location.pathname} path={location.pathname} dir={dir} />
+      {!phone && <TideSweep key={location.pathname} path={location.pathname} dir={dir} />}
 
       {/* Top HUD */}
       <motion.header
         className="pointer-events-none fixed inset-x-0 top-0 z-40"
         style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
-        animate={atTop ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: -24, filter: 'blur(6px)' }}
+        animate={atTop ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: -24, filter: phone ? 'blur(0px)' : 'blur(6px)' }}
         transition={{ duration: atTop ? 0.3 : 0.2, ease: atTop ? EASE : [0.7, 0, 0.84, 0] }}
         aria-hidden={!atTop}
         inert={!atTop}
@@ -434,7 +413,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <NavLink to="/settings" onClick={() => tap()} className={({ isActive }) => `glass glass-soft grid h-12 w-12 place-items-center rounded-full transition-transform duration-200 active:scale-90 ${isActive ? 'text-[var(--water)]' : 'text-ink'}`} aria-label="Settings" title="Settings">
               <IconSettings width={21} height={21} />
             </NavLink>
-            <LangToggle />
+            <LangPicker />
             <ModeToggle />
           </div>
         </div>
@@ -445,9 +424,9 @@ export function Shell({ children }: { children: ReactNode }) {
           <motion.div
             key={location.pathname}
             className="mx-auto max-w-[1280px]"
-            exit={{ opacity: 0, y: -18, scale: 0.985, filter: 'blur(14px)', transition: { duration: 0.32, ease: [0.7, 0, 0.84, 0] } }}
+            exit={phone ? { opacity: 0, y: -10, transition: { duration: 0.18, ease: [0.7, 0, 0.84, 0] } } : { opacity: 0, y: -18, scale: 0.985, filter: 'blur(14px)', transition: { duration: 0.32, ease: [0.7, 0, 0.84, 0] } }}
           >
-            {children}
+            <PageErrorBoundary>{children}</PageErrorBoundary>
           </motion.div>
         </AnimatePresence>
       </main>

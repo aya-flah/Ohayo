@@ -2,6 +2,8 @@
 @import "./palette.css";
 @import "@fontsource-variable/plus-jakarta-sans";
 @import "@fontsource-variable/noto-sans-arabic";
+@import "@fontsource/zen-kaku-gothic-new/400.css";
+@import "@fontsource/zen-kaku-gothic-new/700.css";
 @import "@fontsource/shippori-mincho-b1/latin-600.css";
 @import "@fontsource/shippori-mincho-b1/latin-800.css";
 
@@ -635,7 +637,44 @@ html[lang="ar"] h3 {
 html[lang="ar"] .eyebrow {
   text-transform: none;
 }
+/* Japanese: Latin and numbers in the brand face, Japanese glyphs in Zen Kaku Gothic; no tracking */
+html[lang="ja"] body,
+html[lang="ja"] .scene-badge {
+  font-family: "Plus Jakarta Sans Variable", "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  line-break: strict;
+}
+html[lang="ja"] .eyebrow,
+html[lang="ja"] h1,
+html[lang="ja"] h2,
+html[lang="ja"] h3 {
+  letter-spacing: 0;
+}
+html[lang="ja"] .eyebrow {
+  text-transform: none;
+}
 html[dir="rtl"] .num {
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* Bottom menu bar height, so 3D controls always sit above it (it only shows below 1024 px). */
+:root {
+  --dock-h: 88px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --dock-h: 0px;
+  }
+}
+/* Phone on its side: a slim, icon-only menu bar leaves room for the 3D. */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 1023px) {
+  :root {
+    --dock-h: 64px;
+  }
+  .dock-item {
+    min-height: 44px;
+  }
+  .dock-label {
+    display: none;
+  }
 }

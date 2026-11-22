@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sonae Zitoun: technical presentation notes</title>
+<style>
+  @page { size: A4; margin: 14mm 15mm; }
+  :root { --ink:#17202a; --ink2:#4b5563; --line:#e5e1d8; --margine:#8a5a2b; --olive:#5f7f24; --water:#1b6fae; --chain:#0d7a55; --sun:#c98410; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.42; margin: 0; }
+  h1 { font-size: 25pt; line-height: 1.05; margin: 0 0 4pt; }
+  h2 { font-size: 15pt; margin: 12pt 0 5pt; padding-top: 5pt; border-top: 2px solid var(--line); break-after: avoid; }
+  h3 { font-size: 11.3pt; margin: 9pt 0 3pt; break-after: avoid; }
+  p { margin: 0 0 6pt; }
+  ul { margin: 2pt 0 6pt; padding-left: 15pt; }
+  li { margin: 1.5pt 0; }
+  .kicker { color: var(--margine); font-weight: 700; font-size: 10pt; }
+  .lead { font-size: 12pt; color: var(--ink2); }
+  .meta { font-size: 9.3pt; color: var(--ink2); }
+  code, .mono { font-family: Consolas, monospace; font-size: 9.2pt; background: #f0ece4; padding: 0 3pt; border-radius: 3pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.6pt; margin: 4pt 0 8pt; }
+  th, td { text-align: left; vertical-align: top; padding: 4pt 6pt; border-bottom: 1px solid var(--line); }
+  th { background: #f6f3ec; font-size: 9pt; }
+  tr { break-inside: avoid; }
+  tr:first-child, tr:nth-child(2) { break-after: avoid; }
+  table { break-before: avoid; }
+  td:first-child { font-weight: 650; white-space: nowrap; }
+  .box { border-left: 4px solid var(--olive); background: #f3f7ec; border-radius: 0 9pt 9pt 0; padding: 6pt 10pt; margin: 6pt 0 8pt; break-inside: avoid; }
+  .box.ai { border-left-color: var(--water); background: #ecf3fa; }
+  .box.chain { border-left-color: #10b981; background: #eaf7f1; }
+  .box.warn { border-left-color: var(--sun); background: #fdf6e7; }
+  .say { font-style: italic; }
+  .qa { break-inside: avoid; margin: 0 0 5pt; }
+  .qa .q { font-weight: 750; }
+  .qa .q::before { content: "Q. "; color: var(--margine); }
+  .qa .a { margin-left: 15pt; font-size: 9.8pt; }
+  .arch { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6pt; margin: 6pt 0 4pt; break-inside: avoid; }
+  .arch div { border: 1.5px solid var(--line); border-radius: 9pt; padding: 6pt 8pt; font-size: 9.3pt; }
+  .arch b { display: block; font-size: 10pt; margin-bottom: 2pt; }
+  .arch .w { border-color: #b9d3ea; background: #f4f8fc; }
+  .arch .a { border-color: #cfdcb5; background: #f7faf1; }
+  .arch .c { border-color: #a9dcc6; background: #f1faf6; }
+  .arch .x { border-color: #e8d6bd; background: #fcf8f2; }
+  .arrow { text-align: center; color: var(--ink2); font-size: 9pt; margin: 2pt 0 8pt; }
+  .num { font-weight: 800; color: var(--water); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<div class="kicker">Sonae Zitoun · technical presentation notes</div>
+<h1>How it is built, and how to answer the jury</h1>
+<p class="lead">Every technology we used and why we chose it, how each part works under the hood, and short answers to the technical questions a jury is likely to ask.</p>
+<p class="meta"><b>Live:</b> <span class="mono">https://sonae-zitoun.vercel.app</span> · web app, API and database on Vercel + Neon, contract on Ethereum Sepolia.</p>
+<p class="meta">One-line pitch: <b>Sonae plans, day by day, where an olive mill's margine (olive-mill wastewater) can safely go as water and potassium for olive groves, and sells the grignon (pomace) as fuel. A blockchain ledger proves that no grove got more than the law allows.</b></p>
+
+<h2>1. Architecture in one picture</h2>
+<div class="arch">
+  <div class="w"><b>Web app (React 19)</b>Plan, 3D twin, process, grove check, lab reader, Ask Sonae, accounts, Yui ledger, replay. Also runs as an installable PWA and an Android app (Capacitor).</div>
+  <div class="a"><b>API (Fastify 5, Node)</b>Accounts and sessions, packs, season-plan generation, lab-report reading, Ask Sonae, admin, AI budget guard. Runs as a Vercel serverless function; data in Neon Postgres.</div>
+  <div class="c"><b>Smart contract (Solidity)</b>ZitounLedger on Ethereum Sepolia: grove caps, load dispatch and delivery, grignon escrow, clean-oil certificates.</div>
+</div>
+<div class="arch">
+  <div class="x"><b>Engine (shared TypeScript)</b><code>planZitoun</code>: the deterministic planner. The same code runs in the browser, on the API and in tests.</div>
+  <div class="x"><b>Claude Opus 5.5 (Anthropic API)</b>Reads lab reports, answers farmers, and writes the season plan. Called only from the API, never from the browser.</div>
+  <div class="x"><b>Open-Meteo</b>Free weather API: 8-day rain, temperature and evapotranspiration (ET0) for any point in Tunisia.</div>
+</div>
+<p class="arrow">Browser → <code>/api</code> on the same Vercel domain (HTTPS + session token) → Claude / Neon Postgres · Browser → Sepolia directly (wallet signs, viem reads) · Browser and API → Open-Meteo</p>
+
+<div class="box"><b>Key design idea:</b> the <b>numbers come from code, the words come from AI.</b> Caps, doses, rain blocks and distances are computed by the deterministic engine and enforced by the contract. The AI only explains, reads documents and writes the plan around numbers that the code already computed. So the AI can never authorise an unsafe spread.</div>
+
+<h2>2. Technology stack</h2>
+<table>
+<tr><th>Layer</th><th>Technology</th><th>Why we chose it</th></tr>
+<tr><td>Language</td><td>TypeScript 5.9 everywhere (web, API, engine, tests, scripts)</td><td>One language and shared types from the contract ABI to the UI; fewer integration bugs.</td></tr>
+<tr><td>Repo</td><td>npm workspaces monorepo: <code>apps/web</code>, <code>apps/api</code>, <code>apps/mobile</code>, <code>packages/engine</code>, <code>packages/shared</code>, <code>contracts</code></td><td>The planner is written once and imported by both front and back end.</td></tr>
+<tr><td>Front end</td><td>React 19, Vite 7, React Router 7, Tailwind CSS 4</td><td>Fast dev server and build, modern React, utility CSS for a consistent design system.</td></tr>
+<tr><td>3D</td><td>Three.js 0.180 with React Three Fiber 9 and Drei 10</td><td>Real-time 3D in the browser, written as React components and driven by app state.</td></tr>
+<tr><td>Animation</td><td>Motion 12 (Framer Motion)</td><td>Page transitions, the animated nav and the season-plan reveal. Respects "reduce motion".</td></tr>
+<tr><td>State / data</td><td>Zustand 5, TanStack Query 5</td><td>Small global store (theme, language, scenario); cached server calls.</td></tr>
+<tr><td>Web3 client</td><td>viem 2 and wagmi 2</td><td>Type-safe contract reads and writes, wallet connection (MetaMask).</td></tr>
+<tr><td>Back end</td><td>Fastify 5 with helmet, CORS and rate-limit plugins; Zod 4 validation</td><td>Fast, schema-first Node server; every request body is validated.</td></tr>
+<tr><td>Database</td><td><b>Neon Postgres</b> (serverless, via the Vercel Marketplace) with <code>@neondatabase/serverless</code>; SQLite (<code>node:sqlite</code>) only on a developer laptop</td><td>Serverless functions have no lasting disk, so a SQLite file would be wiped. Neon is managed Postgres reached over HTTPS, built for serverless.</td></tr>
+<tr><td>Hosting</td><td>Vercel: static site on its global CDN + the API as one Node 22 serverless function</td><td>One domain, HTTPS, automatic scaling, no server to maintain.</td></tr>
+<tr><td>AI</td><td>Claude Opus 5.5 (<code>claude-opus-5-5</code>) via the official <code>@anthropic-ai/sdk</code></td><td>Strong at reading PDFs and photos, Arabic and French, tool use, and structured JSON output.</td></tr>
+<tr><td>Weather</td><td>Open-Meteo forecast API</td><td>Free, no key, daily rain and ET0 at any coordinate, Tunis time zone.</td></tr>
+<tr><td>Smart contract</td><td>Solidity 0.8.28, OpenZeppelin 5.4 (AccessControl, Pausable, ReentrancyGuard), Hardhat 2.29</td><td>Audited building blocks; Hardhat for compile, test, deploy and verify.</td></tr>
+<tr><td>Network</td><td>Ethereum Sepolia testnet; source verified on Sourcify</td><td>Public, free test ETH, anyone can read and check the code.</td></tr>
+<tr><td>Mobile</td><td>Capacitor 7 (Android), PWA via vite-plugin-pwa</td><td>The same web code ships as an installable app, with haptics and offline caching.</td></tr>
+<tr><td>Languages</td><td>English and Arabic (RTL), Noto Sans Arabic font</td><td>The whole UI switches with one tap; AI answers in the chosen language.</td></tr>
+<tr><td>Testing</td><td>Vitest (engine), Mocha/Chai via Hardhat (contract), Playwright (recorded demo)</td><td>25 engine tests and 21 contract tests pass.</td></tr>
+</table>
+
+<h2>3. The core: the margine planner</h2>
+<p><b>Input:</b> the mills (pond volume and fill level, margine produced each day, tankers), the groves (area, slope, soil, distance to the nearest well and to the wadi, margine already received this season) and the 8-day weather forecast.</p>
+<p><b>Output:</b> for each day, which tanker carries how many m³ from which mill to which grove, which days are blocked and why, each pond's level, the potassium (K₂O) delivered, money saved, and SMS texts for the farmer and the driver.</p>
+<h3>Rules the planner enforces (from Tunisian practice and the scientific literature on margine spreading)</h3>
+<table>
+<tr><th>Rule</th><th>Value</th><th>Why</th></tr>
+<tr><td>Season cap per grove</td><td>50 m³/ha</td><td>Above this, salts and phenols build up in the soil.</td></tr>
+<tr><td>Daily dose</td><td>10 m³/ha/day</td><td>The soil must absorb it; no run-off.</td></tr>
+<tr><td>Rain block</td><td>No spreading at ≥ 8 mm rain, or the day before rain</td><td>Rain would wash margine into the wadi and the groundwater.</td></tr>
+<tr><td>Wet soil</td><td>Blocked if 2-day rain ≥ 12 mm</td><td>Saturated soil can't absorb more.</td></tr>
+<tr><td>Slope</td><td>Never above 8 %</td><td>Run-off.</td></tr>
+<tr><td>Distances</td><td>≥ 100 m from a well, ≥ 50 m from the wadi</td><td>Protect drinking water.</td></tr>
+<tr><td>Value</td><td>≈ 4 kg K₂O per m³; olive need ≈ 80 kg K₂O/ha</td><td>Converts margine into fertiliser saved, in TND.</td></tr>
+<tr><td>Grignon</td><td>≈ 2.5 kg grignon replaces 1 kg diesel</td><td>Fuel value for the well-pump engine.</td></tr>
+</table>
+<h3>Algorithm (greedy, deterministic)</h3>
+<ul>
+<li>For each day: check the weather → block the day if unsafe (and say why).</li>
+<li>Sort ponds by fill level: <b>the fullest pond is served first</b>, because it is closest to overflowing.</li>
+<li>Pick eligible groves (not excluded by slope or distance, room left under the cap, under the daily dose), nearest first to cut tanker kilometres.</li>
+<li>Assign tanker trips (4 trips per truck per day) until the pond is safe or the trucks are used up; update ponds, then go to the next day.</li>
+<li>Same input → same output. Runs in milliseconds in the browser, so every slider moves the plan and the 3D instantly.</li>
+</ul>
+<p>The <b>Replay</b> page runs the same engine over a whole season with and without Sonae, so we can show the spill that would have happened (for example 7,522 m³ spilled without Sonae, none with it, on the demo data).</p>
+
+<h2>4. The 3D digital twin and process view</h2>
+<ul>
+<li>Built with React Three Fiber: mills, ponds, groves, tankers, the wadi and the well are React components.</li>
+<li><b>Not a video:</b> pond levels, moving tankers, rain and blocked groves come straight from the engine's output for the selected day. Change a number in the plan and the 3D changes.</li>
+<li>The <b>Process</b> page is a 9-step guided 3D sequence: margine settles in the pond → tanker → controlled spreading → potassium into the soil; grignon dries → becomes fuel → runs the well engine → pumps water back to the groves.</li>
+<li>Performance: one shared canvas behind every page, lazy-loaded, simple geometry and instancing, pixel-ratio cap; it falls back to a gradient while loading and respects "reduce motion".</li>
+</ul>
+
+<h2>5. AI features (Claude Opus 5.5)</h2>
+<p>In the interface the AI is called "Sonae AI". Technically it is Anthropic's Claude Opus 5.5, called from our API with the official SDK. The API key stays on the server.</p>
+<table>
+<tr><th>Feature</th><th>What it does</th><th>How it is built</th></tr>
+<tr><td>Lab reader</td><td>A farmer or mill uploads a lab analysis (PDF, photo or text, in French, Arabic or English). Sonae extracts pH, potassium, polyphenols, salinity and so on, and gives a safe dose for that batch.</td><td>The PDF or image goes to Claude as a document or image block; the answer is forced into a Zod schema (structured output). If the document is not a margine analysis, it says so. Text inside the document is treated as data, not instructions.</td></tr>
+<tr><td>Ask Sonae</td><td>Free questions in Tunisian Arabic, French or English: "can I spread at Agareb this week?"</td><td>Tool use: the model calls our own functions (<code>spreading_forecast</code>, <code>check_grove</code>, <code>demo_region_plan</code>), which run the real engine on real Open-Meteo weather. It answers from tool results, not from memory.</td></tr>
+<tr><td>Season plan</td><td>After sign-up, a mill or a farmer gets a full plan for 15 Nov to 28 Feb, phase by phase, with risks and a checklist, shown with an animation.</td><td>The code computes the facts first (hectares needed, pond autonomy, trucks, K₂O need, recommended m³), then Claude writes the plan as structured JSON around those numbers. The plan is saved in the database (Neon Postgres).</td></tr>
+<tr><td>Arabic UI</td><td>The whole interface in Arabic.</td><td>The 944 interface strings and 85 sentence templates were translated once with Claude and stored as JSON, so nothing is translated at run time.</td></tr>
+</table>
+<div class="box ai"><b>Safety and cost controls:</b> structured outputs (schema-validated JSON), adaptive effort, a refusal fallback, input validation with Zod, per-route rate limits (for example 4 plans and 6 questions per minute), and a <b>budget guard</b>: every call's token cost is logged, and the API refuses AI calls past a hard cap (20 USD for the hackathon). The whole development and testing cost about 0.20 USD.</div>
+
+<h2>6. Blockchain: the ZitounLedger contract</h2>
+<p><b>Why a blockchain here?</b> Margine spreading involves parties who don't trust each other: the mill (wants to empty its pond), the farmer, the regulator (ANPE / the agriculture ministry, CRDA) and grignon buyers. Today the paperwork is paper and can be faked after the fact. An append-only public ledger gives a record that <b>nobody, including us, can edit afterwards</b>.</p>
+<table>
+<tr><th>Function</th><th>What it does</th></tr>
+<tr><td><code>registerMill</code> / <code>registerGrove</code></td><td>Only the regulator role can register a mill or an approved grove with its season cap (area × 50 m³).</td></tr>
+<tr><td><code>declareMargine</code></td><td>The mill declares the volume it produced.</td></tr>
+<tr><td><code>dispatch</code></td><td>The mill sends one load to a grove. <b>The contract refuses it if it would exceed the grove's cap</b> (<code>CapExceeded</code> error). It stores a hash of the lab report and reserves the volume.</td></tr>
+<tr><td><code>confirmDelivery</code></td><td>The farmer (or a GPS/flow-meter oracle) confirms within 2 days; the volume becomes "applied".</td></tr>
+<tr><td><code>expire</code></td><td>An unconfirmed load expires: the fee goes back and the mill gets a red flag.</td></tr>
+<tr><td><code>listGrignon</code> / <code>buyGrignon</code> / <code>confirmGrignon</code> / <code>refundGrignon</code></td><td>Grignon market with escrow: the buyer's money is locked until delivery is confirmed, otherwise refunded.</td></tr>
+<tr><td><code>issueCertificate</code></td><td><b>Zero-Spill clean-oil certificate:</b> only issued if the mill's record is clean (everything delivered, nothing expired). Shops and exporters can check it.</td></tr>
+<tr><td><code>pause</code> / roles</td><td>OpenZeppelin AccessControl: REGULATOR, MILL, ORACLE, PAUSER, ADMIN. Emergency pause. ReentrancyGuard on every function that moves money.</td></tr>
+</table>
+<div class="box chain"><b>On chain:</b> grove ids and caps, load volumes, statuses, timestamps, lab-report <i>hashes</i>, escrow, certificates. <b>Off chain:</b> names, phone numbers, the PDFs, accounts. So personal data stays private, but anyone can check that the numbers weren't changed.<br>
+<b>Deployed:</b> ZitounLedger <span class="mono">0x094B7a274D9121513A5F04055Aa24aB7F8F16958</span> on Sepolia, source verified on Sourcify. Seeded with 6 groves and one mill; the live demo sends real transactions (dispatch, confirm, certificate).</div>
+
+<h2>7. Back end, data and security</h2>
+<ul>
+<li><b>Accounts:</b> three roles (admin, mill owner, farmer). Passwords are hashed with <b>scrypt</b> (random salt, constant-time comparison). Sessions use a random token; only its <b>SHA-256 hash</b> is stored, and it expires after 7 days.</li>
+<li><b>Authorization:</b> every <code>/me</code> and <code>/admin</code> route checks the session and the role. The admin can suspend accounts.</li>
+<li><b>Packs:</b> mills pay Essentiel 390 TND / Pro 950 / Coopérative 2,400 per season, plus a per-m³ overage; farmers are free (Voisin), or 35 to 55 TND/ha for planning extras. The API computes the estimate.</li>
+<li><b>Hardening:</b> helmet security headers, CORS allow-list, global rate limit (120 requests/min) and stricter limits on login and AI routes, Zod validation (invalid input → 400), and secrets only in <code>.env</code> (never committed).</li>
+<li><b>Database:</b> Postgres tables for users, sessions, mills, farms, subscriptions, season plans and the AI spending ledger. The tables are created automatically on first start.</li>
+</ul>
+
+<h2>8. Mobile, offline and languages</h2>
+<ul>
+<li><b>PWA:</b> installable from the browser; a service worker caches the app shell so it opens with no network.</li>
+<li><b>Android:</b> the same build wrapped with Capacitor (native status bar, splash screen, haptics).</li>
+<li><b>Responsive:</b> a top nav on desktop, a bottom dock on phones and tablets; tested from 375 px to 1440 px.</li>
+<li><b>Arabic / English:</b> one toggle switches every page, sets <code>dir="rtl"</code>, the Arabic font, and the AI's answer language.</li>
+<li><b>Farmers without smartphones:</b> the engine already generates SMS texts for the farmer and the driver ("tomorrow 15 m³ to your grove"); plugging in an SMS gateway (for example Tunisie Telecom or Twilio) is the next step.</li>
+</ul>
+
+<h2>9. Testing and quality</h2>
+<ul>
+<li><b>25 engine tests</b> (Vitest): caps, rain blocks, slope and distance exclusions, fullest pond first, the season replay.</li>
+<li><b>21 contract tests</b> (Hardhat): roles, the cap being refused on chain, delivery window, expiry, escrow refund, the certificate refused for a non-compliant mill, pause, reentrancy.</li>
+<li>Strict TypeScript across the monorepo; every feature checked in a real browser; a 6-minute automated Playwright tour recorded end to end.</li>
+</ul>
+
+<h2>10. Deployment: how the live site runs</h2>
+<div class="arch">
+  <div class="w"><b>Vercel CDN</b>The built React app (static files) is served from Vercel's global edge network over HTTPS. Unknown paths fall back to the app, so deep links like <code>/yui?cert=3</code> work.</div>
+  <div class="a"><b>Vercel Function</b>The whole Fastify API, bundled with esbuild into one file (<code>api/index.mjs</code>), answers every <code>/api/*</code> request. Up to 300 s per call, enough for the AI season plan (~30 s).</div>
+  <div class="c"><b>Neon Postgres</b>Managed serverless Postgres, provisioned from the Vercel Marketplace; its connection string is injected as <code>DATABASE_URL</code>.</div>
+</div>
+<h3>Why the database is not SQLite after deployment</h3>
+<p>Locally the API uses one SQLite file, which is perfect for development. A Vercel function, however, runs in short-lived containers: <b>there is no permanent disk</b>, several copies can run at once, and each starts empty. A SQLite file there would lose every account and plan. So in production the same code switches to <b>Neon Postgres</b>:</p>
+<ul>
+<li>One small data layer (<code>db.ts</code>) with two drivers: if <code>DATABASE_URL</code> is set it talks to Postgres over HTTPS, otherwise it opens the local SQLite file. Queries are written once, in SQL that both understand.</li>
+<li>The schema is created on the first request (<code>CREATE TABLE IF NOT EXISTS</code>), with Postgres types (identity ids, double precision).</li>
+<li>The AI budget ledger moved from a JSON file into a database table, so the $20 cap holds across every function instance.</li>
+<li>At launch, the local data (demo accounts, mill and farm profiles, the saved season plans) was copied into Neon with an insert-only script.</li>
+</ul>
+<h3>Secrets and settings</h3>
+<ul>
+<li>The Anthropic key, admin and demo passwords, API token and RPC URL live in Vercel's encrypted environment variables (sensitive ones marked "sensitive"), never in the code or in the browser bundle.</li>
+<li><code>.vercelignore</code> blocks every <code>.env</code> file from being uploaded. The blockchain private keys are not on Vercel at all: users sign with their own wallet.</li>
+<li>The front end calls the API on the same domain (<code>/api</code>), so there is no cross-site traffic; CORS is still limited to the live domain.</li>
+</ul>
+<h3>Deploy flow</h3>
+<p><code>vercel deploy --prod</code> → Vercel installs the monorepo, bundles the API, builds the web app (Vite + PWA) and publishes both in about a minute. Reads of the blockchain go straight from the browser to Sepolia, so the contract needed no change.</p>
+
+<h2>11. Likely jury questions, with short answers</h2>
+
+<h3>Product and data</h3>
+<div class="qa"><div class="q">Where do your rules (50 m³/ha, 8 mm…) come from?</div><div class="a">From Tunisian practice for controlled margine spreading on olive groves and the agronomy literature (Sfax region trials). They are parameters in one config object, not hard-coded, so a regulator can change them and the whole system follows.</div></div>
+<div class="qa"><div class="q">Is the data real?</div><div class="a">The weather is real and live (Open-Meteo, Sfax and any town). Mills and groves are a realistic demo dataset; a real mill types its own pond, production and groves in "My mill", and the plan uses them right away.</div></div>
+<div class="qa"><div class="q">Why not just use machine learning to plan?</div><div class="a">Safety rules must be exact and explainable. A deterministic engine gives the same answer every time, and a regulator can audit it. We use AI where it adds value: reading documents, natural-language questions, and writing the plan.</div></div>
+<div class="qa"><div class="q">How accurate is the weather?</div><div class="a">Open-Meteo combines national weather models; the planner is conservative: it also blocks the day <i>before</i> rain and wet-soil days, so a forecast error errs on the safe side.</div></div>
+
+<h3>AI</h3>
+<div class="qa"><div class="q">Which AI model, and why that one?</div><div class="a">Anthropic's Claude Opus 5.5 through its official API. It reads PDFs and photos natively, handles Arabic and French, supports tool use and strict JSON output, which we need for lab reports.</div></div>
+<div class="qa"><div class="q">What if the AI hallucinates?</div><div class="a">It can't change the safety numbers: caps and doses come from the engine and the contract. Answers come from our tools running on real data, outputs are schema-validated, and a document that isn't a margine analysis is rejected.</div></div>
+<div class="qa"><div class="q">Prompt injection in an uploaded PDF?</div><div class="a">The system prompt tells the model to treat document text as data; the output must fit a fixed schema, so it has no way to run actions. The model has no write access to anything.</div></div>
+<div class="qa"><div class="q">What does the AI cost at scale?</div><div class="a">About 0.01 to 0.05 USD per lab reading or question, and a few cents per season plan. Even a Pro mill with hundreds of calls a season costs a few dinars; it's covered by the pack price. A hard budget cap stops runaway costs.</div></div>
+<div class="qa"><div class="q">Is the farmer's data sent to the AI?</div><div class="a">Only what the question needs (area, slope, place, the lab values). No passwords and no phone numbers. The key stays on our server.</div></div>
+
+<h3>Blockchain</h3>
+<div class="qa"><div class="q">Why blockchain and not a normal database?</div><div class="a">Because the parties don't trust each other and the regulator needs proof. A database we own could be edited by us or by the mill; the ledger can't be rewritten, the cap rule runs in public code, and anyone can verify it without asking us.</div></div>
+<div class="qa"><div class="q">Why Sepolia? What about production?</div><div class="a">Sepolia is the free public Ethereum testnet. For production, the same contract deploys unchanged to a low-fee EVM network (for example Polygon PoS or an Ethereum layer 2), where a transaction costs a fraction of a cent.</div></div>
+<div class="qa"><div class="q">Farmers don't have wallets or crypto.</div><div class="a">They don't need to. Reading the ledger needs no wallet. Writes are done by the mill and the regulator; a farmer's confirmation can go through the oracle role (an SMS reply or the tanker's GPS and flow meter), with the platform paying the gas.</div></div>
+<div class="qa"><div class="q">What stops a mill from lying about a delivery?</div><div class="a">The farmer or oracle must confirm, not the mill. Unconfirmed loads expire and flag the mill, and a flagged mill can't get a Zero-Spill certificate. Lab reports are hashed on chain, so they can't be swapped later.</div></div>
+<div class="qa"><div class="q">Is personal data on the blockchain?</div><div class="a">No. Only ids, volumes, timestamps and document hashes. Names, phones and files stay in our database.</div></div>
+<div class="qa"><div class="q">Is the contract secure?</div><div class="a">It uses OpenZeppelin's audited AccessControl, Pausable and ReentrancyGuard, custom errors, a pull-payment withdraw pattern, and 21 tests. Before real money we would add an external audit and a multisig for the admin and pauser roles.</div></div>
+<div class="qa"><div class="q">What is the Zero-Spill certificate exactly?</div><div class="a">An on-chain record proving that a batch of oil came from a mill whose margine all reached approved groves, under the caps, with nothing expired. Exporters and shops can check it from a QR code, like an eco-label that can't be faked.</div></div>
+
+<h3>Engineering</h3>
+<div class="qa"><div class="q">Does it scale?</div><div class="a">Yes, it's already built for it. The planner runs in milliseconds and even in the browser. The API is a stateless serverless function that Vercel scales automatically, the data is in managed Postgres (Neon), and the front end is static files on a global CDN.</div></div>
+<div class="qa"><div class="q">You used SQLite. Isn't that a toy database?</div><div class="a">Only on the developer's laptop. Deployed, the same code runs on Neon Postgres, because serverless functions have no lasting disk. The switch is one environment variable, <code>DATABASE_URL</code>.</div></div>
+<div class="qa"><div class="q">Where is it hosted, and what does it cost?</div><div class="a">Vercel (site and API) and Neon (database), both on free tiers for the demo. For a real launch, paid tiers run roughly 20 USD a month each, plus AI usage, which the mill packs cover.</div></div>
+<div class="qa"><div class="q">How do you protect the keys?</div><div class="a">They're in Vercel's encrypted environment variables, only the server reads them, and <code>.env</code> files are never uploaded or committed. Passwords are scrypt-hashed and sessions are stored as hashes.</div></div>
+<div class="qa"><div class="q">What happens if the database is slow or down?</div><div class="a">The planner, 3D, replay and blockchain pages keep working because they don't need the database; only accounts and saved plans wait. Neon keeps automatic backups and point-in-time restore.</div></div>
+<div class="qa"><div class="q">Does it work offline, in the field?</div><div class="a">Yes for opening the app and the last plan (PWA cache). Live weather, AI and blockchain need a connection; SMS covers farmers without data.</div></div>
+<div class="qa"><div class="q">How is the 3D made, and does it run on cheap phones?</div><div class="a">Three.js via React Three Fiber, low-poly models, one shared canvas, a capped pixel ratio, and lazy loading. Phones get the bottom dock and a lighter scene.</div></div>
+<div class="qa"><div class="q">How long did it take, and what's next?</div><div class="a">Built during the hackathon as a full monorepo. Next: a pilot with one Sfax mill and its farmers, an SMS gateway, tanker GPS and flow meters as the oracle, a regulator dashboard, and a production blockchain network. The web, API and database are already deployed and live.</div></div>
+<div class="qa"><div class="q">Can it work outside Sfax?</div><div class="a">Yes. Weather works for any coordinate (Sfax, Sousse, Mahdia, Kairouan…), and the rules are configurable per region. The same model fits other agri-waste flows.</div></div>
+
+<div class="box warn"><b>If you don't know an answer:</b> say what is built today and what is the next step. For example: "Today the confirmation is done by the farmer in the app. In production it's the tanker's flow meter acting as the oracle; the contract already has that role."</div>
+
+</body>
+</html>

@@ -1,9 +1,11 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router';
+import QRCode from 'qrcode';
 import { motion, AnimatePresence } from 'motion/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, useAccount, useConnect, useDisconnect, useReadContract, useSwitchChain, useWriteContract } from 'wagmi';
 import { waitForTransactionReceipt } from 'wagmi/actions';
-import { keccak256, toHex, type Address } from 'viem';
+import { decodeEventLog, keccak256, toHex, type Address, type TransactionReceipt } from 'viem';
 import { wagmiConfig, zitounAbi, zitounFor, tndFromWei, SEPOLIA_ID } from '../web3/config';
 import { IconLeaf, IconLock, IconSun } from '../components/Icons';
 import { fmt } from '../lib/format';
@@ -103,6 +105,72 @@ function Steps() {
   );
 }
 
+/** Batch names live off chain (only their hash is on chain); keep the ones this browser certified. */
+const BATCH_KEY = 'sonae-cert-batches';
+const batchNames = (): Record<string, string> => {
+  try {
+    return JSON.parse(localStorage.getItem(BATCH_KEY) ?? '{}');
+  } catch {
+    return {};
+  }
+};
+const rememberBatch = (hash: string, name: string) => {
+  try {
+    localStorage.setItem(BATCH_KEY, JSON.stringify({ ...batchNames(), [hash]: name }));
+  } catch {
+    /* private mode: the card just shows the hash */
+  }
+};
+const certLink = (id: number) => `${window.location.origin}/yui?cert=${id}`;
+
+/** The bottle label: a QR that opens this page on the certificate, plus what the chain proves. */
+function CertificateCard({ id, c, onClose }: { id: number; c: Certificate; onClose: () => void }) {
+  const [svg, setSvg] = useState('');
+  const [png, setPng] = useState('');
+  const link = certLink(id);
+  const name = batchNames()[c.batchRef];
+  useEffect(() => {
+    let live = true;
+    const opts = { margin: 1, errorCorrectionLevel: 'M' as const, color: { dark: '#0b121e', light: '#ffffff' } };
+    QRCode.toString(link, { ...opts, type: 'svg' }).then((s) => live && setSvg(s));
+    QRCode.toDataURL(link, { ...opts, width: 720 }).then((u) => live && setPng(u));
+    return () => {
+      live = false;
+    };
+  }, [link]);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: EASE } }}
+      className="mt-4 grid gap-4 rounded-[20px] border border-[color-mix(in_oklab,var(--ok)_40%,transparent)] bg-[color-mix(in_oklab,var(--ok)_8%,transparent)] p-4 sm:grid-cols-[148px_1fr]"
+    >
+      <div className="mx-auto h-[148px] w-[148px] overflow-hidden rounded-[14px] bg-white p-1.5 [&_svg]:h-full [&_svg]:w-full" aria-label={`QR code for certificate ${id}`} role="img" dangerouslySetInnerHTML={{ __html: svg }} />
+      <div className="min-w-0">
+        <p className="text-[13px] font-semibold text-[var(--ok)]">Zero-Spill certificate on Sepolia</p>
+        <p className="mt-0.5 text-[20px] font-extrabold leading-tight">
+          Certificate #{id}
+          {name ? <span className="font-semibold text-ink-2"> · {name}</span> : null}
+        </p>
+        <p className="mt-1.5 text-[14px] text-ink-2">
+          {fmt(c.litres)} L of oil from mill {short(c.mill)}, issued {when(c.issuedAt)}. {fmt(Number(c.deliveredM3))} m³ of margine confirmed on approved groves in {c.loads} loads, no lost load.
+        </p>
+        <p className="mt-1.5 text-[13px] text-ink-2">Scan it: the code opens this page and checks the certificate on the chain, with no account.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a className="btn btn-primary" href={png || undefined} download={`sonae-certificate-${id}.png`} aria-disabled={!png}>
+            Download QR
+          </a>
+          <a className="btn" href={link} target="_blank" rel="noreferrer">
+            Open verify link
+          </a>
+          <button className="btn" onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function Note({ children, tone = 'water' }: { children: ReactNode; tone?: 'water' | 'warn' }) {
   return <div className={`rounded-[16px] border px-4 py-3 text-[14.5px] ${tone === 'warn' ? 'border-[color-mix(in_oklab,var(--solar)_35%,transparent)] bg-solar-soft' : 'border-[color-mix(in_oklab,var(--water)_35%,transparent)] bg-accent-soft'}`}>{children}</div>;
 }
@@ -161,14 +229,15 @@ function Yui() {
   const [verifyId, setVerifyId] = useState('');
 
   const refetch = () => [grovesQ, loadsQ, lotsQ, ordersQ, certsQ, creditsQ, statsQ].forEach((q) => q.refetch());
-  const run = async (label: string, fn: () => Promise<`0x${string}`>) => {
+  const run = async (label: string, fn: () => Promise<`0x${string}`>, after?: (r: TransactionReceipt) => void) => {
     setBusy(label);
     setToast(null);
     try {
       const hash = await fn();
       setToast(`${label}: waiting for the block…`);
-      await waitForTransactionReceipt(wagmiConfig, { hash, chainId: chainId as typeof SEPOLIA_ID });
+      const receipt = await waitForTransactionReceipt(wagmiConfig, { hash, chainId: chainId as typeof SEPOLIA_ID });
       setToast(`${label}: done.`);
+      after?.(receipt);
       tap('medium');
       refetch();
     } catch (e) {
@@ -185,6 +254,39 @@ function Yui() {
   const room = selGrove ? selGrove.capM3 - selGrove.appliedM3 - selGrove.reservedM3 : 0;
   const delivered = loads.filter(({ l }) => l.status === 2).reduce((s, { l }) => s + l.m3, 0);
   const onRoad = loads.filter(({ l }) => l.status === 1).length;
+  // A scanned QR lands here as /yui?cert=N: fill the verifier and bring the card into view.
+  const [params] = useSearchParams();
+  const [shownCert, setShownCert] = useState<number | null>(null);
+  const certRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const id = params.get('cert');
+    if (id && /^\d+$/.test(id)) {
+      setVerifyId(id);
+      setShownCert(Number(id));
+      const t = setTimeout(() => certRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 600);
+      return () => clearTimeout(t);
+    }
+  }, [params]);
+  const certify = () => {
+    const ref = keccak256(toHex(batch));
+    rememberBatch(ref, batch);
+    run('Certify batch', () => write('issueCertificate', [ref, litres]), (receipt) => {
+      for (const log of receipt.logs) {
+        try {
+          const ev = decodeEventLog({ abi: zitounAbi, data: log.data, topics: log.topics });
+          if (ev.eventName === 'CertificateIssued') {
+            const id = Number((ev.args as unknown as { certificateId: bigint }).certificateId);
+            setShownCert(id);
+            setVerifyId(String(id));
+            setToast(`Certificate #${id} issued on Sepolia.`);
+          }
+        } catch {
+          /* a log from another event */
+        }
+      }
+    });
+  };
+  const shown = shownCert ? certs.find((x) => x.id === shownCert) : undefined;
   const verified = useMemo(() => {
     const id = Number(verifyId);
     return Number.isInteger(id) && id > 0 ? certs.find((c) => c.id === id) : undefined;
@@ -509,6 +611,7 @@ function Yui() {
           </GlassCard>
 
           <GlassCard className="p-5 md:p-6">
+            <div ref={certRef} />
             <h2 className="text-[19px] font-extrabold">Clean-oil certificates</h2>
             <p className="mt-1 text-[14.5px] text-ink-2">Printed as a QR code on the bottle. The contract only issues one if the mill has confirmed loads and no load ever went missing.</p>
             {isMill && onRightChain && (
@@ -521,7 +624,7 @@ function Yui() {
                   <label className="label" htmlFor="litres">Litres</label>
                   <input id="litres" type="number" className="field num" min={1} value={litres} onChange={(e) => setLitres(Math.max(1, Math.round(Number(e.target.value))))} />
                 </div>
-                <button className="btn btn-primary sm:col-span-2" disabled={!!busy || !batch} onClick={() => run('Certify batch', () => write('issueCertificate', [keccak256(toHex(batch)), litres]))}>
+                <button className="btn btn-primary sm:col-span-2" disabled={!!busy || !batch} onClick={certify}>
                   Certify this batch
                 </button>
               </div>
@@ -545,11 +648,17 @@ function Yui() {
               <ul className="mt-3 flex flex-col gap-1.5 text-[13.5px] text-ink-2">
                 {certs.slice(0, 5).map(({ id, c }) => (
                   <li key={id}>
-                    #{id} · {fmt(c.litres)} L · {short(c.mill)} · {when(c.issuedAt)}
+                    <button className="flex w-full items-center justify-between gap-3 rounded-[12px] px-2 py-1.5 text-left transition-colors hover:bg-[color-mix(in_oklab,var(--water)_10%,transparent)]" onClick={() => { setShownCert(id); setVerifyId(String(id)); }}>
+                      <span>
+                        #{id} · {fmt(c.litres)} L · {short(c.mill)} · {when(c.issuedAt)}
+                      </span>
+                      <span className="font-semibold text-[var(--water)]">Show QR</span>
+                    </button>
                   </li>
                 ))}
               </ul>
             )}
+            <AnimatePresence>{shown && <CertificateCard key={shown.id} id={shown.id} c={shown.c} onClose={() => setShownCert(null)} />}</AnimatePresence>
           </GlassCard>
 
           <Note>

@@ -75,5 +75,9 @@
  "{0}: waiting for the block…": "{0}: في انتظار الكتلة…",
  "{0}Nearest allowed grove with room: {1}, {2} km away, {3} m³ of its season cap left.": "{0}أقرب غابة زيتون مسموح بها وفيها متّسع: {1}، على بعد {2} km، ويتبقى {3} m³ من حدّها الموسمي.",
  "· confirmed {0}": "· تم التأكيد {0}",
- "Your own plan for {0} in {1}: {2} groves, {3} tankers, with the real forecast for {4}.": "خطتك الخاصة لـ{0} في {1}: {2} غابات زيتون، {3} صهاريج، مع التوقعات الفعلية لـ{4}."
+ "Your own plan for {0} in {1}: {2} groves, {3} tankers, with the real forecast for {4}.": "خطتك الخاصة لـ{0} في {1}: {2} غابات زيتون، {3} صهاريج، مع التوقعات الفعلية لـ{4}.",
+ "Certificate #{0} issued on Sepolia.": "تم إصدار الشهادة رقم {0} على Sepolia.",
+ "QR code for certificate {0}": "رمز QR للشهادة {0}",
+ "Step {0}: {1}": "الخطوة {0}: {1}",
+ "sonae-certificate-{0}.png": "sonae-certificate-{0}.png"
 }

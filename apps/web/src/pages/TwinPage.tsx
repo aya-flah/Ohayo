@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useZPlan, planDayLabel, shortDate } from '../lib/zitoun';
 import { useRegionState, useScene } from '../lib/scene';
-import { tap } from '../lib/device';
+import { tap, useCompactScreen } from '../lib/device';
 import { fmt } from '../lib/format';
 import { IconDrop, IconLeaf, IconPause, IconPlay, IconSun, IconGauge } from '../components/Icons';
 import { EASE, Range } from '../components/ui';
@@ -42,6 +42,10 @@ export default function TwinPage() {
   const forceRain = useScene((s) => s.forceRain);
   const setForceRain = useScene((s) => s.setForceRain);
   const [playing, setPlaying] = useState(false);
+  // Phones: the title card stays one line so the 3D stays visible; tap to see the live numbers.
+  const [info, setInfo] = useState(false);
+  const compact = useCompactScreen();
+  const show = !compact || info;
   const raf = useRef<number | null>(null);
   const N = plan.days.length;
   const [log, setLog] = useState<Array<{ id: number; text: string; tone: string }>>([]);
@@ -108,21 +112,38 @@ export default function TwinPage() {
     <div className="relative -mx-4 md:-mx-8" style={{ height: 'calc(100dvh - max(12px, env(safe-area-inset-top)) - 92px)' }}>
       {/* Title */}
       <motion.div
-        className="glass glass-edge pointer-events-auto absolute left-3 right-3 top-0 rounded-[24px] p-4 md:left-8 md:right-auto md:w-[360px]"
+        className="glass glass-edge pointer-events-auto absolute left-3 right-3 top-0 rounded-[20px] px-4 py-2.5 md:left-8 md:right-auto md:w-[360px] md:rounded-[24px] md:p-4"
         initial={{ opacity: 0, x: -30, filter: 'blur(10px)' }}
         animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className={`items-center justify-between gap-3 ${show ? 'flex' : 'hidden'}`}>
           <div className="eyebrow flex items-center gap-2">
             <span className="dot dot-pulse" style={{ color: state.blocked ? 'var(--water)' : 'var(--ok)' }} />
             Digital twin · Sfax olive belt
           </div>
-          <span lang="ja" className="font-jp text-[18px] text-ink-3">双子</span>
+          <span lang="ja" className="hidden font-jp text-[18px] text-ink-3 md:inline">双子</span>
         </div>
-        <h1 className="mt-1.5 text-[22px] leading-tight font-extrabold md:text-[26px]">
-          The olive region, <span className="text-gradient-water">live in 3D</span>
-        </h1>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className={`leading-tight font-extrabold ${compact ? 'text-[16px]' : 'text-[17px] md:mt-1.5 md:text-[26px]'}`}>
+            <span className={`dot dot-pulse me-2 align-middle ${show ? "hidden" : "inline-block"}`} style={{ color: state.blocked ? 'var(--water)' : 'var(--ok)' }} />
+            The olive region, <span className="text-gradient-water">live in 3D</span>
+          </h1>
+          <button
+            className={`h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 ${compact ? 'grid' : 'hidden'}`}
+            style={{ background: 'color-mix(in oklab, var(--ink) 8%, transparent)' }}
+            onClick={() => {
+              tap();
+              setInfo((v) => !v);
+            }}
+            aria-expanded={info}
+            aria-label={info ? 'Hide the live numbers' : 'Show the live numbers'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ transform: info ? 'rotate(180deg)' : 'none', transition: 'transform 200ms ease' }}>
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
         <p className="mt-1 hidden text-[14px] text-ink-2 md:block">Drag to orbit. Play the week, or make it rain and watch the tankers stop.</p>
         <ul className="mt-2.5 hidden flex-wrap gap-x-3 gap-y-1 md:flex">
           {LEGEND.map((l) => (
@@ -132,7 +153,7 @@ export default function TwinPage() {
             </li>
           ))}
         </ul>
-        <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 lg:hidden">{instruments}</div>
+        <div className={`no-scrollbar -mx-1 mt-2.5 gap-2 overflow-x-auto px-1 md:mt-3 lg:hidden ${show ? 'flex' : 'hidden'}`}>{instruments}</div>
       </motion.div>
 
       {/* Right rail (large screens): instruments, then the log, never taller than the space above the dock */}
@@ -161,7 +182,7 @@ export default function TwinPage() {
 
       {/* Control dock: left of the rail on large screens, above the tab bar on phones */}
       <motion.div
-        className="glass glass-edge glass-strong pointer-events-auto absolute inset-x-3 bottom-[calc(max(12px,env(safe-area-inset-bottom))+88px)] flex flex-wrap items-center gap-3 rounded-[26px] p-3 md:inset-x-8 md:bottom-6 md:flex-nowrap lg:right-[348px]"
+        className="glass glass-edge glass-strong pointer-events-auto absolute inset-x-3 bottom-[calc(max(12px,env(safe-area-inset-bottom))+var(--dock-h))] flex items-center gap-2.5 rounded-[24px] p-2.5 md:inset-x-8 md:gap-3 md:p-3 lg:bottom-6 md:flex-nowrap lg:right-[348px]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4, ease: EASE }}
@@ -209,14 +230,15 @@ export default function TwinPage() {
           </div>
         </div>
         <button
-          className={`btn ${forceRain ? 'btn-primary' : 'btn-quiet'} w-full md:w-auto`}
+          className={`btn ${forceRain ? 'btn-primary' : 'btn-quiet'} h-12 w-12 shrink-0 !p-0 md:h-auto md:w-auto md:!px-4 md:!py-2.5`}
+          title={forceRain ? 'Stop the rain' : 'Make it rain'}
           onClick={() => {
             tap('medium');
             setForceRain(!forceRain);
           }}
           aria-pressed={forceRain}
         >
-          <IconDrop width={17} height={17} /> {forceRain ? 'Stop the rain' : 'Make it rain'}
+          <IconDrop width={17} height={17} /> <span className="sr-only md:not-sr-only">{forceRain ? 'Stop the rain' : 'Make it rain'}</span>
         </button>
       </motion.div>
     </div>

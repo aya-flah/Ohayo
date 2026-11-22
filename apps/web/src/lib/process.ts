@@ -86,6 +86,15 @@ export const STEPS: ProcessStep[] = [
   },
 ];
 
+/** Short labels for the step dock, in step order. */
+export const SHORT = ['Press', 'Pond', 'Tanker', 'Spread', 'Soil', 'Dry', 'Gas', 'Engine', 'Circle'];
+export const TRACK: Record<Track, { label: string; tone: string }> = {
+  margine: { label: 'Margine → soil', tone: 'var(--margine)' },
+  grignon: { label: 'Fitoura → well engine', tone: 'var(--solar)' },
+  both: { label: 'Both', tone: 'var(--olive)' },
+};
+export const STEP_SECONDS = 8;
+
 interface ProcessStore {
   step: number;
   playing: boolean;

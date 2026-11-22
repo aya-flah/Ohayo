@@ -627,7 +627,21 @@ function EngineAndWell({ step, reduced }: { step: number; reduced: boolean }) {
 
 /* ── Camera ────────────────────────────────────────────────────────── */
 
-function Rig({ step, reduced }: { step: number; reduced: boolean }) {
+/** Where the UI covers the screen, so the camera can frame the scene in the free part. */
+export type Framing = 'page' | 'standalone';
+
+/** View offset (fractions of the canvas) and a distance multiplier for each screen shape. */
+function frame(framing: Framing, w: number, h: number): { x: number; y: number; dist: number } {
+  const narrow = w < 768;
+  if (framing === 'page') return narrow ? { x: 0, y: 0.03, dist: 1.6 } : { x: -0.16, y: 0.02, dist: 1 };
+  const shortLandscape = w > h && h < 560;
+  if (shortLandscape) return { x: -0.2, y: 0, dist: 1.15 }; // phone on its side: card on the left
+  if (narrow) return { x: 0, y: 0.1, dist: 1.65 }; // phone upright: compact card at the bottom
+  if (w < 1100) return { x: 0, y: 0.12, dist: 1.25 }; // tablet: card at the bottom
+  return { x: -0.15, y: 0.02, dist: 1 }; // desktop: card on the left
+}
+
+function Rig({ step, reduced, framing }: { step: number; reduced: boolean; framing: Framing }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera, size } = useThree();
   const flying = useRef(true);
@@ -642,11 +656,11 @@ function Rig({ step, reduced }: { step: number; reduced: boolean }) {
     const c = controls.current;
     if (!c) return;
     const p = STEPS[step]!.cam;
-    const narrow = size.width < 768;
-    // Leave room for the step card: on desktop the scene sits right of it, on phones above the dock.
-    (camera as THREE.PerspectiveCamera).setViewOffset(size.width, size.height, narrow ? 0 : -0.16 * size.width, narrow ? 0.1 * size.height : 0.02 * size.height, size.width, size.height);
+    // Leave room for the step card: the scene sits beside it on wide screens, above it on phones.
+    const f = frame(framing, size.width, size.height);
+    (camera as THREE.PerspectiveCamera).setViewOffset(size.width, size.height, f.x * size.width, f.y * size.height, size.width, size.height);
     tgt.set(...p.target);
-    sph.set(narrow ? p.r * 1.45 : p.r, p.polar, p.az);
+    sph.set(p.r * f.dist, p.polar, p.az);
     desired.setFromSpherical(sph).add(tgt);
     if (!flying.current) {
       c.update();
@@ -706,7 +720,7 @@ function Ground({ field }: { field: boolean }) {
   );
 }
 
-export function ProcessScene({ step, reduced, field = false }: { step: number; reduced: boolean; field?: boolean }) {
+export function ProcessScene({ step, reduced, field = false, framing = 'page' }: { step: number; reduced: boolean; field?: boolean; framing?: Framing }) {
   return (
     <Canvas camera={{ position: [20, 18, 26], fov: 38 }} dpr={[1, 1.5]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <Sky field={field} />
@@ -721,7 +735,7 @@ export function ProcessScene({ step, reduced, field = false }: { step: number; r
       <DryingYard step={step} reduced={reduced} />
       <PelletAndGas step={step} reduced={reduced} />
       <EngineAndWell step={step} reduced={reduced} />
-      <Rig step={step} reduced={reduced} />
+      <Rig step={step} reduced={reduced} framing={framing} />
     </Canvas>
   );
 }

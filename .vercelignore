@@ -1,0 +1,18 @@
+# Never upload secrets
+.env
+.env.*
+**/.env
+**/.env.*
+# Local data and heavy folders the site doesn't need
+**/node_modules
+apps/api/data
+contracts/node_modules
+contracts/cache
+contracts/artifacts
+apps/mobile/android
+docs
+scripts/demo-video
+*.mp4
+
+# The public demo video is served by the site
+!apps/web/public/video/*.mp4
