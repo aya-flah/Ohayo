@@ -102,6 +102,7 @@ const LabBody = z.object({
   imageBase64: z.string().max(8_000_000).optional(),
   imageType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
   pdfBase64: z.string().max(8_000_000).optional(),
+  lang: z.enum(['en', 'ar']).optional(),
 });
 
 app.post('/zitoun/lab', { config: { rateLimit: { max: 8, timeWindow: '1 minute' } } }, async (req) => {
@@ -116,16 +117,17 @@ app.post('/zitoun/lab', { config: { rateLimit: { max: 8, timeWindow: '1 minute' 
 
 const AskBody = z.object({
   messages: z.array(z.object({ role: z.enum(['user', 'assistant']), text: z.string().min(1).max(2000) })).min(1).max(20),
+  lang: z.enum(['en', 'ar']).optional(),
 });
 
 app.post('/zitoun/ask', { config: { rateLimit: { max: 8, timeWindow: '1 minute' } } }, async (req) => {
-  const { messages } = AskBody.parse(req.body);
+  const { messages, lang } = AskBody.parse(req.body);
   if (messages[messages.length - 1]!.role !== 'user') {
     const err = new Error('The last message must be the question.') as Error & { statusCode: number };
     err.statusCode = 400;
     throw err;
   }
-  return zitounAsk(messages);
+  return zitounAsk(messages, undefined, lang ?? 'en');
 });
 
 app.get('/admin/ai-spend', async (req) => {

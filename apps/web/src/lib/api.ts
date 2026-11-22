@@ -1,8 +1,9 @@
 import { create } from 'zustand';
+import { useSonae } from './store';
 import type { DayWeather } from '@sonae/shared';
 import type { MargineAdvice } from '@sonae/engine';
 
-/** The Sonae API (Claude features). Set VITE_API_URL for a deployed server; phones need a reachable URL. */
+/** The Sonae API (AI features). Set VITE_API_URL for a deployed server; phones need a reachable URL. */
 export const API_URL = ((import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8787').replace(/\/$/, '');
 
 export class ApiError extends Error {}
@@ -34,9 +35,9 @@ export interface LabReading {
   notes: string;
 }
 
-export const readLabReport = (body: { text?: string; imageBase64?: string; imageType?: string; pdfBase64?: string }) => post<{ reading: LabReading; advice: MargineAdvice | null }>('/zitoun/lab', body);
+export const readLabReport = (body: { text?: string; imageBase64?: string; imageType?: string; pdfBase64?: string }) => post<{ reading: LabReading; advice: MargineAdvice | null }>('/zitoun/lab', { ...body, lang: useSonae.getState().lang });
 
-export const askSonae = (messages: Array<{ role: 'user' | 'assistant'; text: string }>) => post<{ answer: string; toolCalls: string[] }>('/zitoun/ask', { messages });
+export const askSonae = (messages: Array<{ role: 'user' | 'assistant'; text: string }>) => post<{ answer: string; toolCalls: string[] }>('/zitoun/ask', { messages, lang: useSonae.getState().lang });
 
 /** The last lab reading, so the Yui page can put its hash on a load. */
 interface LabStore {

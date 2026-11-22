@@ -171,7 +171,7 @@ export function SeasonPlanView({ plan }: { plan: SeasonPlan }) {
       </Block>
 
       {/* Timeline */}
-      <Block title="The season, phase by phase" kicker="Written by Claude Opus around Sonae's numbers · tap a phase">
+      <Block title="The season, phase by phase" kicker="Written by Sonae AI around the computed numbers · tap a phase">
         <div className="relative">
           <div className="flex h-14 overflow-hidden rounded-[16px] border border-line">
             {ai.phases.map((p, i) => {

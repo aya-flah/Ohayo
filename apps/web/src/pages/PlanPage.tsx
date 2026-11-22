@@ -242,7 +242,7 @@ export default function PlanPage() {
       >
         {scenario === 'mine' ? (
           <>
-            Your own plan for <b className="text-ink">{myMill.name}</b> in {myMill.town}: {myMill.groves.length} groves, {myMill.trucks} tanker{myMill.trucks > 1 ? 's' : ''}, the real forecast for {myMill.town}.{' '}
+            {`Your own plan for ${myMill.name} in ${myMill.town}: ${myMill.groves.length} groves, ${myMill.trucks} tankers, with the real forecast for ${myMill.town}.`}{' '}
             <button className="font-semibold text-[var(--water)] underline-offset-2 hover:underline" onClick={() => setMillOpen(true)}>
               Edit your mill
             </button>

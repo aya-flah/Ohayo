@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./palette.css";
 @import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/noto-sans-arabic";
 @import "@fontsource/shippori-mincho-b1/latin-600.css";
 @import "@fontsource/shippori-mincho-b1/latin-800.css";
 
@@ -164,7 +165,7 @@
 }
 
 @theme inline {
-  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", "Noto Sans Arabic Variable", "Plus Jakarta Sans", "Inter", "Segoe UI", system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-jp: "Shippori Mincho B1", "Yu Mincho", "Noto Serif JP", serif;
   --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -618,4 +619,23 @@
   to {
     transform: translateY(1200px);
   }
+}
+
+/* Arabic: right-to-left, an Arabic face first, no letter-spacing (it breaks joined letters) */
+html[lang="ar"] body,
+html[lang="ar"] .scene-badge {
+  font-family: "Noto Sans Arabic Variable", "Plus Jakarta Sans Variable", system-ui, sans-serif;
+}
+html[lang="ar"] .eyebrow,
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3 {
+  letter-spacing: 0;
+}
+html[lang="ar"] .eyebrow {
+  text-transform: none;
+}
+html[dir="rtl"] .num {
+  direction: ltr;
+  unicode-bidi: isolate;
 }

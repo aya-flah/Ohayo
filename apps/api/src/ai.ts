@@ -54,7 +54,7 @@ export async function readNotice(input: { text?: string; imageBase64?: string; i
     messages: [{ role: 'user', content }],
   });
   record('notice', response.usage);
-  if (response.stop_reason === 'refusal') throw new Error('Claude declined to read this notice.');
+  if (response.stop_reason === 'refusal') throw new Error('The AI declined to read this notice.');
   const out = response.parsed_output;
   if (!out) throw new Error('Could not read a cut from this notice.');
   const valid = (s: string | null) => (s && !Number.isNaN(Date.parse(s)) ? s : null);

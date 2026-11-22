@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import { call, ROLE_LABEL, useSession, type FarmProfile, type Facts, type Me, type MillProfile, type SeasonPlan } from '../lib/session';
 import { TOWNS } from '../lib/api';
+import { useSonae } from '../lib/store';
 import { tap } from '../lib/device';
 import { fmt } from '../lib/format';
 import { SeasonPlanView } from '../components/SeasonPlanView';
@@ -140,10 +141,10 @@ function FarmForm({ initial, name, onSaved }: { initial: FarmProfile | null; nam
   );
 }
 
-/* ── Generating: a short story while Opus works ────────────────────── */
+/* ── Generating: a short story while the AI works ────────────────────── */
 
-const STEPS_MILL = ['Reading your mill profile', 'Counting tanker trips and hectares', 'Checking last season’s rain, day by day', 'Pricing your pack, transport and fitoura', 'Claude Opus is writing your phases and risks', 'Checking every number adds up'];
-const STEPS_FARM = ['Reading your farm profile', 'Checking your land against the rules', 'Working out the potassium your trees need', 'Checking last season’s rain, day by day', 'Claude Opus is writing your plan', 'Checking every number adds up'];
+const STEPS_MILL = ['Reading your mill profile', 'Counting tanker trips and hectares', 'Checking last season’s rain, day by day', 'Pricing your pack, transport and fitoura', 'Sonae AI is writing your phases and risks', 'Checking every number adds up'];
+const STEPS_FARM = ['Reading your farm profile', 'Checking your land against the rules', 'Working out the potassium your trees need', 'Checking last season’s rain, day by day', 'Sonae AI is writing your plan', 'Checking every number adds up'];
 
 function Generating({ mill }: { mill: boolean }) {
   const steps = mill ? STEPS_MILL : STEPS_FARM;
@@ -162,7 +163,7 @@ function Generating({ mill }: { mill: boolean }) {
         </span>
         <div>
           <div className="text-[20px] font-extrabold">Building your season plan</div>
-          <div className="text-[14px] text-ink-2">About 25 seconds. Sonae computes the numbers, Claude Opus writes the plan.</div>
+          <div className="text-[14px] text-ink-2">About 25 seconds. Sonae computes the numbers, then Sonae AI writes the plan.</div>
         </div>
       </div>
       <ol className="mt-5 flex flex-col gap-2">
@@ -202,7 +203,7 @@ function Member({ me, reload }: { me: Me; reload: () => void }) {
     setError(null);
     setPlan(null);
     try {
-      const p = await call<SeasonPlan>('POST', '/me/plan', {});
+      const p = await call<SeasonPlan>('POST', '/me/plan', { lang: useSonae.getState().lang });
       setPlan(p);
       reload();
       setTimeout(() => document.getElementById('plan-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
@@ -318,8 +319,8 @@ function Member({ me, reload }: { me: Me; reload: () => void }) {
             <h2 className="text-[24px] font-extrabold md:text-[28px]">{mill ? 'Your season, planned for your margine and fitoura' : 'Your season, planned for your land'}</h2>
             <p className="mt-1 text-[15px] text-ink-2">
               {mill
-                ? 'Costs, income, how many tankers and hectares, when to spread, what could go wrong. Sonae computes the numbers; Claude Opus writes the plan.'
-                : 'How much margine your trees need, how many loads, what you save on fertiliser, and when. Sonae computes the numbers; Claude Opus writes the plan.'}
+                ? 'Costs, income, how many tankers and hectares, when to spread, what could go wrong. Sonae computes the numbers; Sonae AI writes the plan.'
+                : 'How much margine your trees need, how many loads, what you save on fertiliser, and when. Sonae computes the numbers; Sonae AI writes the plan.'}
             </p>
           </div>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="btn btn-primary shrink-0 px-7 text-[16px]" onClick={generate} disabled={busy || !profile}>

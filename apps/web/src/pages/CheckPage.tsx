@@ -198,7 +198,7 @@ function GroveCheck() {
   );
 }
 
-/* ── 2. Read a lab report (Claude Opus) ────────────────────────────── */
+/* ── 2. Read a lab report (AI) ────────────────────────────── */
 
 const SAMPLE_REPORT = `Laboratoire Régional d'Analyses Sfax - Bulletin n° 2611/26
 Échantillon : eaux de végétation, Huilerie El Amel, prélevé le 23/11/2026
@@ -269,9 +269,9 @@ function LabReader() {
     <GlassCard className="p-5 md:p-6" variants={{}}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[20px] font-extrabold">Read a margine lab report</h2>
-        <Pill tone="water">Claude Opus</Pill>
+        <Pill tone="water">Lab reader AI</Pill>
       </div>
-      <p className="mt-1 text-[14.5px] text-ink-2">Photo, scan, PDF or pasted text, in French, Arabic or English. Claude reads the values; Sonae turns them into a safe dose per hectare.</p>
+      <p className="mt-1 text-[14.5px] text-ink-2">Photo, scan, PDF or pasted text, in French, Arabic or English. The lab reader AI reads the values; Sonae turns them into a safe dose per hectare.</p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <button
@@ -296,7 +296,7 @@ function LabReader() {
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="btn btn-primary" onClick={run} disabled={busy}>
-          {busy ? 'Claude is reading…' : 'Read the report'}
+          {busy ? 'Reading the report…' : 'Read the report'}
         </button>
         <button
           className="btn btn-quiet"
@@ -371,7 +371,7 @@ function LabReader() {
   );
 }
 
-/* ── 3. Ask Sonae (Claude Opus with the planner as tools) ─────────── */
+/* ── 3. Ask Sonae (AI with the planner as tools) ─────────── */
 
 const SUGGESTIONS = [
   'When can I spread margine near Agareb this week, for a 10 ha grove?',
@@ -420,7 +420,7 @@ function AskSonae() {
         <h2 className="flex items-center gap-2 text-[20px] font-extrabold">
           <IconMessage width={20} height={20} /> Ask Sonae
         </h2>
-        <Pill tone="water">Claude Opus · real forecasts</Pill>
+        <Pill tone="water">AI · real forecasts</Pill>
       </div>
       <p className="mt-1 text-[14.5px] text-ink-2">Ask in Derja, Arabic, French or English. Sonae answers with the planner and the real weather, never with guesses.</p>
 
@@ -494,7 +494,7 @@ export default function CheckPage() {
           />
         }
       >
-        Not a simulation: these tools use your own numbers, the real weather where you are, and Claude Opus to read documents and answer questions.
+        Not a simulation: these tools use your own numbers, the real weather where you are, and AI to read documents and answer questions.
       </PageHeader>
       <Rise>
         <AnimatePresence mode="wait">

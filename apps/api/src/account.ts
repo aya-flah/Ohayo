@@ -132,6 +132,7 @@ export async function registerAccount(app: FastifyInstance) {
 
   app.post('/me/plan', { config: { rateLimit: { max: 4, timeWindow: '1 minute' } } }, async (req) => {
     const u = requireUser(req.headers.authorization, ['mill', 'farmer']);
+    const { lang } = z.object({ lang: z.enum(['en', 'ar']).optional() }).parse(req.body ?? {});
     const packId = subOf(u.id)?.pack_id;
     let facts;
     if (u.role === 'mill') {
@@ -143,7 +144,7 @@ export async function registerAccount(app: FastifyInstance) {
       if (!f) throw new HttpError(400, 'Fill in your farm first.');
       facts = farmFacts(f, packId);
     }
-    const { ai, usd } = await generateSeasonPlan(facts);
+    const { ai, usd } = await generateSeasonPlan(facts, lang ?? 'en');
     const out = { facts, ai };
     const res = db.prepare('INSERT INTO plans (user_id, kind, input_json, output_json, cost_usd) VALUES (?, ?, ?, ?, ?)').run(u.id, u.role, JSON.stringify(facts.profile), JSON.stringify(out), usd);
     return { id: Number(res.lastInsertRowid), created_at: new Date().toISOString(), ...out };

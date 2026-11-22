@@ -171,6 +171,30 @@ function AccountButton() {
   );
 }
 
+function LangToggle() {
+  const lang = useSonae((s) => s.lang);
+  const setLang = useSonae((s) => s.setLang);
+  const ar = lang === 'ar';
+  return (
+    <button
+      onClick={() => {
+        tap();
+        setLang(ar ? 'en' : 'ar');
+      }}
+      className="glass glass-soft relative grid h-12 w-12 place-items-center overflow-hidden rounded-full text-ink transition-transform duration-200 active:scale-90"
+      aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'}
+      title={ar ? 'English' : 'العربية'}
+      data-no-translate
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span key={lang} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} transition={{ duration: 0.2, ease: EASE }} className={ar ? 'text-[14px] font-extrabold' : 'text-[19px] font-bold'} style={{ fontFamily: ar ? undefined : '"Noto Sans Arabic Variable", sans-serif' }}>
+          {ar ? 'EN' : 'ع'}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  );
+}
+
 function ModeToggle() {
   const field = useFieldMode();
   const setTheme = useSonae((s) => s.setTheme);
@@ -368,6 +392,15 @@ export function Shell({ children }: { children: ReactNode }) {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [location.pathname]);
 
+  // The top bar fades away as soon as the page scrolls, and comes back only at the very top.
+  const [atTop, setAtTop] = useState(true);
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [location.pathname]);
+
   return (
     <div className="relative min-h-screen">
       <Intro />
@@ -375,8 +408,15 @@ export function Shell({ children }: { children: ReactNode }) {
       <TideSweep key={location.pathname} path={location.pathname} dir={dir} />
 
       {/* Top HUD */}
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-40" style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-3 md:px-6">
+      <motion.header
+        className="pointer-events-none fixed inset-x-0 top-0 z-40"
+        style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+        animate={atTop ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: -24, filter: 'blur(6px)' }}
+        transition={{ duration: atTop ? 0.3 : 0.2, ease: atTop ? EASE : [0.7, 0, 0.84, 0] }}
+        aria-hidden={!atTop}
+        inert={!atTop}
+      >
+        <div className={`mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-3 md:px-6 ${atTop ? '' : '[&_*]:!pointer-events-none'}`}>
           <div className="glass glass-edge pointer-events-auto rounded-full py-1 pl-1 pr-4">
             <BrandMark />
           </div>
@@ -394,10 +434,11 @@ export function Shell({ children }: { children: ReactNode }) {
             <NavLink to="/settings" onClick={() => tap()} className={({ isActive }) => `glass glass-soft grid h-12 w-12 place-items-center rounded-full transition-transform duration-200 active:scale-90 ${isActive ? 'text-[var(--water)]' : 'text-ink'}`} aria-label="Settings" title="Settings">
               <IconSettings width={21} height={21} />
             </NavLink>
+            <LangToggle />
             <ModeToggle />
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <main className={`relative z-10 min-w-0 px-4 md:px-8 ${twin ? 'pointer-events-none' : ''}`} style={{ paddingTop: 'calc(max(12px, env(safe-area-inset-top)) + 92px)', paddingBottom: twin ? 0 : 'calc(max(12px, env(safe-area-inset-bottom)) + 108px)' }}>
         <AnimatePresence mode="wait" initial={false}>
