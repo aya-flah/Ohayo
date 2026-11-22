@@ -112,3 +112,32 @@ export const IconWifiOff = (p: P) => (
     <circle cx="12" cy="20" r="0.6" fill="currentColor" />
   </svg>
 );
+export const IconSunMode = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4" />
+  </svg>
+);
+export const IconMoon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+  </svg>
+);
+export const IconLeaf = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15" />
+    <path d="M5 19l7-7" />
+  </svg>
+);
+export const IconCoin = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5V8M12 16v1.5" />
+  </svg>
+);
+export const IconGauge = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 17a8 8 0 1 1 16 0" />
+    <path d="M12 17l4-5" />
+  </svg>
+);

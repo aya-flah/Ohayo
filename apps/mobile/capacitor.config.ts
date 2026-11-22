@@ -6,17 +6,18 @@ const config: CapacitorConfig = {
   appName: 'Sonae',
   webDir: '../web/dist',
   android: {
-    backgroundColor: '#00419a',
+    backgroundColor: '#0b121e',
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 900,
-      backgroundColor: '#00419a',
+      backgroundColor: '#0b121e',
       showSpinner: false,
     },
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#00419a',
+      overlaysWebView: false,
+      backgroundColor: '#0b121e',
     },
   },
 };

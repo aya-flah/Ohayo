@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sonae Zitoun: team guide</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 16mm 16mm; }
+  :root { --ink:#17202a; --ink2:#4b5563; --line:#e5e1d8; --margine:#8a5a2b; --olive:#5f7f24; --water:#1b6fae; --cut:#c43d3d; --sun:#c98410; --bg:#faf8f4; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 11pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 30pt; line-height: 1.05; margin: 0 0 6pt; letter-spacing: -0.5pt; }
+  h2 { font-size: 16pt; margin: 18pt 0 6pt; padding-top: 4pt; border-top: 2px solid var(--line); }
+  h2, h3 { break-after: avoid; page-break-after: avoid; }
+  h3 { font-size: 12pt; margin: 10pt 0 3pt; }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin-bottom: 3pt; }
+  .jp { font-family: "Yu Mincho", "MS Mincho", serif; }
+  .cover { padding: 6pt 0 10pt; border-bottom: 3px solid var(--margine); margin-bottom: 8pt; }
+  .kicker { color: var(--margine); font-weight: 700; font-size: 10.5pt; }
+  .lead { font-size: 13pt; color: var(--ink2); }
+  .box { border: 1px solid var(--line); border-radius: 10pt; padding: 9pt 11pt; margin: 8pt 0; background: var(--bg); break-inside: avoid; }
+  .box.m { border-left: 5px solid var(--margine); }
+  .box.o { border-left: 5px solid var(--olive); }
+  .box.w { border-left: 5px solid var(--water); }
+  .box.s { border-left: 5px solid var(--sun); }
+  .box.c { border-left: 5px solid var(--cut); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8pt; }
+  table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 10.5pt; break-inside: avoid; }
+  th, td { border-bottom: 1px solid var(--line); padding: 5pt 6pt; text-align: left; vertical-align: top; }
+  th { font-size: 9.5pt; color: var(--ink2); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .big { font-size: 20pt; font-weight: 800; line-height: 1.1; }
+  .small { font-size: 9.5pt; color: var(--ink2); }
+  code { font-family: Consolas, monospace; font-size: 9.5pt; background: #f0ece4; padding: 0 3pt; border-radius: 3pt; }
+  .flow { display: flex; gap: 6pt; align-items: stretch; margin: 8pt 0; }
+  .flow div { flex: 1; border: 1px solid var(--line); border-radius: 9pt; padding: 7pt 8pt; background: var(--bg); font-size: 10pt; }
+  .flow b { display: block; font-size: 10.5pt; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Kizuna 2026 · Team guide · Read this first (5 pages)</div>
+  <h1>Sonae Zitoun <span class="jp" style="font-weight:400;color:#8a5a2b">備え</span></h1>
+  <p class="lead">We changed the main idea. Sonae now plans what olive mills do with their waste, so it feeds olive trees instead of polluting wadis, and proves it on a blockchain.</p>
+</div>
+
+<h2>1. The idea in one minute</h2>
+<div class="box m">
+  <p>Every winter, each <b>maâsra</b> (olive mill, معصرة) presses olives into oil and is left with two wastes:</p>
+  <ul>
+    <li><b>Margine</b> (مرجين): dark, bitter water. Dumped in a wadi it kills plants, fish and wells. Spread thinly on an olive grove, at the right time, it is <b>free water and potassium fertiliser</b>.</li>
+    <li><b>Grignon</b> (فيتورة): the dry paste of skins and pits. It burns like firewood, so hammams, bakeries and brick kilns can use it as <b>fuel</b>.</li>
+  </ul>
+  <p style="margin:0"><b>Sonae is the daily planner</b> that sends each tanker of margine to the right grove on the right day, sends grignon to whoever needs fuel, and records every load on a public ledger nobody can edit.</p>
+</div>
+<p><b>Why it's different:</b> pump schedulers and water filters are everywhere at this hackathon. Olive-mill waste is a Tunisian problem: it happens right now, November to February, and it ties water, energy and farming together in one service.</p>
+
+<h2>2. The core service: one decision a day</h2>
+<p>Every day, for each mill, Sonae looks at the weather forecast, the ponds and the groves, and decides:</p>
+<div class="grid3">
+  <div class="box o"><h3>Where</h3>Only approved groves: not on a slope (over 8%), not within 100 m of a drinking-water well, not within 50 m of the wadi. Nearest grove first.</div>
+  <div class="box w"><h3>When</h3>Never on a rainy day, the day before rain, or while the soil is still wet. Rain would wash margine into the wadis.</div>
+  <div class="box m"><h3>How much</h3>At most 50 m³ per hectare per season and 10 m³ per hectare per day. The fullest pond is served first.</div>
+</div>
+<p>Then it sends a <b>Derja SMS</b> to the farmer and the tanker driver, for example:</p>
+<div class="box"><code>Sonae: ghodwa 60 m3 margine men Maasra Ben Salah lel jnen mta3ek (4 kamyoun). Ma tsa9ich 3 ayem. Potassium bla flous lel zitoun.</code></div>
+<p><b>Demo story (the Plan page):</b> three mills near Sfax are pressing. A storm is coming on Wednesday. Sonae sends out <b>640 m³ on Monday and Tuesday</b>, pauses for four days of rain and wet soil, and <b>no pond overflows</b>. Doing nothing would spill 114 m³ into the wadis that week.</p>
+
+<h2>3. The app: five pages, website and Android</h2>
+<table>
+  <tr><th style="width:18%">Page</th><th>What it shows</th></tr>
+  <tr><td><b>Plan</b></td><td>The 7-day plan: one card per day (spread or paused), every tanker trip with its reason, the pond levels, the SMS, the groves and their caps, and the week's numbers. You can <b>Add rain</b> to see Sonae reschedule. "Live forecast" uses the real Sfax weather.</td></tr>
+  <tr><td><b>Twin</b></td><td>The whole olive region in <b>3D</b>: mills with their margine ponds and grignon heaps, groves of olive trees, tankers driving, the wadi, the drinking well and its safe zone, the hammam, bakery, kiln and greenhouses. Play the week, or press <b>Make it rain</b> and the tankers stop.</td></tr>
+  <tr><td><b>Yui</b></td><td>The blockchain page (section 4). It reads the live contract on Sepolia with no wallet needed.</td></tr>
+  <tr><td><b>Replay</b></td><td>A whole real season (15 Nov 2025 to 28 Feb 2026, real Sfax weather): <b>7,522 m³ spilled without Sonae, none with it</b>. A "wet winter" option triples the rain to stress-test the pauses.</td></tr>
+  <tr><td><b>Settings</b></td><td>All the rules (caps, distances, rain limits) and prices, editable. Glass or Field (sunlight) mode.</td></tr>
+</table>
+<p class="small">The 3D region sits behind every page and moves when you change days. Everything works offline except the live forecast and the blockchain.</p>
+
+<h2 class="pb">4. The blockchain part: Yui, the margine passport</h2>
+<p><b>The problem it solves:</b> a mill is legally responsible for its margine, but nobody can check where each tanker went. Inspectors can't follow trucks, and exporters can't prove their oil was made cleanly. A public ledger that <b>no mill, farmer or official can quietly edit</b> fixes that, with no middleman.</p>
+<div class="flow">
+  <div><b>1. Dispatch</b>The mill records a load: which grove, how many m³, a hash of the lab reading. It pays Sonae's fee (0.5 TND/m³).</div>
+  <div><b>2. Confirm</b>The farmer, or the tanker's GPS and flow meter (the "oracle"), confirms it arrived within 48 h.</div>
+  <div><b>3. Certify</b>A mill with traced loads and no lost load can certify a batch of oil, shown as a QR code on the bottle.</div>
+  <div><b>4. Verify</b>Anyone types the certificate number and sees the proof. No account needed.</div>
+</div>
+<div class="grid">
+  <div class="box c"><h3>Rules the contract enforces</h3>
+    <ul style="margin:0">
+      <li>Only registered mills dispatch; only the regulator (CRDA/ANPE) registers groves.</li>
+      <li>A load over the grove's season cap is <b>refused</b>, counting loads still on the road.</li>
+      <li>A load nobody confirms in 48 h <b>expires</b>: the fee goes back and the mill gets a red flag. A flagged mill can't certify oil.</li>
+    </ul></div>
+  <div class="box s"><h3>Grignon market (escrow)</h3>
+    <p style="margin:0">The mill lists grignon (demo: 30 t at 60 TND/t). A hammam pays into the contract; the money stays locked until the hammam confirms delivery, then goes to the mill. No delivery in 2 days means the buyer can take the money back.</p></div>
+</div>
+<table>
+  <tr><th>Contract (Sepolia test network)</th><th>Address</th></tr>
+  <tr><td><b>ZitounLedger</b> (new, source verified on Sourcify)</td><td><code>0x094B7a274D9121513A5F04055Aa24aB7F8F16958</code></td></tr>
+  <tr><td>Demo wallet: regulator + mill + oracle + farmer</td><td><code>0x60Ea5C4b78A5b1b613Bc6B2f7dD093c3f854F0AD</code></td></tr>
+</table>
+<p><b>Already on chain:</b> 6 approved groves, the mill Maâsra El Amel, 1,050 m³ declared, one grignon lot. <b>To demo:</b> MetaMask on Sepolia with the demo wallet, then dispatch 15 m³, confirm it, and certify a batch. Buying grignon needs a <b>second</b> MetaMask account with a little test ETH, because a mill can't buy its own grignon. Test ETH has no value. Never paste a private key anywhere.</p>
+
+<h2>5. Who pays, and is it worth it?</h2>
+<table>
+  <tr><th style="width:20%">Who</th><th style="width:30%">Pays</th><th>Why it's worth it</th></tr>
+  <tr><td><b>Maâsra</b> (main customer)</td><td>About 0.5 TND per m³, roughly 800 TND per season for a medium mill. Plus the tanker transport it already pays today.</td><td>Ponds and fines cost it more. It also sells its grignon.</td></tr>
+  <tr><td><b>Farmer</b></td><td>A small seasonal fee</td><td>Free water and potassium: about 150 to 300 TND/ha of fertiliser saved.</td></tr>
+  <tr><td><b>Hammam, bakery, kiln</b></td><td>About 5 TND per tonne of grignon, as a commission</td><td>Cheaper than wood or gas, delivered on time.</td></tr>
+  <tr><td><b>Exporter</b> (optional)</td><td>Yearly fee for clean-oil certificates</td><td>Sells better to EU buyers who ask for traceability.</td></tr>
+</table>
+<p><b>Rough launch budget</b> (one region, 20 mills, first year): about 58,000 TND, covered by prizes and grants (Startup Act, JICA, GIZ, EU). It pays for itself from about 25 to 40 mills, and Tunisia has more than a thousand.</p>
+<div class="box c small"><b>Be honest in the pitch:</b> the limits (50 m³/ha, distances, rain thresholds) are cautious defaults, still to check against the Tunisian decree. Fertiliser and price figures are estimates. Only numbers from our own simulation go on slides. The biggest business risk: mills that dump illegally won't pay unless inspections are real. Our answer is the passport, because it makes compliance visible and valuable (certified oil).</div>
+
+<h2 class="pb">6. The 2-minute demo</h2>
+<ol>
+  <li><b>Plan:</b> "Three mills are pressing, a storm is coming Wednesday." Show 640 m³ going out before the rain and "no pond spills". Tap a trip to show its reason, and show the farmer's SMS.</li>
+  <li><b>Add rain</b> on Tuesday and watch the plan move the tankers to Monday.</li>
+  <li><b>Twin:</b> play the week. Tankers drive, ponds drop, a grove darkens. Point at the red borders: "this grove is next to a well, so never". Press <b>Make it rain</b>: everything stops.</li>
+  <li><b>Yui:</b> live contract on Sepolia. Dispatch a 15 m³ load, confirm it, issue a certificate, type its number in "Verify".</li>
+  <li><b>Replay:</b> a real season: "7,522 m³ into the wadis without Sonae, none with it."</li>
+</ol>
+
+<h2>7. For the developers</h2>
+<table>
+  <tr><th>Where</th><th>What</th></tr>
+  <tr><td><code>packages/engine/src/zitoun.ts</code></td><td>The planner (<code>planZitoun</code>), Derja SMS, season replay. Tests in <code>packages/engine/test/zitoun.test.ts</code>.</td></tr>
+  <tr><td><code>packages/shared/src/zitoun.ts</code></td><td>Types, default rules, the demo region (mills, groves, buyers, storm week).</td></tr>
+  <tr><td><code>apps/web/src/pages/</code></td><td>Plan, Twin, Yui, Replay, Settings. 3D scene: <code>pages/twin/ZitounScene.tsx</code>. State: <code>lib/zitoun.ts</code>, <code>lib/scene.ts</code>.</td></tr>
+  <tr><td><code>contracts/contracts/ZitounLedger.sol</code></td><td>The passport and grignon market (21 contract tests pass). Deploy: <code>npm --prefix contracts run deploy-zitoun:sepolia</code>.</td></tr>
+  <tr><td><code>data/fetch-olive-season.mjs</code></td><td>Downloads the real season weather for the Replay.</td></tr>
+</table>
+<p>Run it: <code>npm install</code>, then <code>npm test</code>, then <code>npm run dev:web</code> (http://localhost:5173). Android: <code>npm run mobile:sync</code>, then <code>npm run mobile:open</code>.</p>
+<p class="small">The old pump planner code is still in the repo for reference but no longer shown in the app. The ESP32 node can become the tanker's flow meter and GPS (the oracle) in a next step.</p>
+
+</body>
+</html>

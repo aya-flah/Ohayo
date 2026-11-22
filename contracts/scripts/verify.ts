@@ -15,10 +15,15 @@ async function main() {
   const file = path.join(__dirname, "..", "deployments", `${network.name}.json`);
   if (!fs.existsSync(file)) throw new Error(`No deployment record for ${network.name}. Deploy first.`);
   const d = JSON.parse(fs.readFileSync(file, "utf8"));
-  const targets = [
-    { name: "SonaeExchange", address: d.exchange as string, tx: d.exchangeTx as string | undefined },
-    { name: "LedgerAnchor", address: d.ledger as string, tx: d.ledgerTx as string | undefined },
+  const targets: Array<{ name: string; address: string; tx?: string; args: unknown[] }> = [
+    { name: "SonaeExchange", address: d.exchange, tx: d.exchangeTx, args: [d.deployer, d.oracle] },
+    { name: "LedgerAnchor", address: d.ledger, tx: d.ledgerTx, args: [d.deployer, d.oracle] },
   ];
+  const zFile = path.join(__dirname, "..", "deployments", `zitoun-${network.name}.json`);
+  if (fs.existsSync(zFile)) {
+    const z = JSON.parse(fs.readFileSync(zFile, "utf8"));
+    targets.push({ name: "ZitounLedger", address: z.address, tx: z.deployTx, args: [z.deployer, z.oracle, z.deployer, z.feePerM3Wei] });
+  }
 
   for (const t of targets) {
     const fqn = `contracts/${t.name}.sol:${t.name}`;
@@ -33,7 +38,7 @@ async function main() {
 
     if (process.env.ETHERSCAN_API_KEY) {
       try {
-        await hre.run("verify:verify", { address: t.address, contract: fqn, constructorArguments: [d.deployer, d.oracle] });
+        await hre.run("verify:verify", { address: t.address, contract: fqn, constructorArguments: t.args });
       } catch (e) {
         console.warn(`  Etherscan: not verified (${(e as Error).message})`);
         process.exitCode = 1;

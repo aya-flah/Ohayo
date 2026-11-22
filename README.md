@@ -1,10 +1,10 @@
 # Sonae (備え)
 
-**Prepared, nothing to fear.** Sonae keeps irrigation going in Tunisian farming communities when STEG cuts the power. It pumps water up into the tank while there is energy, irrigates by gravity when the cut comes, and sends every farmer a fair turn by SMS. Neighbours can also share spare water and solar energy through **Yui**, an escrowed exchange on the Sepolia test network.
+**Prepared, nothing to fear.** Sonae Zitoun plans what Tunisia's olive mills (maâsras) do with their waste. Every day it sends each tanker of **margine** to an olive grove that can safely take it, as free water and potassium: never before rain, near a well or the wadi, or beyond the grove's season cap. It sends **grignon** to hammams, bakeries and kilns as fuel. **Yui**, the margine passport on the Sepolia test network, records every load so inspectors and olive-oil buyers can verify it with no middleman.
 
 Built at the Kizuna 2026 hackathon.
 
-- **New to the project? Read the team guide first:** [`docs/Sonae_Team_Guide.pdf`](docs/Sonae_Team_Guide.pdf) (15 pages, plain English).
+- **New to the project? Read the Zitoun guide first:** [`docs/Sonae_Zitoun_Team_Guide.pdf`](docs/Sonae_Zitoun_Team_Guide.pdf) (5 pages, plain English). The older [`docs/Sonae_Team_Guide.pdf`](docs/Sonae_Team_Guide.pdf) describes the first idea (pump planner).
 - **Full plan, Dev spec and Task board:** the "Sonae Master Plan" doc. Ask the team lead for the link.
 
 ## What's in this repo
@@ -32,14 +32,15 @@ npm install                 # every workspace
 npm test                    # engine tests (Hedi scenario, fairness, SMS, replay)
 npm run dev:web             # website on http://localhost:5173
 npm run dev:api             # API on http://localhost:8787 (copy apps/api/.env.example to .env first)
-npm run weather:fetch       # refresh the real Kairouan summer 2026 weather for the Replay
+node data/fetch-olive-season.mjs   # refresh the real 2025-26 Sfax olive-season weather for the Replay
 ```
 
 ### Smart contracts (Yui)
 
 ```bash
 npm run contracts:install
-npm run contracts:test                  # 11 tests
+npm run contracts:test                  # 21 tests
+npm --prefix contracts run deploy-zitoun:sepolia   # ZitounLedger + demo groves; writes apps/web/src/web3/zitoun-contract.json
 npm run contracts:node                  # local chain (keep it running)
 npm run contracts:deploy:local          # deploy to it; addresses go to apps/web/src/web3/sonae-contracts.json
 npm run contracts:deploy:sepolia        # needs contracts/.env (test wallet + RPC); never commit it
@@ -52,6 +53,7 @@ Then open the Yui page with MetaMask on Sepolia (or on `localhost:8545`, chain 3
 | Contract | Address | Source |
 | --- | --- | --- |
 | `SonaeExchange` (Yui escrow) | [`0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D`](https://sepolia.etherscan.io/address/0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D) | [Sourcify](https://repo.sourcify.dev/11155111/0xbaf8Fb1d4BeD2e25811C899B5b7095408dDE1e0D) |
+| `ZitounLedger` (margine passport, grignon escrow, oil certificates) | [`0x094B7a274D9121513A5F04055Aa24aB7F8F16958`](https://sepolia.etherscan.io/address/0x094B7a274D9121513A5F04055Aa24aB7F8F16958) | [Sourcify](https://repo.sourcify.dev/11155111/0x094B7a274D9121513A5F04055Aa24aB7F8F16958) |
 | `LedgerAnchor` | [`0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA`](https://sepolia.etherscan.io/address/0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA) | [Sourcify](https://repo.sourcify.dev/11155111/0xc35E5558d3A6E0F1A3B29191Bb9eFeFA2B602daA) |
 
 The deployer wallet `0x60Ea5C4b78A5b1b613Bc6B2f7dD093c3f854F0AD` is the admin and the delivery oracle. To check its balance, run `npm --prefix contracts run whoami:sepolia`. To publish the source again, run `npm --prefix contracts run verify:sepolia`; it also verifies on Etherscan when `ETHERSCAN_API_KEY` is set.
@@ -61,6 +63,7 @@ The deployer wallet `0x60Ea5C4b78A5b1b613Bc6B2f7dD093c3f854F0AD` is the admin an
 ```bash
 npm run mobile:sync     # builds the website and copies it into apps/mobile/android
 npm run mobile:open     # opens Android Studio; press Run, or build an APK there
+npm run mobile:run      # or, without Android Studio open: rebuild, install on the USB phone and launch it
 ```
 
 Android Studio's bundled JDK 21 is the easiest way to build. The app is named Sonae, with the 備 icon.

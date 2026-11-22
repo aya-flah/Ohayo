@@ -10,8 +10,12 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function Loading() {
   return (
-    <div className="py-24 text-center text-ink-2" role="status">
-      Loading…
+    <div className="flex flex-col items-center gap-4 py-32 text-ink-2" role="status">
+      <span className="relative h-12 w-12">
+        <span className="absolute inset-0 animate-ping rounded-full border border-[var(--water)] opacity-40" />
+        <span className="absolute inset-2 rounded-full" style={{ background: 'linear-gradient(135deg, var(--water), var(--water-deep))', boxShadow: 'var(--glow-water)' }} />
+      </span>
+      <span className="text-[15px] font-semibold">Loading the olive region…</span>
     </div>
   );
 }

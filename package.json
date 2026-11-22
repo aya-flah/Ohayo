@@ -14,6 +14,7 @@
     "build:web": "npm run build -w apps/web",
     "mobile:sync": "npm run build -w apps/web && npm run sync -w apps/mobile",
     "mobile:open": "npm run open -w apps/mobile",
+    "mobile:run": "npm run mobile:sync && powershell -NoProfile -ExecutionPolicy Bypass -File apps/mobile/run-android.ps1",
     "contracts:install": "npm --prefix contracts install",
     "contracts:test": "npm --prefix contracts test",
     "contracts:node": "npm --prefix contracts run node",

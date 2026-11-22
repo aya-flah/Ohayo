@@ -1,37 +1,50 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
-import { usePlan } from '../lib/store';
-import { twinAt, twinFromTelemetry, useLiveTelemetry, type TwinState } from '../lib/twin';
-import { usePrefersReducedMotion, tap } from '../lib/device';
-import { clock, dayLabel, fmt } from '../lib/format';
-import { TwinScene } from './twin/Scene';
-import { IconCut, IconPause, IconPlay } from '../components/Icons';
+import { useZPlan, planDayLabel, shortDate } from '../lib/zitoun';
+import { useRegionState, useScene } from '../lib/scene';
+import { tap } from '../lib/device';
+import { fmt } from '../lib/format';
+import { IconDrop, IconLeaf, IconPause, IconPlay, IconSun, IconGauge } from '../components/Icons';
+import { EASE } from '../components/ui';
 
-const PLAY_SECONDS = 24;
+const PLAY_SECONDS = 20;
 
-function Instrument({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'ok' | 'cut' | 'sun' | 'water' }) {
-  const color = { default: 'var(--ink)', ok: 'var(--ok)', cut: 'var(--cut)', sun: 'var(--solar)', water: 'var(--water)' }[tone];
+function Instrument({ label, value, tone, icon, fill }: { label: string; value: string; tone: string; icon: ReactNode; fill?: number }) {
   return (
-    <div className="rounded-[12px] border border-line bg-surface px-3.5 py-3">
-      <div className="text-[12.5px] text-ink-2">{label}</div>
-      <motion.div key={value} initial={{ opacity: 0.4 }} animate={{ opacity: 1, transition: { duration: 0.2 } }} className="mt-0.5 font-display text-[20px] font-extrabold num" style={{ color }}>
+    <div className="relative min-w-[132px] overflow-hidden rounded-[16px] border border-line bg-surface px-3.5 py-2.5">
+      {fill !== undefined && <motion.span className="absolute inset-x-0 bottom-0 opacity-25" style={{ background: tone }} animate={{ height: `${Math.min(1, fill) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} />}
+      <div className="relative flex items-center gap-1.5 text-[12.5px] font-semibold text-ink-2">
+        <span style={{ color: tone }}>{icon}</span>
+        {label}
+      </div>
+      <div className="num relative mt-0.5 text-[19px] font-extrabold" style={{ color: tone === 'var(--ink-2)' ? 'var(--ink)' : tone }}>
         {value}
-      </motion.div>
+      </div>
     </div>
   );
 }
 
+const LEGEND = [
+  { c: 'var(--margine)', t: 'Margine: ponds and tankers' },
+  { c: 'var(--olive)', t: 'Olive groves that may receive it' },
+  { c: 'var(--cut)', t: 'Never: near a well, the wadi, or steep' },
+  { c: 'var(--water)', t: 'Wadi, rain and the drinking well' },
+  { c: 'var(--solar)', t: 'Grignon going to fuel buyers' },
+];
+
 export default function TwinPage() {
-  const { input, plan } = usePlan();
-  const reduced = usePrefersReducedMotion();
-  const [source, setSource] = useState<'sim' | 'live'>('sim');
-  const [cursor, setCursor] = useState(20);
+  const { input, plan } = useZPlan();
+  const state = useRegionState();
+  const cursor = useScene((s) => s.cursor);
+  const setCursor = useScene((s) => s.setCursor);
+  const forceRain = useScene((s) => s.forceRain);
+  const setForceRain = useScene((s) => s.setForceRain);
   const [playing, setPlaying] = useState(false);
-  const [forceCut, setForceCut] = useState(false);
-  const [log, setLog] = useState<string[]>([]);
-  const live = useLiveTelemetry(source === 'live');
-  const H = plan.pump.length;
   const raf = useRef<number | null>(null);
+  const N = plan.days.length;
+  const [log, setLog] = useState<Array<{ id: number; text: string; tone: string }>>([]);
+  const ids = useRef(0);
+  const prev = useRef(state);
 
   useEffect(() => {
     if (!playing) return;
@@ -39,127 +52,159 @@ export default function TwinPage() {
     const step = (t: number) => {
       const dt = (t - last) / 1000;
       last = t;
-      setCursor((c) => {
-        const next = c + (dt * H) / PLAY_SECONDS;
-        if (next >= H) {
-          setPlaying(false);
-          return H - 0.01;
-        }
-        return next;
-      });
+      const c = useScene.getState().cursor;
+      const next = c + (dt * N) / PLAY_SECONDS;
+      if (next >= N) {
+        setPlaying(false);
+        setCursor(N - 0.001);
+        return;
+      }
+      setCursor(next);
       raf.current = requestAnimationFrame(step);
     };
     raf.current = requestAnimationFrame(step);
     return () => {
       if (raf.current) cancelAnimationFrame(raf.current);
     };
-  }, [playing, H]);
+  }, [playing, N, setCursor]);
 
-  const simState = useMemo(() => twinAt(plan, input, cursor, forceCut), [plan, input, cursor, forceCut]);
-  const state: TwinState = source === 'live' && live.last ? twinFromTelemetry(live.last, input.gda.tank.capacityM3) : simState;
-
-  // A short event log, written when the node's state changes.
-  const prev = useRef<TwinState | null>(null);
+  // A short event log, like a dispatcher's radio.
   useEffect(() => {
     const p = prev.current;
     prev.current = state;
-    if (!p) return;
-    const at = clock(state.timeIso);
-    const events: string[] = [];
-    if (p.gridOn && !state.gridOn) events.push(`${at} STEG cut: grid off`);
-    if (!p.gridOn && state.gridOn) events.push(`${at} Grid back`);
-    if (!p.valveOpen && state.valveOpen) events.push(`${at} Valve open${state.farmer ? ` for ${state.farmer}` : ''}: gravity flow`);
-    if (p.valveOpen && !state.valveOpen) events.push(`${at} Valve closed`);
-    if (!p.pumpOn && state.pumpOn) events.push(`${at} Pump on (${state.source === 'solar' ? 'sun' : state.source})`);
-    if (p.pumpOn && !state.pumpOn) events.push(`${at} Pump off`);
-    if (events.length) setLog((l) => [...events.reverse(), ...l].slice(0, 7));
-  }, [state]);
+    const at = `${planDayLabel(state.day, state.date)} ${String(Math.floor(state.hour)).padStart(2, '0')}:00`;
+    const ev: Array<{ text: string; tone: string }> = [];
+    for (const t of state.trucks) {
+      if (t.kind === 'margine' && t.unloading && !p.trucks.some((x) => x.key === t.key && x.unloading)) {
+        const g = input.groves.find((x) => x.id === t.toId);
+        ev.push({ text: `${at} ${fmt(t.m3)} m³ spread on ${g?.owner ?? 'a grove'}'s olives`, tone: 'var(--margine)' });
+      }
+      if (t.kind === 'grignon' && t.unloading && !p.trucks.some((x) => x.key === t.key && x.unloading)) {
+        const b = input.buyers.find((x) => x.id === t.toId);
+        ev.push({ text: `${at} ${fmt(t.m3)} t of grignon to ${b?.name ?? 'a buyer'}`, tone: 'var(--solar)' });
+      }
+    }
+    if (state.rain > 0 && p.rain === 0) ev.push({ text: `${at} Rain: tankers stay at the mills`, tone: 'var(--water)' });
+    if (ev.length) setLog((l) => [...ev.map((e) => ({ ...e, id: ids.current++ })), ...l].slice(0, 6));
+  }, [state, input]);
 
-  const liveNote = {
-    off: '',
-    connecting: 'Connecting to the MQTT broker…',
-    waiting: 'Connected. Waiting for the node: start the Wokwi simulation or power the ESP32.',
-    live: 'Live data from the node.',
-    error: `MQTT error: ${live.error ?? 'unknown'}`,
-    'not-configured': 'Set VITE_MQTT_WS_URL in apps/web/.env.local to receive live data.',
-  }[live.status];
+  const onRoad = state.trucks.filter((t) => t.kind === 'margine').length;
+  const instruments = (
+    <>
+      <Instrument label="Rain today" value={`${fmt(state.rainMm, state.rainMm % 1 ? 1 : 0)} mm`} tone={state.rain > 0 ? 'var(--water)' : 'var(--ink-2)'} icon={<IconDrop width={15} height={15} />} />
+      <Instrument label="Spreading" value={state.blocked ? 'Paused' : 'Allowed'} tone={state.blocked ? 'var(--water)' : 'var(--ok)'} icon={<IconLeaf width={15} height={15} />} />
+      {input.mills.map((m) => {
+        const p = state.ponds.find((x) => x.id === m.id)!;
+        return <Instrument key={m.id} label={`Pond ${m.name.replace('Maâsra ', '')}`} value={`${fmt(p.share * 100)}%`} tone={p.share >= 0.9 ? 'var(--cut)' : 'var(--margine)'} icon={<IconGauge width={15} height={15} />} fill={p.share} />;
+      })}
+      <Instrument label="Tankers on the road" value={`${onRoad}`} tone="var(--margine)" icon={<IconGauge width={15} height={15} />} />
+      <Instrument label="Spread this week" value={`${fmt(state.spreadSoFarM3)} m³`} tone="var(--olive)" icon={<IconLeaf width={15} height={15} />} />
+      <Instrument label="Grignon buyers served" value={`${state.buyersServed.length}`} tone="var(--solar)" icon={<IconSun width={15} height={15} />} />
+    </>
+  );
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div className="max-w-[640px]">
-          <h1 className="font-display text-[30px] leading-tight font-extrabold md:text-[38px]">The farm, live in 3D</h1>
-          <p className="mt-2 text-[15.5px] text-ink-2">The same signals the Sonae Node sends: tank level, pump, valve, solar power and the STEG line.</p>
+    <div className="relative -mx-4 md:-mx-8" style={{ height: 'calc(100dvh - max(12px, env(safe-area-inset-top)) - 92px)' }}>
+      <motion.div
+        className="glass glass-edge pointer-events-auto absolute left-3 right-3 top-0 rounded-[26px] p-4 md:left-8 md:right-auto md:w-[400px] md:p-5"
+        initial={{ opacity: 0, x: -30, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.8, delay: 0.25, ease: EASE }}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="eyebrow flex items-center gap-2">
+            <span className="dot dot-pulse" style={{ color: state.blocked ? 'var(--water)' : 'var(--ok)' }} />
+            Digital twin · Sfax olive belt
+          </div>
+          <span lang="ja" className="font-jp text-[20px] text-ink-3">双子</span>
         </div>
-        <div className="inline-flex rounded-[11px] border border-line bg-surface p-1" role="radiogroup" aria-label="Data source">
-          {(['sim', 'live'] as const).map((s) => (
-            <button key={s} role="radio" aria-checked={source === s} onClick={() => setSource(s)} className={`rounded-[8px] px-3 py-1.5 text-[13.5px] transition-colors duration-150 ${source === s ? 'bg-accent-strong text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
-              {s === 'sim' ? 'From the plan' : 'Live from the node'}
-            </button>
+        <h1 className="mt-2 text-[26px] leading-tight font-extrabold md:text-[30px]">
+          Every tanker, pond and grove, <span className="text-gradient-water">in 3D</span>
+        </h1>
+        <p className="mt-1.5 hidden text-[15px] text-ink-2 md:block">Drag to orbit. Play the week, or make it rain and watch the tankers stop.</p>
+        <ul className="mt-3 hidden flex-col gap-1.5 md:flex">
+          {LEGEND.map((l) => (
+            <li key={l.t} className="flex items-center gap-2 text-[13.5px] text-ink-2">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: l.c, boxShadow: `0 0 8px ${l.c}` }} />
+              {l.t}
+            </li>
           ))}
-        </div>
-      </div>
-      {source === 'live' && <p className="mt-2 text-[13px] text-ink-2">{liveNote}</p>}
+        </ul>
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 md:hidden">{instruments}</div>
+      </motion.div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_300px]">
-        <div>
-          <div className="card h-[360px] overflow-hidden md:h-[520px]">
-            <TwinScene state={state} reduced={reduced} />
-          </div>
-          {source === 'sim' && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button className="btn btn-primary" onClick={() => { tap(); setPlaying((p) => !p); }} aria-label={playing ? 'Pause' : 'Play'}>
-                {playing ? <IconPause width={16} height={16} /> : <IconPlay width={16} height={16} />}
-                {playing ? 'Pause' : 'Play'}
-              </button>
-              <label className="flex min-w-[220px] flex-1 items-center gap-3 text-[13px] text-ink-2">
-                <span className="sr-only">Time</span>
-                <input type="range" min={0} max={H - 0.01} step={0.05} value={cursor} onChange={(e) => { setPlaying(false); setCursor(Number(e.target.value)); }} className="w-full accent-[var(--accent-strong)]" />
-                <span className="w-32 shrink-0 text-ink num">
-                  {dayLabel(state.timeIso, input.now)} {clock(state.timeIso)}
-                </span>
-              </label>
-              <button
-                className={`btn ${forceCut ? 'bg-danger text-white' : 'btn-quiet'}`}
-                onClick={() => {
-                  tap('heavy');
-                  setForceCut((f) => !f);
-                }}
-                aria-pressed={forceCut}
-              >
-                <IconCut width={16} height={16} />
-                {forceCut ? 'Bring the grid back' : 'Cut the power now'}
-              </button>
-            </div>
-          )}
+      <motion.aside
+        className="pointer-events-auto absolute right-8 top-0 hidden w-[300px] flex-col gap-2 lg:flex"
+        initial={{ opacity: 0, x: 30, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
+      >
+        <div className="glass glass-edge grid grid-cols-2 gap-2 rounded-[24px] p-3">{instruments}</div>
+        <div className="glass glass-edge rounded-[24px] p-4">
+          <div className="text-[14px] font-bold">Dispatch log</div>
+          <ul className="mt-2 flex flex-col gap-1.5" aria-live="polite">
+            {log.length === 0 && <li className="text-[13.5px] text-ink-3">Press play to watch the tankers work.</li>}
+            {log.map((e) => (
+              <motion.li key={e.id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }} className="flex gap-2 text-[13px] text-ink-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: e.tone }} />
+                {e.text}
+              </motion.li>
+            ))}
+          </ul>
         </div>
+      </motion.aside>
 
-        <aside className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Instrument label="Tank" value={`${fmt(state.levelShare * 100)}%`} tone="water" />
-            <Instrument label="Grid" value={state.gridOn ? 'On' : 'Cut'} tone={state.gridOn ? 'ok' : 'cut'} />
-            <Instrument label="Pump" value={state.pumpOn ? (state.source === 'solar' ? 'Sun' : state.source === 'diesel' ? 'Diesel' : 'Grid') : 'Off'} tone={state.pumpOn ? (state.source === 'solar' ? 'sun' : 'water') : 'default'} />
-            <Instrument label="Valve" value={state.valveOpen ? 'Open' : 'Closed'} tone={state.valveOpen ? 'ok' : 'default'} />
-            <Instrument label="Gravity flow" value={`${fmt(state.flowM3h)} m³/h`} />
-            <Instrument label="Solar" value={`${fmt(state.solarKW, 1)} kW`} tone={state.solarKW > 1 ? 'sun' : 'default'} />
+      <motion.div
+        className="glass glass-edge glass-strong pointer-events-auto absolute inset-x-3 flex flex-wrap items-center gap-3 rounded-[28px] p-3 md:left-1/2 md:right-auto md:w-[min(760px,calc(100%-4rem))] md:-translate-x-1/2 md:flex-nowrap md:p-3.5"
+        style={{ bottom: 'calc(max(12px, env(safe-area-inset-bottom)) + 92px)' }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.45, ease: EASE }}
+      >
+        <button
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-white transition-transform duration-200 active:scale-90"
+          style={{ background: 'linear-gradient(135deg, var(--olive), color-mix(in oklab, var(--olive) 45%, #1d2a10))' }}
+          onClick={() => {
+            tap();
+            if (!playing && cursor >= N - 0.01) setCursor(0);
+            setPlaying((p) => !p);
+          }}
+          aria-label={playing ? 'Pause' : 'Play the week'}
+        >
+          {playing ? <IconPause width={20} height={20} /> : <IconPlay width={20} height={20} />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2 text-[13.5px]">
+            <span className="font-bold">
+              {planDayLabel(state.day, state.date)} · {shortDate(state.date)}
+            </span>
+            <span className="num text-ink-2">{String(Math.floor(state.hour)).padStart(2, '0')}:{String(Math.floor((state.hour % 1) * 60)).padStart(2, '0')}</span>
           </div>
-          <section className="card p-4">
-            <h2 className="font-display text-[17px] font-extrabold">Node events</h2>
-            {log.length === 0 ? (
-              <p className="mt-2 text-[13px] text-ink-2">Press play or cut the power to see what the node does.</p>
-            ) : (
-              <ul className="mt-2 space-y-1.5 text-[13px] num">
-                {log.map((e, i) => (
-                  <motion.li key={`${e}-${i}`} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0, transition: { duration: 0.2 } }}>
-                    {e}
-                  </motion.li>
-                ))}
-              </ul>
-            )}
-          </section>
-          <p className="text-[12.5px] text-ink-3">Mode: {state.mode}. Drag to orbit the farm; scroll to zoom.</p>
-        </aside>
-      </div>
+          <input
+            type="range"
+            className="range mt-1.5 w-full"
+            min={0}
+            max={N - 0.001}
+            step={0.005}
+            value={cursor}
+            aria-label="Moment of the week"
+            onChange={(e) => {
+              setPlaying(false);
+              setCursor(Number(e.target.value));
+            }}
+          />
+        </div>
+        <button
+          className={`btn ${forceRain ? 'btn-primary' : 'btn-quiet'} w-full md:w-auto`}
+          onClick={() => {
+            tap('medium');
+            setForceRain(!forceRain);
+          }}
+          aria-pressed={forceRain}
+        >
+          <IconDrop width={17} height={17} /> {forceRain ? 'Stop the rain' : 'Make it rain'}
+        </button>
+      </motion.div>
     </div>
   );
 }

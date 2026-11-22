@@ -1,229 +1,204 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { animate, motion } from 'motion/react';
-import { replaySeason, syntheticSeason, type ReplayRun, type SeasonKpis } from '@sonae/engine';
-import { DEMO_GDA, demoPlots, localHour, toMs, type ForecastHour } from '@sonae/shared';
-import { loadSummer2026 } from '../lib/weather';
+import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
+import { replayZitounSeason, type ZitounReplay } from '@sonae/engine';
+import type { DayWeather } from '@sonae/shared';
+import { useZitoun } from '../lib/zitoun';
 import { fmt } from '../lib/format';
-import { IconReplay } from '../components/Icons';
+import { AnimatedNumber, EASE, GlassCard, PageHeader, Rise, Segmented, Stagger } from '../components/ui';
 
-interface Row {
-  key: keyof SeasonKpis;
-  label: string;
-  unit: string;
-  digits?: number;
-  better: 'lower' | 'higher';
+type Variant = 'real' | 'wet';
+
+interface SeasonFile {
+  place: string;
+  source: string;
+  days: DayWeather[];
 }
 
-const ROWS: Row[] = [
-  { key: 'daysShort', label: 'Days a plot went short of water', unit: 'days', better: 'lower' },
-  { key: 'deliveredPct', label: 'Water delivered, share of need', unit: '%', digits: 1, better: 'higher' },
-  { key: 'plotStressDays', label: 'Plot-days under water stress', unit: 'plot-days', better: 'lower' },
-  { key: 'dieselL', label: 'Diesel burned', unit: 'L', better: 'lower' },
-  { key: 'kWhPeak', label: 'Grid energy at peak hours (13:00 to 17:00)', unit: 'kWh', better: 'lower' },
-  { key: 'fairnessGapPct', label: 'Gap between best- and worst-served plot', unit: 'points', digits: 1, better: 'lower' },
-  { key: 'yieldLossPct', label: 'Estimated yield lost to thirst', unit: '%', digits: 1, better: 'lower' },
-];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function median(xs: number[]) {
-  const s = [...xs].sort((a, b) => a - b);
-  return s[Math.floor(s.length / 2)] ?? 0;
+/** Pond fill over the season: without Sonae (coral, spilling at the brim) and with Sonae (margine brown). */
+function SeasonChart({ r }: { r: ZitounReplay }) {
+  const W = 1000;
+  const H = 240;
+  const top = 46;
+  const n = r.days.length;
+  const x = (i: number) => (i / Math.max(1, n - 1)) * W;
+  const y = (share: number) => top + (1 - Math.min(1, share)) * (H - top - 6);
+  const path = (k: 'pondShareWithout' | 'pondShareWith') => r.days.map((d, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(d[k]).toFixed(1)}`).join('');
+  const maxRain = Math.max(10, ...r.days.map((d) => d.rainMm));
+  const months = r.days.map((d, i) => ({ i, d })).filter(({ d }) => d.date.endsWith('-01') || d.date.endsWith('-15'));
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block h-[220px] w-full md:h-[260px]" role="img" aria-label="Pond fill over the season, without and with Sonae, with daily rain">
+        {r.days.map((d, i) =>
+          d.blocked ? <rect key={`b${i}`} x={x(i) - W / n / 2} y={top} width={W / n} height={H - top} fill="var(--water)" opacity={0.08} /> : null,
+        )}
+        {r.days.map((d, i) =>
+          d.rainMm >= 0.5 ? <rect key={`r${i}`} x={x(i) - 2} y={4} width={4} height={(d.rainMm / maxRain) * (top - 10)} rx={1.5} fill="var(--water)" opacity={0.8} /> : null,
+        )}
+        <line x1={0} x2={W} y1={y(1)} y2={y(1)} stroke="var(--cut)" strokeDasharray="6 6" opacity={0.6} vectorEffect="non-scaling-stroke" />
+        {r.days.map((d, i) => (d.overflowWithout > 0 ? <rect key={`o${i}`} x={x(i) - W / n / 2} y={y(1) - 4} width={W / n} height={4} fill="var(--cut)" opacity={0.85} /> : null))}
+        <motion.path d={path('pondShareWithout')} fill="none" stroke="var(--cut)" strokeWidth={2.5} vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.6, ease: EASE }} />
+        <motion.path d={path('pondShareWith')} fill="none" stroke="var(--margine)" strokeWidth={3} vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.6, delay: 0.3, ease: EASE }} />
+      </svg>
+      <div className="relative mt-1 h-5 text-[12px] text-ink-3">
+        {months.map(({ i, d }) => (
+          <span key={i} className="num absolute -translate-x-1/2" style={{ left: `${(i / Math.max(1, n - 1)) * 100}%` }}>
+            {Number(d.date.slice(8))} {MONTHS[Number(d.date.slice(5, 7)) - 1]}
+          </span>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[13.5px] text-ink-2">
+        <span className="flex items-center gap-2"><span className="h-[3px] w-5 rounded-full" style={{ background: 'var(--cut)' }} />Ponds without Sonae (spill at the brim)</span>
+        <span className="flex items-center gap-2"><span className="h-[3px] w-5 rounded-full" style={{ background: 'var(--margine)' }} />Ponds with Sonae</span>
+        <span className="flex items-center gap-2"><span className="h-3 w-1.5 rounded-sm" style={{ background: 'var(--water)' }} />Daily rain</span>
+        <span className="flex items-center gap-2"><span className="h-3 w-4 rounded-sm opacity-30" style={{ background: 'var(--water)' }} />Spreading paused</span>
+      </div>
+    </div>
+  );
 }
 
-function Rolling({ value, digits = 0 }: { value: number; digits?: number }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const prev = useRef(0);
-  useEffect(() => {
-    const from = prev.current;
-    prev.current = value;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce || !ref.current) {
-      if (ref.current) ref.current.textContent = fmt(value, digits);
-      return;
-    }
-    const controls = animate(from, value, {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => {
-        if (ref.current) ref.current.textContent = fmt(v, digits);
-      },
-    });
-    return () => controls.stop();
-  }, [value, digits]);
-  return <span ref={ref} className="num" />;
+function Row({ label, without, withS, unit, better, digits = 0 }: { label: string; without: number; withS: number; unit: string; better: 'lower' | 'higher'; digits?: number }) {
+  const max = Math.max(1, without, withS);
+  const good = better === 'lower' ? withS <= without : withS >= without;
+  return (
+    <div className="grid grid-cols-1 gap-2 border-b border-line py-3.5 last:border-0 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-4">
+      <div className="text-[15px] font-semibold">{label}</div>
+      <div>
+        <div className="flex items-baseline justify-between text-[13px] text-ink-3 md:hidden">Without Sonae</div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--line)]">
+            <motion.div className="h-full rounded-full" style={{ background: 'var(--ink-3)' }} initial={{ width: 0 }} whileInView={{ width: `${(without / max) * 100}%` }} viewport={{ once: true }} transition={{ duration: 0.8, ease: EASE }} />
+          </div>
+          <span className="num w-28 text-right text-[15px] font-bold">
+            <AnimatedNumber value={without} digits={digits} /> <span className="text-[12.5px] font-semibold text-ink-3">{unit}</span>
+          </span>
+        </div>
+      </div>
+      <div>
+        <div className="flex items-baseline justify-between text-[13px] text-ink-3 md:hidden">With Sonae</div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--line)]">
+            <motion.div className="h-full rounded-full" style={{ background: good ? 'var(--ok)' : 'var(--cut)' }} initial={{ width: 0 }} whileInView={{ width: `${(withS / max) * 100}%` }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.15, ease: EASE }} />
+          </div>
+          <span className="num w-28 text-right text-[15px] font-bold" style={{ color: good ? 'var(--ok)' : 'var(--cut)' }}>
+            <AnimatedNumber value={withS} digits={digits} /> <span className="text-[12.5px] font-semibold text-ink-3">{unit}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ReplayPage() {
-  const [hourly, setHourly] = useState<ForecastHour[] | null>(null);
-  const [real, setReal] = useState(false);
-  const [tank, setTank] = useState(DEMO_GDA.tank.capacityM3);
-  const [solar, setSolar] = useState(DEMO_GDA.solar?.kWp ?? 0);
-  const [seeds, setSeeds] = useState(20);
-  const [runs, setRuns] = useState<ReplayRun[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const cancel = useRef(false);
+  const rules = useZitoun((s) => s.rules);
+  const [file, setFile] = useState<SeasonFile | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [variant, setVariant] = useState<Variant>('real');
 
   useEffect(() => {
-    loadSummer2026().then((r) => {
-      if (r && r.hourly.length > 24 * 30) {
-        setHourly(r.hourly);
-        setReal(true);
-      } else {
-        setHourly(syntheticSeason('2026-06-01T00:00:00+01:00', 122, 7));
-      }
-    });
+    fetch('/data/sfax-olive-season-2025-26.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((j: SeasonFile) => setFile(j))
+      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the season'));
   }, []);
 
-  const run = useCallback(async () => {
-    if (!hourly) return;
-    cancel.current = false;
-    setRunning(true);
-    setProgress(0);
-    const t0 = performance.now();
-    const gda = { ...DEMO_GDA, tank: { ...DEMO_GDA.tank, capacityM3: tank, levelM3: Math.min(DEMO_GDA.tank.levelM3, tank) }, solar: solar > 0 ? { kWp: solar } : undefined };
-    const plots = demoPlots(toMs('2026-07-20T12:00:00+01:00'));
-    const out: ReplayRun[] = [];
-    for (let s = 1; s <= seeds; s++) {
-      if (cancel.current) break;
-      out.push(replaySeason({ gda, plots, hourly, seed: s }));
-      setProgress(s / seeds);
-      await new Promise((r) => setTimeout(r, 0));
-    }
-    setRuns(out);
-    setElapsed((performance.now() - t0) / 1000);
-    setRunning(false);
-  }, [hourly, tank, solar, seeds]);
-
-  useEffect(() => {
-    if (hourly && runs.length === 0 && !running) run();
-  }, [hourly]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => () => {
-    cancel.current = true;
-  }, []);
-
-  const days = useMemo(() => {
-    if (!hourly) return [];
-    const map = new Map<number, number>();
-    for (const h of hourly) {
-      const ms = toMs(h.time);
-      const day = ms - localHour(ms) * 3_600_000;
-      map.set(Math.round(day / 86_400_000), Math.max(map.get(Math.round(day / 86_400_000)) ?? -99, h.tempC));
-    }
-    return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([d, t]) => ({ day: d, tMax: t }));
-  }, [hourly]);
-
-  const example = runs[0];
-  const cutDays = useMemo(() => new Set(example?.cuts.map((c) => Math.round((c.startMs - localHour(c.startMs) * 3_600_000) / 86_400_000)) ?? []), [example]);
-  const summary = useMemo(() => {
-    if (runs.length === 0) return null;
-    const pick = (side: 'without' | 'with', k: keyof SeasonKpis) => runs.map((r) => r[side][k]);
-    return Object.fromEntries(
-      ROWS.map((r) => [r.key, { without: median(pick('without', r.key)), with: median(pick('with', r.key)), withMin: Math.min(...pick('with', r.key)), withMax: Math.max(...pick('with', r.key)), woMin: Math.min(...pick('without', r.key)), woMax: Math.max(...pick('without', r.key)) }]),
-    ) as Record<string, { without: number; with: number; withMin: number; withMax: number; woMin: number; woMax: number }>;
-  }, [runs]);
-
-  const tMin = Math.min(...days.map((d) => d.tMax), 30);
-  const tMaxAll = Math.max(...days.map((d) => d.tMax), 40);
-  const hottest = days.length ? Math.round(tMaxAll) : null;
-  const hot40 = days.filter((d) => d.tMax >= 40).length;
+  const weather = useMemo(() => (file ? (variant === 'wet' ? file.days.map((d) => ({ ...d, rainMm: Math.round(d.rainMm * 3 * 10) / 10, et0Mm: d.rainMm > 1 ? Math.min(d.et0Mm, 1) : d.et0Mm })) : file.days) : null), [file, variant]);
+  const r = useMemo(() => (weather ? replayZitounSeason(weather, rules) : null), [weather, rules]);
+  const totalRain = weather ? Math.round(weather.reduce((s, d) => s + d.rainMm, 0)) : 0;
 
   return (
-    <div>
-      <div className="max-w-[720px]">
-        <h1 className="font-display text-[30px] leading-tight font-extrabold md:text-[38px]">Summer 2026, replayed twice</h1>
-        <p className="mt-2 text-[15.5px] leading-relaxed text-ink-2">
-          Kairouan's {real ? 'real' : 'synthetic'} summer weather, run once without Sonae and once with it, under the same power cuts.
-          {hottest !== null && ` The hottest day reached ${hottest} °C, and ${hot40} days passed 40 °C.`}
-        </p>
-      </div>
+    <Stagger className="flex flex-col gap-6">
+      <PageHeader
+        kanji="再"
+        eyebrow="Season replay · Sfax olive belt, 15 Nov 2025 to 28 Feb 2026"
+        title={
+          r ? (
+            <>
+              {fmt(r.without.overflowM3)} m³ spilled without Sonae, <span className="text-gradient-water">{r.with.overflowM3 > 0 ? `${fmt(r.with.overflowM3)} m³ with it` : 'none with it'}</span>
+            </>
+          ) : (
+            <>Replaying a whole olive season</>
+          )
+        }
+        aside={
+          <Segmented
+            label="Weather"
+            value={variant}
+            onChange={setVariant}
+            options={[
+              { value: 'real', label: '2025-26, real' },
+              { value: 'wet', label: 'Wet winter (rain ×3)' },
+            ]}
+          />
+        }
+      >
+        The three demo mills press for the whole season. Without Sonae, each pond fills and then spills into the wadi. With Sonae, the same weather, day by day, drives the tankers to {r ? r.groves : '…'} allowed groves ({r ? fmt(r.hectares) : '…'} ha) and pauses on rainy days.
+      </PageHeader>
 
-      {/* heat strip */}
-      <section className="card mt-6 p-5">
-        <div className="flex items-end gap-[2px]" style={{ height: 96 }} role="img" aria-label={`Daily highs from June to September 2026; red marks show modelled cuts in one example season`}>
-          {days.map((d) => {
-            const h = 14 + ((d.tMax - tMin) / Math.max(1, tMaxAll - tMin)) * 82;
-            const cut = cutDays.has(d.day);
-            return <span key={d.day} className="flex-1 rounded-t-[2px]" style={{ height: `${h}%`, background: cut ? 'var(--cut)' : d.tMax >= 40 ? 'var(--solar)' : 'color-mix(in oklch, var(--solar) 35%, transparent)' }} title={`${fmt(d.tMax, 1)} °C${cut ? ', modelled cut' : ''}`} />;
-          })}
-        </div>
-        <div className="mt-2 flex justify-between text-[12px] text-ink-2">
-          <span>June</span>
-          <span>July</span>
-          <span>August</span>
-          <span>September</span>
-        </div>
-        <p className="mt-3 text-[12.5px] text-ink-3">
-          Daily highs{real ? ' from the Open-Meteo archive (ERA5)' : ' (synthetic: run npm run weather:fetch for the real data)'}. Red days had a modelled cut in one example season. STEG publishes no outage log, so cuts are modelled from heat: the hotter the afternoon, the likelier the cut.
-        </p>
-      </section>
+      {error && (
+        <Rise className="card glass-edge p-5 text-[15px]" style={{ borderColor: 'var(--cut)' }}>
+          The season file did not load ({error}). Run <code>node data/fetch-olive-season.mjs</code>, or reconnect once so it is cached for offline use.
+        </Rise>
+      )}
 
-      <div className="mt-7 grid gap-7 lg:grid-cols-[1fr_300px]">
-        <section className="card overflow-hidden">
-          <div className="grid grid-cols-[1fr_7.5rem_7.5rem] items-end gap-3 border-b border-line px-5 py-4 text-[13px]">
-            <span className="text-ink-2">Median of {runs.length || seeds} simulated seasons</span>
-            <span className="text-right font-display text-[16px] font-extrabold text-ink-2">Without</span>
-            <span className="text-right font-display text-[16px] font-extrabold text-accent-strong">With Sonae</span>
-          </div>
-          <ul>
-            {ROWS.map((r) => {
-              const v = summary?.[r.key];
-              const improved = v ? (r.better === 'lower' ? v.with < v.without : v.with > v.without) : false;
-              return (
-                <li key={r.key} className="grid grid-cols-[1fr_7.5rem_7.5rem] items-center gap-3 border-b border-line px-5 py-3.5 last:border-b-0">
-                  <span className="text-[14px] leading-snug">
-                    {r.label}
-                    {v && <span className="block text-[12px] text-ink-3 num">range with Sonae {fmt(v.withMin, r.digits ?? 0)} to {fmt(v.withMax, r.digits ?? 0)}</span>}
-                  </span>
-                  <span className="text-right font-display text-[22px] font-extrabold text-ink-2">
-                    {v ? <Rolling value={v.without} digits={r.digits} /> : '…'}
-                    <span className="ml-1 text-[12px] font-normal">{r.unit === '%' ? '%' : ''}</span>
-                  </span>
-                  <span className="text-right font-display text-[22px] font-extrabold" style={{ color: improved ? 'var(--ok)' : 'var(--ink)' }}>
-                    {v ? <Rolling value={v.with} digits={r.digits} /> : '…'}
-                    <span className="ml-1 text-[12px] font-normal">{r.unit === '%' ? '%' : ''}</span>
-                  </span>
+      {r && (
+        <>
+          <GlassCard className="p-5 md:p-6">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-[19px] font-extrabold">The ponds, day by day</h2>
+              <span className="num text-[13.5px] text-ink-2">
+                {weather!.length} days · {totalRain} mm of rain · {r.days.filter((d) => d.blocked).length} days paused
+              </span>
+            </div>
+            <SeasonChart r={r} />
+          </GlassCard>
+
+          <GlassCard className="p-5 md:p-6">
+            <div className="hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 pb-2 text-[13px] font-semibold text-ink-3 md:grid">
+              <span>Over the season</span>
+              <span>Without Sonae</span>
+              <span>With Sonae</span>
+            </div>
+            <Row label="Margine spilled into the wadis" without={r.without.overflowM3} withS={r.with.overflowM3} unit="m³" better="lower" />
+            <Row label="Days a pond overflowed" without={r.overflowDaysWithout} withS={r.overflowDaysWith} unit="days" better="lower" />
+            <Row label="Margine returned to olive groves" without={0} withS={r.with.spreadM3} unit="m³" better="higher" />
+            <Row label="Potassium fertiliser saved" without={0} withS={r.with.fertiliserTND} unit="TND" better="higher" />
+            <Row label="Grignon sent to fuel buyers" without={0} withS={r.with.grignonT} unit="t" better="higher" />
+            <Row label="Spread on a rainy or wet day" without={0} withS={0} unit="loads" better="lower" />
+          </GlassCard>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <GlassCard className="p-5 md:p-6">
+              <h2 className="text-[19px] font-extrabold">What it costs and earns</h2>
+              <ul className="mt-3 flex flex-col gap-2 text-[15px] text-ink-2">
+                <li>
+                  Transport for {fmt(r.with.trips)} tanker trips ({fmt(r.with.km)} km): <b className="num text-ink">{fmt(r.with.transportTND)} TND</b>, paid by the mills.
                 </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        <aside className="card h-fit p-5">
-          <h2 className="font-display text-[19px] font-extrabold">Change an assumption</h2>
-          <p className="mt-1 text-[13px] text-ink-2">A judge can change one number and rerun the whole summer, live.</p>
-          <div className="mt-4 space-y-3">
-            <div>
-              <label className="label" htmlFor="r-tank">Tank capacity (m³)</label>
-              <input id="r-tank" type="number" min={20} className="field num" value={tank} onChange={(e) => setTank(Math.max(20, Number(e.target.value)))} />
-            </div>
-            <div>
-              <label className="label" htmlFor="r-solar">Solar panels (kWp)</label>
-              <input id="r-solar" type="number" min={0} className="field num" value={solar} onChange={(e) => setSolar(Math.max(0, Number(e.target.value)))} />
-            </div>
-            <div>
-              <label className="label" htmlFor="r-seeds">Seasons to simulate</label>
-              <select id="r-seeds" className="field" value={seeds} onChange={(e) => setSeeds(Number(e.target.value))}>
-                {[10, 20, 50, 100].map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
+                <li>
+                  Sonae&apos;s fee at {rules.feeTNDPerM3} TND/m³: <b className="num text-ink">{fmt(r.with.feeTND)} TND</b> from three mills.
+                </li>
+                <li>
+                  Potassium the farmers did not have to buy: <b className="num text-ink">{fmt(r.with.fertiliserTND)} TND</b>.
+                </li>
+                <li>
+                  Heat from grignon, equal to about <b className="num text-ink">{fmt(r.with.dieselLitresReplaced)} L</b> of diesel.
+                </li>
+              </ul>
+            </GlassCard>
+            <GlassCard className="p-5 md:p-6">
+              <h2 className="text-[19px] font-extrabold">How this replay works</h2>
+              <ul className="mt-3 flex list-disc flex-col gap-1.5 pl-5 text-[14.5px] text-ink-2">
+                <li>Real daily rain and evaporation for Sfax from the Open-Meteo archive (CC BY 4.0). &ldquo;Wet winter&rdquo; triples that rain to stress-test the pauses.</li>
+                <li>Ponds start 10% full; mills press every day (38, 30 and 45 m³ of margine a day).</li>
+                <li>The 9 demo groves plus a network of signed-up groves; groves near a well, the wadi or on a slope are excluded.</li>
+                <li>Rules from Settings: {rules.capM3PerHa} m³/ha per season, {rules.maxDoseM3PerHaDay} m³/ha per day, no spreading from {rules.rainBlockMm} mm of rain.</li>
+                <li>Only results from this simulation go into the pitch; the limits must be checked against the decree.</li>
+              </ul>
+            </GlassCard>
           </div>
-          <button className="btn btn-primary mt-4 w-full justify-center" disabled={running || !hourly} onClick={run}>
-            <IconReplay width={18} height={18} />
-            {running ? `Replaying… ${Math.round(progress * 100)}%` : 'Replay the summer'}
-          </button>
-          {running && (
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2">
-              <motion.div className="h-full origin-left bg-accent" style={{ transform: `scaleX(${progress})` }} />
-            </div>
-          )}
-          {!running && runs.length > 0 && <p className="mt-3 text-[12.5px] text-ink-3 num">{runs.length} seasons in {fmt(elapsed, 1)} s, on this device.</p>}
-          <p className="mt-4 text-[12.5px] leading-relaxed text-ink-3">Only these numbers go in the pitch. Village: 3 ha, 12 plots, a 40 m³/h pump, cuts announced the day before 60% of the time.</p>
-        </aside>
-      </div>
-    </div>
+        </>
+      )}
+    </Stagger>
   );
 }

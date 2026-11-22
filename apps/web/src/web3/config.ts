@@ -3,6 +3,7 @@ import { hardhat, sepolia } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 import type { Abi, Address } from 'viem';
 import bundle from './sonae-contracts.json';
+import zitounBundle from './zitoun-contract.json';
 
 const sepoliaRpc = import.meta.env.VITE_SEPOLIA_RPC_URL as string | undefined;
 
@@ -33,3 +34,16 @@ export function deploymentFor(chainId: number | undefined): { exchange: Address;
 
 export const TND_PER_ETH = Number(import.meta.env.VITE_TND_PER_ETH ?? 10000);
 export const SEPOLIA_ID = sepolia.id;
+
+/* ── Sonae Zitoun: the margine passport and grignon market ─────────── */
+
+export const zitounAbi = zitounBundle.abi as Abi;
+
+/** ZitounLedger address on a chain, written by `npm --prefix contracts run deploy-zitoun:*`. */
+export function zitounFor(chainId: number | undefined): Address | null {
+  if (!chainId) return null;
+  const d = (zitounBundle.chains as Record<string, { address: string }>)[String(chainId)];
+  return d ? (d.address as Address) : null;
+}
+
+export const tndFromWei = (wei: bigint) => (Number(wei) / 1e18) * TND_PER_ETH;
