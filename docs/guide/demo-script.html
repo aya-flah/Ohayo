@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sonae Zitoun: demo script and test checklist</title>
+<style>
+  @page { size: A4; margin: 14mm 15mm; }
+  :root { --ink:#17202a; --ink2:#4b5563; --line:#e5e1d8; --margine:#8a5a2b; --olive:#5f7f24; --water:#1b6fae; --cut:#c43d3d; --sun:#c98410; --bg:#faf8f4; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 10.6pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 26pt; line-height: 1.05; margin: 0 0 4pt; }
+  h2 { font-size: 15pt; margin: 16pt 0 5pt; padding-top: 5pt; border-top: 2px solid var(--line); break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 9pt 0 3pt; break-after: avoid; }
+  p { margin: 0 0 6pt; }
+  .kicker { color: var(--margine); font-weight: 700; font-size: 10pt; }
+  .lead { font-size: 12pt; color: var(--ink2); }
+  .meta { font-size: 9.5pt; color: var(--ink2); }
+  ol.steps { margin: 4pt 0 6pt; padding-left: 0; list-style: none; counter-reset: s; }
+  ol.steps > li { counter-increment: s; position: relative; padding: 3pt 0 3pt 26pt; break-inside: avoid; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 3pt; width: 18pt; height: 18pt; border-radius: 50%; background: #eef3f8; color: var(--water); font-weight: 800; font-size: 9pt; display: grid; place-items: center; }
+  .click { font-weight: 700; }
+  .ui { font-family: Consolas, monospace; font-size: 9.5pt; background: #f0ece4; padding: 0 3pt; border-radius: 3pt; white-space: nowrap; }
+  .say { border-left: 4px solid var(--olive); background: #f3f7ec; border-radius: 0 9pt 9pt 0; padding: 6pt 10pt; margin: 6pt 0 8pt; break-inside: avoid; }
+  .say b { color: var(--olive); }
+  .see { color: var(--ink2); font-size: 9.8pt; }
+  .warn { border-left: 4px solid var(--sun); background: #fdf6e7; border-radius: 0 9pt 9pt 0; padding: 6pt 10pt; margin: 6pt 0; font-size: 9.8pt; break-inside: avoid; }
+  .chain { border-left-color: #10b981; background: #eaf7f1; }
+  .ai { border-left-color: var(--water); background: #ecf3fa; }
+  .tag { display: inline-block; font-size: 8.5pt; font-weight: 800; padding: 1pt 6pt; border-radius: 99px; margin-left: 4pt; vertical-align: 1pt; }
+  .t-ai { background: #e3eefa; color: var(--water); }
+  .t-chain { background: #def3ea; color: #0d7a55; }
+  .t-real { background: #f5eadf; color: var(--margine); }
+  .t-time { background: #eee; color: #555; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.8pt; margin: 4pt 0 8pt; }
+  th, td { border-bottom: 1px solid var(--line); padding: 4pt 5pt; text-align: left; vertical-align: top; }
+  th { font-size: 9pt; color: var(--ink2); }
+  tr { break-inside: avoid; }
+  .box { width: 11pt; height: 11pt; border: 1.5px solid #888; border-radius: 3pt; display: inline-block; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+  .card { border: 1px solid var(--line); border-radius: 9pt; padding: 7pt 9pt; background: var(--bg); break-inside: avoid; }
+  .pb { break-before: page; }
+  code { font-family: Consolas, monospace; font-size: 9.3pt; background: #f0ece4; padding: 0 3pt; border-radius: 3pt; }
+</style>
+</head>
+<body>
+
+<div class="kicker">Kizuna 2026 · Demo script · For whoever drives the laptop</div>
+<h1>Sonae Zitoun: click this, say that</h1>
+<p class="lead">Every feature in the order we show it to the jury: what to click, what you should see, and what to say. Use it once alone as a test run, then use it live.</p>
+<p class="meta">Live demo: about 7 minutes for the full tour, about 4 minutes for the short version (parts marked <span class="tag t-time">core</span>). Backup: the 3-minute video in <code>docs/video/Sonae_Zitoun_Demo.mp4</code>.</p>
+
+<h2>0. Before the jury arrives (10 minutes)</h2>
+<ol class="steps">
+  <li>In one terminal, at the repo root, run <code>npm run dev:api</code>. Wait for the line saying it listens on port 8787.</li>
+  <li>In a second terminal, run <code>npm run dev:web</code>, then open <span class="ui">http://localhost:5173</span> in Chrome, full screen.</li>
+  <li>Open <code>apps/api/.env</code> and keep it at hand: it holds the demo logins (admin, mill owner, farmer). Never show this file on the projector.</li>
+  <li>MetaMask: select the <b>Sepolia</b> test network and the <b>demo wallet</b> (<span class="ui">0x60Ea…F0AD</span>). It is the regulator, the mill and the farmer of the 6 demo groves. Make sure it has some test ETH (it had about 0.07).</li>
+  <li>Optional, for the grignon purchase: a <b>second MetaMask account</b> with about 0.01 test ETH (send it from the demo wallet). A mill can't buy its own grignon.</li>
+  <li>Click the <b>moon/sun</b> button at the top right if the room is very bright (Field mode reads better on projectors). Check that the language button shows <b>ع</b> (you are in English).</li>
+  <li>Sign out of any account (<span class="ui">Account → Sign out</span>) so the demo starts clean. On the Plan page, choose <span class="ui">Storm demo</span>.</li>
+</ol>
+<div class="warn"><b>If the internet is weak:</b> the Plan, Twin, Process and Replay pages work offline. The AI features, the live forecast and the blockchain need internet: switch to the video for those parts.</div>
+
+<h2>1. Opening <span class="tag t-time">core · 20 s</span></h2>
+<div class="say"><b>Say:</b> "Every winter, Tunisia's olive mills, the maâsras, press their olives and are left with two wastes: margine, a dark water that pollutes wadis and wells when it's dumped, and fitoura, the pomace. Sonae plans what happens to both, every day: margine goes to olive groves as free water and potassium, fitoura goes to hammams, bakeries and kilns as fuel, and every load is recorded on a public ledger."</div>
+
+<h2>2. The core service: the 7-day plan <span class="tag t-time">core · 1 min 30</span> <span class="tag t-real">real engine</span></h2>
+<ol class="steps">
+  <li>Stay on the <span class="click">Plan</span> page. Point at the big headline.</li>
+  <li><span class="click">Click the round green play button</span> on the right of "The week, one decision a day". <span class="see">The days play; the 3D region behind the page follows, tankers drive.</span></li>
+  <li><span class="click">Click the play button again</span> to pause, then <span class="click">click the "Tomorrow" card</span>.</li>
+  <li><span class="click">Click one tanker trip</span> in the list (a grove owner's name). <span class="see">Its reason opens: pond level, distance, cap left.</span></li>
+  <li>Scroll down to <b>The SMS</b>. <span class="click">Click "Driver"</span>, then <span class="click">"Farmer"</span>.</li>
+  <li>Scroll back up. <span class="click">Click "Add rain"</span>, choose <b>Thursday</b>, set about <b>20 mm</b>, <span class="click">click "Add rain"</span>. <span class="see">Thursday becomes 44 mm and is paused; the headline still says no pond spills.</span></li>
+  <li><span class="click">Click the "+20 mm thursday" chip</span> to remove it again.</li>
+</ol>
+<div class="say"><b>Say:</b> "This is the core: one decision a day. Three mills are pressing and a storm is coming on Wednesday. Sonae sends 640 m³ out on the two dry days, pauses during the rain and while the soil is wet, and no pond spills. Doing nothing would pour 114 m³ into the wadis this week.<br>Every trip has a reason: the fullest pond goes first, to the nearest grove that is allowed: never near a drinking well, never near the wadi, never on a slope, never above 50 m³ per hectare. Farmers and drivers get an SMS in Derja, on any phone. If the forecast changes, the plan changes."</div>
+
+<h3>Optional: My mill <span class="tag t-real">real forecast</span></h3>
+<ol class="steps">
+  <li><span class="click">Click "My mill"</span> at the top right of the Plan page, then <span class="click">"Edit your mill"</span>. Change the town or the pond size, <span class="click">click "Save and plan"</span>.</li>
+</ol>
+<div class="say"><b>Say:</b> "A mill can enter its own numbers: the plan now uses its pond, its tankers, its groves and the real forecast for its town, starting today."</div>
+
+<h2>3. The 3D twin <span class="tag t-time">40 s</span></h2>
+<ol class="steps">
+  <li><span class="click">Click "Twin"</span> in the top menu. Drag the 3D scene to turn it.</li>
+  <li><span class="click">Click the green play button</span> at the bottom. <span class="see">Tankers drive, ponds go down, groves darken; the dispatch log fills.</span></li>
+  <li><span class="click">Click "Make it rain"</span>. <span class="see">Clouds, the wadi lights up, tankers stop.</span> <span class="click">Click "Stop the rain"</span>.</li>
+</ol>
+<div class="say"><b>Say:</b> "This is the whole region in 3D: three mills with their margine ponds, the olive groves, the drinking well with its safety ring, the wadi, and the buyers of fitoura. The groves with a red border can never receive margine. When it rains, everything stops: that's the rule that protects the wadis."</div>
+
+<h2>4. How the waste is transformed <span class="tag t-time">40 s</span></h2>
+<ol class="steps">
+  <li><span class="click">Click "Process"</span> in the menu. <span class="click">Click the steps</span> at the bottom one by one: <b>Spread</b>, <b>Soil</b>, <b>Dry</b>, <b>Gas</b>, <b>Engine</b> (or press play).</li>
+</ol>
+<div class="say"><b>Say:</b> "Two paths. Margine is spread as a thin film between the rows; in the soil, microbes break down the bitter part and the potassium reaches the roots. It never goes into water. Fitoura is dried in the sun, pressed into pellets, and a gasifier turns it into gas that can run the well's pump engine with 60 to 70% less diesel. The gasifier is a later step; today fitoura is sold as fuel."</div>
+
+<h2 class="pb">5. Farmer tools: real data and AI <span class="tag t-time">core · 1 min 30</span></h2>
+<h3>5a. Check my grove <span class="tag t-real">real forecast</span></h3>
+<ol class="steps">
+  <li><span class="click">Click "Check"</span> in the menu. Keep <b>My grove</b> selected.</li>
+  <li>Pick a town (e.g. <b>Agareb</b>) or <span class="click">click "Use my location"</span>. Type an area, e.g. <b>12</b> ha.</li>
+  <li><span class="click">Click "Check my grove"</span>. <span class="see">Allowed or never, the season cap, and 7 days from the real forecast with the m³ allowed each day.</span></li>
+  <li>Try a "no": set <b>To nearest well</b> to <b>60</b> m. <span class="see">"Can never receive margine."</span> Put it back.</li>
+</ol>
+<div class="say"><b>Say:</b> "This isn't a simulation: a farmer enters his own grove and gets the real forecast for his exact place, with the days he can receive margine and how much."</div>
+
+<h3>5b. Lab report reader <span class="tag t-ai">AI · Claude Opus</span></h3>
+<ol class="steps">
+  <li><span class="click">Click "Lab report"</span> at the top right.</li>
+  <li><span class="click">Click "Try a sample report"</span> (or <span class="click">"Add a photo or PDF"</span> and take a photo of a real report).</li>
+  <li><span class="click">Click "Read the report"</span>. <span class="see">About 6 seconds: the values (pH, potassium, polyphenols, salinity), then "Sonae's advice": up to 33 m³/ha, with reasons.</span></li>
+  <li><span class="click">Click "Use this reading on the passport"</span>. <span class="see">It opens Yui with the reading ready for the next load (used in part 7).</span></li>
+</ol>
+<div class="say ai"><b>Say:</b> "Mills get lab reports as paper or PDF, in French or Arabic. Our lab reader AI reads them, converts the units itself, and Sonae turns the values into a safe dose per hectare. Here the margine is rich in potassium, so Sonae lowers the dose to 33 m³ per hectare."</div>
+
+<h3>5c. Ask Sonae <span class="tag t-ai">AI · Claude Opus</span></h3>
+<ol class="steps">
+  <li>Go back to <span class="click">Check</span> and <span class="click">click "Ask Sonae"</span>.</li>
+  <li><span class="click">Click the suggestion</span> "When can I spread margine near Agareb this week, for a 10 ha grove?" Or type a question in Derja: <i>"Chnoua n3amel bel margine ki tsob chta ghodwa?"</i></li>
+  <li><span class="see">About 10 seconds. The answer shows "used: grove check" or "used: forecast": it called the planner and the real weather.</span></li>
+</ol>
+<div class="say ai"><b>Say:</b> "Ask Sonae answers in Derja, Arabic, French or English. It doesn't guess: it calls our planner and the real forecast, then explains the result simply."</div>
+<div class="warn ai"><b>If the jury asks what the AI is:</b> "Anthropic's Claude Opus model through its API, behind our server, with a hard spending cap. The numbers always come from our engine; the AI reads documents, explains and writes plans around those numbers."</div>
+
+<h2>6. Accounts, packs and the AI season plan <span class="tag t-time">core · 2 min</span></h2>
+<h3>6a. Packs</h3>
+<ol class="steps">
+  <li><span class="click">Click "Sign in"</span> at the top right, then the link <span class="click">"See the packs and prices"</span>.</li>
+  <li>Switch <span class="click">Mill owner / Farmer</span>. Move the <span class="click">slider</span>: the prices update.</li>
+</ol>
+<div class="say"><b>Say:</b> "The mill pays most, because the waste is its problem: about half a dinar per m³, 950 dinars a season on Pro for most mills. Farmers can use Sonae for free, or pay 35 dinars a hectare to have their dose planned."</div>
+
+<h3>6b. Mill owner: season plan <span class="tag t-ai">AI · Claude Opus</span></h3>
+<ol class="steps">
+  <li><span class="click">Click "Sign in"</span>. Type the <b>mill</b> email and password from <code>apps/api/.env</code>. <span class="click">Click "Sign in"</span>.</li>
+  <li>You land on the mill owner's space: the mill, the pack (Pro), the season balance.</li>
+  <li><span class="click">Click "Generate my season plan"</span>. <span class="see">About 25 seconds: the steps tick one by one.</span> Keep talking (text below).</li>
+  <li>When the plan appears, scroll slowly: <b>headline and figures</b>, <b>costs and income bars</b>, <span class="click">click a phase</span> on the timeline, <span class="click">open a risk</span>, <span class="click">tick two checklist items</span>, last season's weather.</li>
+  <li><span class="click">Click the account button</span> (initials, top right) → <span class="click">"Sign out"</span>.</li>
+</ol>
+<div class="say ai"><b>Say (while it generates):</b> "One button gives the mill owner his whole season. First our engine computes the real numbers from his mill and last season's weather: tanker trips, hectares needed, safe days, every cost and every dinar of fitoura sales. Then Sonae AI writes the plan around those numbers: phases from November to February, risks, a checklist. It's not allowed to change a number.<br><b>When it appears:</b> "1,800 m³ of margine, 36 hectares of groves, 102 safe days, and a positive balance thanks to the fitoura. Each phase says what to do and what weather to expect."</div>
+
+<h3>6c. Farmer: plan for his land <span class="tag t-ai">AI · Claude Opus</span></h3>
+<ol class="steps">
+  <li><span class="click">Sign in</span> with the <b>farmer</b> login from <code>.env</code>. If the farm form shows, fill <b>Farm name</b> and <b>12</b> ha, <span class="click">click "Save my farm"</span>.</li>
+  <li><span class="click">Click "Generate my season plan"</span>. Show the margine for his land, the loads, and the fertiliser saved. <span class="click">Sign out</span>.</li>
+</ol>
+<div class="say"><b>Say:</b> "The farmer gets the same thing for his land: how much margine his trees really need, how many tanker loads, and how much he saves on potassium fertiliser."</div>
+
+<h3>6d. Admin</h3>
+<ol class="steps">
+  <li><span class="click">Sign in</span> with the <b>admin</b> login. Show the tiles, the packs and the users. <span class="click">Click "mills"</span> and <span class="click">"farmers"</span> to filter. <span class="click">Sign out</span>.</li>
+</ol>
+<div class="say"><b>Say:</b> "The admin sees everything: users by role, who has which pack, the season revenue, the margine and hectares under plan, and how much the AI has cost. He can suspend an account. Passwords are hashed, sessions expire, and every action checks the role."</div>
+
+<h2 class="pb">7. Blockchain: Yui, the margine passport <span class="tag t-time">core · 1 min 30</span> <span class="tag t-chain">Sepolia + MetaMask</span></h2>
+<div class="say chain"><b>Say first:</b> "A mill is legally responsible for its margine, but nobody can follow every tanker. Yui puts every load on a public record that no mill, farmer or official can quietly change. It runs on Sepolia, Ethereum's test network, so there's no real money."</div>
+<ol class="steps">
+  <li><span class="click">Click "Yui"</span> in the menu. <span class="see">Without any wallet, it already reads the live contract: 6 groves approved by the regulator, loads, grignon lots, certificates.</span></li>
+  <li>Point at the 4 steps: <b>Dispatch → Confirm → Certify → Verify</b>.</li>
+  <li><span class="click">Click "Connect MetaMask"</span> and approve in MetaMask. <span class="see">Badges show: Regulator, Mill, Tanker meter, Farmer.</span></li>
+  <li><b>Dispatch.</b> In "Dispatch a tanker load": choose grove <b>#1 Hedi Ben Ali</b>, <b>15</b> m³ (the lab reading from part 5b is already filled in). <span class="click">Click "Dispatch 15 m³"</span>, confirm in MetaMask. <span class="see">After about 15 seconds the load appears "On the road"; the grove bar shows 15 reserved.</span></li>
+  <li><b>Over the cap?</b> Type <b>700</b> m³: the button says <b>"Over the grove's cap"</b>. Put 15 back.</li>
+  <li><b>Confirm.</b> On the new load, <span class="click">click "Confirm"</span>, approve in MetaMask. <span class="see">"Delivered"; the grove now shows 15 m³ applied.</span></li>
+  <li><b>Certify.</b> In "Clean-oil certificates", keep batch <b>EVOO-2026-017</b>, <b>5000</b> L. <span class="click">Click "Certify this batch"</span>, approve.</li>
+  <li><b>Verify.</b> Type the certificate number (e.g. <b>1</b>) in "Verify a certificate number". <span class="see">"Certificate #1 is genuine", with the mill's traced m³.</span></li>
+  <li>Optional, <b>grignon escrow</b>: switch MetaMask to the <b>second account</b>, <span class="click">click "Buy with escrow"</span> on the lot, 5 t, <span class="click">"Pay into escrow"</span>. Then <span class="click">"Delivered"</span> on the order: the mill is paid.</li>
+  <li>Optional: <span class="click">click the "ZitounLedger 0x094B…" chip</span> to show the contract on Etherscan, and "Source verified on Sourcify".</li>
+</ol>
+<div class="say chain"><b>Say while you click:</b> "The mill records each tanker load: which grove, how many m³, and a fingerprint of the lab report. It pays Sonae's fee, which stays locked until delivery. The contract itself refuses any load beyond the grove's legal cap. The farmer, or the tanker's GPS meter, confirms the delivery. If nobody confirms within 48 hours, the load expires, the fee goes back and the mill gets a red flag.<br>Only a mill with every load traced can certify a batch of oil. That's our <b>Zero-Spill certificate</b>: a QR code on the bottle that any buyer, here or in Europe, can verify with no account and no middleman. Other traceability shows where the olives came from; Sonae shows the mill didn't pollute."</div>
+<div class="warn chain"><b>If MetaMask fails or the network is slow:</b> stay on the read-only view (groves, loads, certificates are live) and say "every action is a real transaction; here are the ones we recorded". Each transaction takes about 15 seconds on Sepolia: keep talking while it confirms.</div>
+
+<h2>8. Proof on real weather <span class="tag t-time">30 s</span></h2>
+<ol class="steps">
+  <li><span class="click">Click "Replay"</span>. Point at the red line (without Sonae) and the brown line (with Sonae).</li>
+  <li><span class="click">Click "Wet winter (rain ×3)"</span>.</li>
+</ol>
+<div class="say"><b>Say:</b> "This is last winter in Sfax, real weather, day by day. Without Sonae, the ponds fill and spill 7,522 m³ of margine into the wadis on 78 days. With Sonae: none, and 11,800 m³ go back to olive groves as fertiliser. Even with three times the rain, the plan holds."</div>
+
+<h2>9. Arabic <span class="tag t-time">20 s</span></h2>
+<ol class="steps">
+  <li><span class="click">Click the ع button</span> next to the moon. <span class="see">The whole site switches to Arabic, right to left.</span> Open two pages (e.g. <span class="click">Check</span>, <span class="click">Process</span>). <span class="click">Click EN</span> to go back.</li>
+</ol>
+<div class="say"><b>Say:</b> "Everything is available in Arabic, right to left, including the AI answers and the season plans. The SMS stay in Derja."</div>
+
+<h2>10. Closing <span class="tag t-time">core · 20 s</span></h2>
+<div class="say"><b>Say:</b> "Sonae turns olive waste from a pollution problem into free fertiliser for farmers, cheap fuel for hammams and kilns, and proof of clean oil for exporters. Planned every day, enforced by the contract, verifiable by anyone. 備え, sonae: prepared, nothing to fear."</div>
+
+<h2>11. Test checklist: tick everything once before the pitch</h2>
+<table>
+  <tr><th style="width:4%"></th><th style="width:22%">Feature</th><th>What must happen</th><th style="width:14%">Needs</th></tr>
+  <tr><td><span class="box"></span></td><td>Plan: play the week</td><td>Days advance, 3D follows, then pause works</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Plan: trip reason and SMS</td><td>Reason opens; Farmer/Driver SMS switch</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Plan: add rain</td><td>+20 mm Thursday → still "no pond spills"; chip removes it</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Plan: live forecast and My mill</td><td>"Live forecast" shows today's Sfax days; My mill saves and replans</td><td>Internet</td></tr>
+  <tr><td><span class="box"></span></td><td>Twin</td><td>Play, Make it rain, Stop the rain; 3D smooth</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Process</td><td>All 9 steps; camera moves; soil cross-section visible on step 5</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Check: my grove</td><td>7 days of real forecast; 60 m from a well → "never"</td><td>Internet</td></tr>
+  <tr><td><span class="box"></span></td><td>Check: lab report (AI)</td><td>Sample read in ~6 s; advice 33 m³/ha; "Use on the passport" opens Yui</td><td>Internet + API</td></tr>
+  <tr><td><span class="box"></span></td><td>Check: Ask Sonae (AI)</td><td>Answer in ~10 s with "used: …"; Derja question answered</td><td>Internet + API</td></tr>
+  <tr><td><span class="box"></span></td><td>Sign up</td><td>New farmer account with a test email; wrong password refused at sign-in</td><td>API</td></tr>
+  <tr><td><span class="box"></span></td><td>Pricing</td><td>Slider updates prices; choosing a pack shows "active (demo: no payment)"</td><td>API</td></tr>
+  <tr><td><span class="box"></span></td><td>Mill season plan (AI)</td><td>Plan in ~25 s; phases click; risks open; checklist ticks</td><td>Internet + API</td></tr>
+  <tr><td><span class="box"></span></td><td>Farmer season plan (AI)</td><td>Farm saved; plan shows loads and fertiliser saved</td><td>Internet + API</td></tr>
+  <tr><td><span class="box"></span></td><td>Admin</td><td>Tiles, packs, users; filters; suspend/reactivate a test user</td><td>API</td></tr>
+  <tr><td><span class="box"></span></td><td>Yui: read</td><td>6 groves visible without a wallet</td><td>Internet</td></tr>
+  <tr><td><span class="box"></span></td><td>Yui: dispatch and confirm</td><td>Load "On the road", then "Delivered"; 700 m³ → "Over the grove's cap"</td><td>MetaMask, test ETH</td></tr>
+  <tr><td><span class="box"></span></td><td>Yui: certify and verify</td><td>Certificate issued; "Certificate #N is genuine"</td><td>MetaMask</td></tr>
+  <tr><td><span class="box"></span></td><td>Yui: grignon escrow</td><td>Second account pays; "Delivered" releases to the mill</td><td>2nd account</td></tr>
+  <tr><td><span class="box"></span></td><td>Replay</td><td>7,522 m³ vs none; wet winter switch</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Arabic</td><td>ع switches every page to Arabic RTL; EN switches back</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Top bar</td><td>Fades when you scroll down, comes back at the top</td><td>Nothing</td></tr>
+  <tr><td><span class="box"></span></td><td>Phone / Android</td><td>Bottom menu works; pages readable at phone width</td><td>Phone</td></tr>
+</table>
+
+<h3>If something goes wrong</h3>
+<div class="grid">
+  <div class="card"><b>"Can't reach the Sonae server"</b><br>The API isn't running: run <code>npm run dev:api</code>. Until then, skip the AI and account parts.</div>
+  <div class="card"><b>"The AI budget is used up"</b><br>The 20 USD cap was reached: raise <code>AI_BUDGET_USD</code> in <code>apps/api/.env</code> and restart the API.</div>
+  <div class="card"><b>MetaMask on the wrong network</b><br>Click "Switch to Sepolia" on the Yui page, or pick Sepolia in MetaMask.</div>
+  <div class="card"><b>Anything else, or no time</b><br>Play the 3-minute video, then take questions with the jury Q&A in the team guide.</div>
+</div>
+
+</body>
+</html>
