@@ -52,3 +52,11 @@ Thumbs.db
 
 # AI spend ledger written at runtime by the API
 apps/api/data/
+
+# Demo video outputs
+docs/video/
+scripts/demo-video/clips/
+scripts/demo-video/segs/
+scripts/demo-video/node_modules/
+scripts/demo-video/marks.json
+scripts/demo-video/package*.json
