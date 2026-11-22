@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, RoundedBox, Sparkles, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import type { Buyer, Grove, Mill, ZitounInput } from '@sonae/shared';
+import type { Buyer, Grove, Mill, ZitounInput, ZitounPlan } from '@sonae/shared';
 import type { RegionState, ScenePose, TruckState } from '../../lib/scene';
 
 /* Colour carries meaning: margine is brown, olive leaves are silver-green, water and rain are cyan,
@@ -293,7 +293,7 @@ function treePositions(groves: Grove[]) {
   const pts: Array<{ x: number; z: number; s: number; tilt: number }> = [];
   for (const g of groves) {
     const { w, d } = grovePatch(g);
-    const step = 0.95;
+    const step = 1.2;
     const tilt = g.slopePct > 8 ? 0.22 : 0;
     for (let ix = 0; ix * step < w - 0.4; ix++) {
       for (let iz = 0; iz * step < d - 0.4; iz++) {
@@ -378,7 +378,7 @@ function GrovePatch({ grove, share, allowed, reason, receiving, todayM3, reduced
       </group>
       {receiving && !reduced && <Sparkles count={20} scale={[w, 0.6, d]} position={[0, 0.4, 0]} size={2.6} speed={0.5} color={C.margineSheen} opacity={0.8} />}
       <Badge
-        show={badges}
+        show={badges && (receiving || !allowed)}
         position={[0, 2.2, 0]}
         tone={!allowed ? 'cut' : receiving ? 'margine' : 'olive'}
         label={grove.owner.split(' ')[0]!}
@@ -448,7 +448,7 @@ function BuyerModel({ buyer, served, reduced, badges }: { buyer: Buyer; served: 
         <meshStandardMaterial color="#bdb4a4" />
       </mesh>
       <Smoke position={[1, buyer.kind === 'greenhouse' ? 1.6 : 2.8, -0.6]} color={served ? '#e8b46a' : '#cfcac2'} active reduced={reduced} count={served ? 7 : 4} />
-      <Badge show={badges} position={[0, 3.6, 0]} tone="solar" label={label} value={served ? 'Grignon in' : undefined} />
+      <Badge show={badges && served} position={[0, 3.6, 0]} tone="solar" label={label} value="Grignon in" />
     </group>
   );
 }
@@ -665,6 +665,7 @@ function Rig({ pose, interactive, reduced }: { pose: ScenePose; interactive: boo
 
 export interface ZitounSceneProps {
   input: ZitounInput;
+  plan: ZitounPlan;
   state: RegionState;
   grignonStock: Record<string, number>;
   reduced: boolean;
@@ -676,23 +677,17 @@ export interface ZitounSceneProps {
 
 const WELL: [number, number] = [-1.4, -1.0];
 
-export function ZitounScene({ input, state, grignonStock, reduced, pose = 'twin', interactive = true, field = false, badges = true }: ZitounSceneProps) {
+export function ZitounScene({ input, plan, state, grignonStock, reduced, pose = 'twin', interactive = true, field = false, badges = true }: ZitounSceneProps) {
+  // Only the tracks the week's plan actually drives on: fewer lines, a calmer map.
   const routes = useMemo(() => {
-    const seen = new Set<string>();
-    const out: Array<{ key: string; a: [number, number]; b: [number, number] }> = [];
-    for (const m of input.mills) {
-      for (const g of input.groves) {
-        const key = `${m.id}-${g.id}`;
-        const d = Math.hypot(m.pos[0] - g.pos[0], m.pos[1] - g.pos[1]);
-        if (d < 15 && !seen.has(key)) {
-          seen.add(key);
-          out.push({ key, a: m.pos, b: g.pos });
-        }
-      }
-      for (const b of input.buyers) out.push({ key: `${m.id}-${b.id}`, a: m.pos, b: b.pos });
+    const seen = new Map<string, { key: string; a: [number, number]; b: [number, number] }>();
+    const add = (a: [number, number], b: [number, number], key: string) => !seen.has(key) && seen.set(key, { key, a, b });
+    for (const d of plan.days) {
+      for (const t of d.trips) add(input.mills.find((m) => m.id === t.millId)!.pos, input.groves.find((g) => g.id === t.groveId)!.pos, `${t.millId}-${t.groveId}`);
+      for (const g of d.grignon) add(input.mills.find((m) => m.id === g.millId)!.pos, input.buyers.find((b) => b.id === g.buyerId)!.pos, `${g.millId}-${g.buyerId}`);
     }
-    return out;
-  }, [input]);
+    return [...seen.values()];
+  }, [input, plan]);
   const polluted = state.ponds.some((p) => p.overflow);
   return (
     <Canvas camera={{ position: [30, 26, 34], fov: 36 }} dpr={[1, 1.5]} gl={{ antialias: true, powerPreference: 'high-performance' }}>

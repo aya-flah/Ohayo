@@ -1,5 +1,5 @@
 import { AnimatePresence, animate, motion, useMotionTemplate, useMotionValue, useReducedMotion, type HTMLMotionProps, type Variants } from 'motion/react';
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type CSSProperties, type InputHTMLAttributes, type ReactNode } from 'react';
 import { fmt } from '../lib/format';
 import { tap } from '../lib/device';
 
@@ -229,5 +229,22 @@ export function Sheet({ open, onClose, children, label, className = '' }: { open
     </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/* ── Slider: the filled part of the track always follows the thumb ─── */
+
+export function Range({ value, min = 0, max = 100, tone = 'water', className = '', style, ...rest }: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'min' | 'max'> & { value: number; min?: number; max?: number; tone?: 'water' | 'olive' | 'margine' }) {
+  const p = max > min ? ((value - min) / (max - min)) * 100 : 0;
+  return (
+    <input
+      type="range"
+      className={`range ${className}`}
+      min={min}
+      max={max}
+      value={value}
+      style={{ ...style, '--p': `${Math.max(0, Math.min(100, p))}%`, '--range-tone': `var(--${tone})` } as CSSProperties}
+      {...rest}
+    />
   );
 }

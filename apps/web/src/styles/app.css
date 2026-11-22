@@ -557,12 +557,14 @@
   width: 100%;
   height: 32px;
   background: transparent;
+  cursor: pointer;
   --p: 50%;
+  --range-tone: var(--water);
 }
 .range::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--water) 0 var(--p), var(--surface-2) var(--p) 100%);
+  background: linear-gradient(90deg, var(--range-tone) 0 var(--p), var(--surface-2) var(--p) 100%);
 }
 .range::-moz-range-track {
   height: 6px;
@@ -572,7 +574,14 @@
 .range::-moz-range-progress {
   height: 6px;
   border-radius: 999px;
-  background: var(--water);
+  background: var(--range-tone);
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid color-mix(in oklab, var(--range-tone) 45%, transparent);
+  outline-offset: 2px;
 }
 .range::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -581,15 +590,15 @@
   margin-top: -8px;
   border-radius: 999px;
   background: #fff;
-  border: 4px solid var(--water);
-  box-shadow: var(--glow-water);
+  border: 4px solid var(--range-tone);
+  box-shadow: 0 0 18px -2px var(--range-tone);
 }
 .range::-moz-range-thumb {
   width: 16px;
   height: 16px;
   border-radius: 999px;
   background: #fff;
-  border: 4px solid var(--water);
+  border: 4px solid var(--range-tone);
 }
 
 /* film grain: a whisper of texture over the glass */

@@ -47,7 +47,7 @@ function Backdrop() {
         <div className="absolute inset-0" style={{ background: field ? 'linear-gradient(180deg,#f3ead9,#faf8f5)' : 'radial-gradient(120% 80% at 70% 20%, #13304f 0%, #0b121e 55%, #060b14 100%)' }} />
         <Suspense fallback={null}>
           <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 1.6, ease: EASE } }}>
-            <ZitounScene input={input} state={state} grignonStock={grignonStock} reduced={reduced} pose={pose} interactive={twin} field={field} badges={twin} />
+            <ZitounScene input={input} plan={plan} state={state} grignonStock={grignonStock} reduced={reduced} pose={pose} interactive={twin} field={field} badges={twin} />
           </motion.div>
         </Suspense>
       </div>

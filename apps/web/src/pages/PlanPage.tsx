@@ -8,7 +8,7 @@ import { useOnline, tap } from '../lib/device';
 import { fmt } from '../lib/format';
 import { PondGauge } from '../components/PondGauge';
 import { IconClose, IconCoin, IconDrop, IconLeaf, IconMessage, IconPause, IconPlay, IconPlus, IconSun } from '../components/Icons';
-import { EASE, GlassCard, PageHeader, Pill, Rise, Segmented, Sheet, Stagger, Stat } from '../components/ui';
+import { EASE, GlassCard, PageHeader, Pill, Range, Rise, Segmented, Sheet, Stagger, Stat } from '../components/ui';
 
 const PLAY_SECONDS = 14;
 const ALERT_TONE = { critical: 'var(--cut)', warn: 'var(--solar)', info: 'var(--water)' } as const;
@@ -255,9 +255,9 @@ export default function PlanPage() {
             <p className="text-[14.5px] text-ink-2">Pick a day, or play the week: the olive region behind this page follows.</p>
           </div>
           <div className="flex items-center gap-3">
-            <input
-              type="range"
-              className="range w-40 md:w-56"
+            <Range
+              tone="olive"
+              className="w-40 md:w-56"
               min={0}
               max={N - 0.001}
               step={0.01}
@@ -513,7 +513,7 @@ export default function PlanPage() {
         <label className="label mt-4 block" htmlFor="storm-mm">
           Rain: <span className="num">{stormMm} mm</span>
         </label>
-        <input id="storm-mm" type="range" className="range mt-2 w-full" min={2} max={60} step={1} value={stormMm} onChange={(e) => setStormMm(Number(e.target.value))} />
+        <Range id="storm-mm" className="mt-2 w-full" min={2} max={60} step={1} value={stormMm} onChange={(e) => setStormMm(Number(e.target.value))} />
         <div className="mt-6 flex justify-end gap-2">
           <button className="btn btn-quiet" onClick={() => setStormOpen(false)}>
             Cancel
