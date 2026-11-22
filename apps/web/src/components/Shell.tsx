@@ -110,9 +110,9 @@ function BrandMark() {
         <span lang="ja" className="relative z-[1] font-jp text-[22px] leading-none font-extrabold text-white">備</span>
         <span className="absolute inset-x-0 bottom-0 h-1/2 bg-white/15 transition-transform duration-700 group-hover:-translate-y-1" style={{ borderRadius: '45% 55% 0 0' }} />
       </span>
-      <span className="flex flex-col leading-none">
-        <span className="text-[19px] font-extrabold tracking-tight">Sonae <span className="font-semibold text-ink-2">Zitoun</span></span>
-        <span lang="ja" className="mt-1 font-jp text-[11px] tracking-[0.3em] text-ink-2">備え</span>
+      <span className="hidden flex-col leading-none sm:flex">
+        <span className="whitespace-nowrap text-[19px] font-extrabold tracking-tight">Sonae <span className="font-semibold text-ink-2">Zitoun</span></span>
+        <span lang="ja" className="mt-1.5 font-jp text-[11px] tracking-[0.3em] text-ink-2">備え</span>
       </span>
     </NavLink>
   );
@@ -223,9 +223,9 @@ function DesktopNav() {
   return (
     <nav className="glass glass-edge relative flex items-center gap-1 rounded-full p-1.5" aria-label="Main">
       {NAV.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative">
+        <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative" title={label}>
           {({ isActive }) => (
-            <span className={`relative z-[1] flex min-h-[44px] items-center gap-2 rounded-full px-4 text-[15px] font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
+            <span className={`relative z-[1] flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 text-[15px] min-[1340px]:px-4 font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
               {isActive && (
                 <motion.span
                   layoutId="nav-liquid"
@@ -235,7 +235,7 @@ function DesktopNav() {
                 />
               )}
               <Icon width={19} height={19} />
-              {label}
+              <span className="sr-only min-[1340px]:not-sr-only">{label}</span>
             </span>
           )}
         </NavLink>
@@ -246,7 +246,7 @@ function DesktopNav() {
 
 function MobileDock() {
   return (
-    <nav className="fixed inset-x-3 z-50 md:hidden" style={{ bottom: 'max(12px, env(safe-area-inset-bottom))' }} aria-label="Main">
+    <nav className="fixed inset-x-3 z-50 lg:hidden" style={{ bottom: 'max(12px, env(safe-area-inset-bottom))' }} aria-label="Main">
       <div className="glass glass-edge glass-strong grid grid-cols-6 rounded-[28px] p-1.5">
         {NAV.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative">
@@ -417,17 +417,17 @@ export function Shell({ children }: { children: ReactNode }) {
         inert={!atTop}
       >
         <div className={`mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-3 md:px-6 ${atTop ? '' : '[&_*]:!pointer-events-none'}`}>
-          <div className="glass glass-edge pointer-events-auto rounded-full py-1 pl-1 pr-4">
+          <div className="glass glass-edge pointer-events-auto shrink-0 rounded-full p-1.5 sm:pr-5">
             <BrandMark />
           </div>
-          <div className="pointer-events-auto hidden md:block">
+          <div className="pointer-events-auto hidden lg:block">
             <DesktopNav />
           </div>
-          <div className="pointer-events-auto flex items-center gap-2">
-            <div className="hidden lg:block">
+          <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+            <div className="hidden 2xl:block">
               <StatusCluster />
             </div>
-            <div className="lg:hidden">
+            <div className="hidden md:block 2xl:hidden">
               <StatusCluster compact />
             </div>
             <AccountButton />
