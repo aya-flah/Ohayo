@@ -22,6 +22,7 @@
     "@sonae/engine": "0.1.0",
     "@sonae/shared": "0.1.0",
     "@tanstack/react-query": "^5.90.0",
+    "jspdf": "^3.0.4",
     "motion": "^12.23.0",
     "mqtt": "^5.14.0",
     "qrcode": "^1.5.4",

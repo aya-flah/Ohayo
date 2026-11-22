@@ -28,8 +28,18 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-        navigateFallback: '/index.html',
+        // Pages always come from the network when online, so a new release shows at once
+        // (QR links like /3d or /certificate/3 must never open an old cached app).
+        navigateFallback: null,
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'pages', networkTimeoutSeconds: 4, expiration: { maxEntries: 30 } },
+          },
           {
             urlPattern: /^https:\/\/(api|archive-api)\.open-meteo\.com\/.*/i,
             handler: 'NetworkFirst',

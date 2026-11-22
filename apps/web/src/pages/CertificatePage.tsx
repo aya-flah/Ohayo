@@ -5,6 +5,7 @@ import { sepolia } from 'viem/chains';
 import QRCode from 'qrcode';
 import { zitounAbi, zitounFor, SEPOLIA_ID } from '../web3/config';
 import { fmt } from '../lib/format';
+import { downloadCertificatePdf } from '../lib/certificatePdf';
 
 /**
  * The Zero-Spill certificate as a document: read from Sepolia, laid out as an A4 landscape
@@ -67,6 +68,7 @@ export default function CertificatePage() {
   const [state, setState] = useState<'loading' | 'ok' | 'missing' | 'error'>('loading');
   const [qr, setQr] = useState('');
   const [scale, setScale] = useState(1);
+  const [pdf, setPdf] = useState<'idle' | 'busy' | 'error'>('idle');
   const stage = useRef<HTMLDivElement>(null);
   const verifyUrl = `${window.location.origin}/certificate/${id}`;
 
@@ -126,6 +128,30 @@ export default function CertificatePage() {
   const dateText = issued?.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const name = cert ? batchName(cert.batchRef) : undefined;
 
+  const savePdf = async () => {
+    if (!cert || pdf === 'busy') return;
+    setPdf('busy');
+    try {
+      await downloadCertificatePdf({
+        id,
+        mill,
+        litres: cert.litres,
+        deliveredM3: Number(cert.deliveredM3),
+        declaredM3: Number(cert.declaredM3),
+        loads: cert.loads,
+        issued: dateText ?? '',
+        millWallet: cert.mill,
+        batchRef: cert.batchRef,
+        batchName: name,
+        contract: CONTRACT,
+        verifyUrl,
+      });
+      setPdf('idle');
+    } catch {
+      setPdf('error');
+    }
+  };
+
   return (
     <div className="cert-page min-h-dvh text-ink" style={{ background: 'radial-gradient(120% 80% at 70% 0%, #1c3d60 0%, #0f2033 50%, #070d17 100%)' }}>
       <style>{`
@@ -153,8 +179,8 @@ export default function CertificatePage() {
         </a>
         {state === 'ok' && (
           <div className="flex flex-wrap gap-2">
-            <button className="btn btn-primary" onClick={() => window.print()}>
-              Download PDF
+            <button className="btn btn-primary" onClick={savePdf} disabled={pdf === 'busy'}>
+              {pdf === 'busy' ? 'Preparing PDF…' : 'Download PDF'}
             </button>
             <a className="btn" href={`/yui?cert=${id}`}>
               Open in the ledger
@@ -163,7 +189,9 @@ export default function CertificatePage() {
         )}
       </header>
 
-      <div ref={stage} className="cert-stage mx-auto max-w-[1180px] px-3 py-5 md:px-6 md:py-8">
+      <div className="cert-stage mx-auto max-w-[1180px] px-3 py-5 md:px-6 md:py-8">
+        <div ref={stage} className="w-full">
+        {pdf === 'error' && <p className="cert-chrome mb-4 rounded-[14px] border border-[color-mix(in_oklab,var(--cut)_40%,transparent)] bg-[color-mix(in_oklab,var(--cut)_12%,transparent)] px-4 py-3 text-[14px] text-white">The PDF could not be created on this device. Try again, or open this page on a computer.</p>}
         {state === 'loading' && <p className="cert-chrome py-24 text-center text-[16px] font-semibold text-white/70">Reading certificate #{id} from Sepolia…</p>}
         {(state === 'missing' || state === 'error') && (
           <div className="cert-chrome glass glass-edge mx-auto max-w-[520px] rounded-[24px] p-6 text-white">
@@ -283,6 +311,7 @@ export default function CertificatePage() {
             </a>
           </p>
         )}
+        </div>
       </div>
     </div>
   );

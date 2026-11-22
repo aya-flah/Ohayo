@@ -7,6 +7,16 @@ import { startTranslator } from './i18n/translate';
 
 startTranslator();
 
+// When a new version of the site takes over (after a deploy), reload once so the page matches it.
+if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloaded) return;
+    reloaded = true;
+    window.location.reload();
+  });
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>

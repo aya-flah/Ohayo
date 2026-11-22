@@ -878,5 +878,7 @@
  "Open the certificate": "証明書を開く",
  "Scan it: the code opens the certificate, read live from the chain, with no account.": "スキャンすると、ブロックチェーンから読み込んだ証明書が開きます（アカウント不要）。",
  "Download PDF": "PDFをダウンロード",
- "Open in the ledger": "台帳で開く"
+ "Open in the ledger": "台帳で開く",
+ "Preparing PDF…": "PDFを作成中…",
+ "The PDF could not be created on this device. Try again, or open this page on a computer.": "この端末ではPDFを作成できませんでした。もう一度試すか、パソコンでこのページを開いてください。"
 }

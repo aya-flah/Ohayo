@@ -882,5 +882,7 @@
  "Open the certificate": "فتح الشهادة",
  "Scan it: the code opens the certificate, read live from the chain, with no account.": "امسح الرمز: يفتح الشهادة مباشرة من البلوكشين، دون حساب.",
  "Download PDF": "تنزيل PDF",
- "Open in the ledger": "فتح في السجل"
+ "Open in the ledger": "فتح في السجل",
+ "Preparing PDF…": "جارٍ تحضير PDF…",
+ "The PDF could not be created on this device. Try again, or open this page on a computer.": "تعذّر إنشاء ملف PDF على هذا الجهاز. حاول مجددًا أو افتح الصفحة على حاسوب."
 }
