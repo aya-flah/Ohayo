@@ -168,7 +168,7 @@ function AccountButton() {
       <span className="grid h-9 w-9 place-items-center rounded-full text-[13px] font-extrabold text-white" style={{ background: tone }}>
         {user.name.slice(0, 2).toUpperCase()}
       </span>
-      <span className="hidden max-w-[110px] truncate text-[14px] font-semibold sm:inline">{user.name}</span>
+      <span className="hidden max-w-[110px] truncate text-[14px] font-semibold min-[1800px]:inline">{user.name}</span>
     </NavLink>
   );
 }
@@ -203,7 +203,7 @@ function DesktopNav() {
       {NAV.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative" title={label}>
           {({ isActive }) => (
-            <span className={`relative z-[1] flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 text-[15px] min-[1340px]:px-4 font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
+            <span className={`relative z-[1] flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 text-[15px] min-[1560px]:px-4 font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2 hover:text-ink'}`}>
               {isActive && (
                 <motion.span
                   layoutId="nav-liquid"
@@ -213,7 +213,7 @@ function DesktopNav() {
                 />
               )}
               <Icon width={19} height={19} />
-              <span className="sr-only min-[1340px]:not-sr-only">{label}</span>
+              <span className="sr-only min-[1560px]:not-sr-only">{label}</span>
             </span>
           )}
         </NavLink>
@@ -395,7 +395,7 @@ export function Shell({ children }: { children: ReactNode }) {
         aria-hidden={!atTop}
         inert={!atTop}
       >
-        <div className={`mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-3 md:px-6 ${atTop ? '' : '[&_*]:!pointer-events-none'}`}>
+        <div className={`mx-auto flex max-w-[1720px] items-center justify-between gap-3 px-3 md:px-6 ${atTop ? '' : '[&_*]:!pointer-events-none'}`}>
           <div className="glass glass-edge pointer-events-auto shrink-0 rounded-full p-1.5 sm:pr-5">
             <BrandMark />
           </div>
@@ -403,10 +403,10 @@ export function Shell({ children }: { children: ReactNode }) {
             <DesktopNav />
           </div>
           <div className="pointer-events-auto flex shrink-0 items-center gap-2">
-            <div className="hidden 2xl:block">
+            <div className="hidden">
               <StatusCluster />
             </div>
-            <div className="hidden md:block 2xl:hidden">
+            <div className="hidden md:block">
               <StatusCluster compact />
             </div>
             <AccountButton />
