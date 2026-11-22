@@ -118,14 +118,18 @@
 <h3>Why the circle works</h3>
 <p>The oil is sold. Margine returns water and potassium to the soil, so the farmer buys less fertiliser. Fitoura replaces diesel or wood, as heat for hammams and kilns or as gas for the well's engine. Well water irrigates the same trees, which bring olives back to the maâsra next winter. Every load of margine is on the Yui passport.</p>
 
-<h2>5. The app: six pages, website and Android</h2>
+<h2>5. The app: the pages, website and Android</h2>
 <table>
   <tr><th style="width:18%">Page</th><th>What it shows</th></tr>
   <tr><td><b>Plan</b></td><td>The 7-day plan: one card per day (spread or paused), every tanker trip with its reason, the pond levels, the SMS, the groves and their caps, and the week's numbers. You can <b>Add rain</b> to see Sonae reschedule. "Live forecast" uses the real Sfax weather.</td></tr>
   <tr><td><b>Twin</b></td><td>The whole olive region in <b>3D</b>: mills with their margine ponds and grignon heaps, groves of olive trees, tankers driving, the wadi, the drinking well and its safe zone, the hammam, bakery, kiln and greenhouses. Play the week, or press <b>Make it rain</b> and the tankers stop.</td></tr>
   <tr><td><b>Process</b></td><td>The transformation in 3D, in <b>9 steps</b>: press, pond, tanker, thin film, soil cross-section, drying, pellets and gasifier, the well engine, the full circle. Press play or tap a step.</td></tr>
+  <tr><td><b>Check</b></td><td>Real tools, not simulations. <b>My grove:</b> eligibility, season cap and the next safe days at your own place, from the real forecast (your location or a town). <b>Lab report:</b> Claude Opus reads a photo, PDF or text of a margine analysis and Sonae turns it into a safe dose per hectare; the reading can go onto the passport. <b>Ask Sonae:</b> Claude Opus answers in Derja, Arabic, French or English using the planner and real weather.</td></tr>
   <tr><td><b>Yui</b></td><td>The blockchain page (section 6). It reads the live contract on Sepolia with no wallet needed.</td></tr>
   <tr><td><b>Replay</b></td><td>A whole real season (15 Nov 2025 to 28 Feb 2026, real Sfax weather): <b>7,522 m³ spilled without Sonae, none with it</b>. A "wet winter" option triples the rain to stress-test the pauses.</td></tr>
+  <tr><td><b>Plan: My mill</b></td><td>A mill manager enters their own pond, production, tankers and groves; the 7-day plan, the SMS and the 3D region use them with the real forecast for their town.</td></tr>
+  <tr><td><b>Account</b></td><td>Sign in or sign up as a mill owner or a farmer (admins are created by Sonae). Each role gets its own space: profile, pack, and the AI season plan. The admin sees users, packs, revenue and AI spending.</td></tr>
+  <tr><td><b>Pricing</b></td><td>The packs for mills and farmers, with a live price calculator for your volume or area.</td></tr>
   <tr><td><b>Settings</b></td><td>All the rules (caps, distances, rain limits) and prices, editable. Glass or Field (sunlight) mode.</td></tr>
 </table>
 <p class="small">The 3D region sits behind every page and moves when you change days. Everything works offline except the live forecast and the blockchain.</p>
@@ -155,18 +159,58 @@
 </table>
 <p><b>Already on chain:</b> 6 approved groves, the mill Maâsra El Amel, 1,050 m³ declared, one grignon lot. <b>To demo:</b> MetaMask on Sepolia with the demo wallet, then dispatch 15 m³, confirm it, and certify a batch. Buying grignon needs a <b>second</b> MetaMask account with a little test ETH, because a mill can't buy its own grignon. Test ETH has no value. Never paste a private key anywhere.</p>
 
-<h2>7. Who pays, and is it worth it?</h2>
+<h2>7. Accounts, packs and the AI season plan</h2>
+<p>Three kinds of users, each with their own space. Everything they enter is saved in Sonae's database, and the season plan is generated live on the website.</p>
+<table>
+  <tr><th style="width:18%">Who</th><th>What they can do</th></tr>
+  <tr><td><b>Mill owner</b></td><td>Describes the mill (olives pressed, margine m³, fitoura tonnes, pond size, tankers, season length), chooses a pack, and generates a <b>season plan</b>: costs, income, phases, risks and a checklist. Uses Plan, Check and Yui.</td></tr>
+  <tr><td><b>Farmer</b></td><td>Describes the farm (area, trees, slope, distance to the well and the wadi, fertiliser spend), chooses a pack, and generates a plan for <b>his land</b>: how much margine, how many loads, fertiliser saved. Uses Check.</td></tr>
+  <tr><td><b>Admin</b></td><td>Sees all users by role, who has which pack, the season revenue, the margine and hectares under plan, the plans generated and the AI spending; can suspend an account. Admin accounts can't be created by sign-up.</td></tr>
+</table>
+
+<h3>The packs (per season, November to February)</h3>
+<table>
+  <tr><th style="width:22%">Pack</th><th style="width:30%">Price</th><th>For</th></tr>
+  <tr><td><b>Mill Essentiel</b></td><td>390 TND, 600 m³ included, then 0.60 TND/m³</td><td>Small mill, one tanker: daily plan, passport, 300 SMS</td></tr>
+  <tr><td><b>Mill Pro</b> (popular)</td><td>950 TND, 2,000 m³ included, then 0.45 TND/m³</td><td>Most mills: plus Zero-Spill certificates, grignon market, AI season plan, lab reading</td></tr>
+  <tr><td><b>Mill Coopérative</b></td><td>2,400 TND, 6,000 m³ included, then 0.35 TND/m³</td><td>Large mills and groups: plus GPS and flow-meter oracle, inspector dashboard</td></tr>
+  <tr><td><b>Farmer Voisin</b></td><td>Free</td><td>Receive margine, SMS, grove check, confirm deliveries</td></tr>
+  <tr><td><b>Farmer Grove</b> (popular)</td><td>35 TND per hectare</td><td>Dose planned from lab results, AI season plan, priority on dry days</td></tr>
+  <tr><td><b>Farmer Grove+</b></td><td>55 TND per hectare</td><td>Plus one soil analysis per season with a partner lab</td></tr>
+</table>
+<p class="small">These are our launch proposal, consistent with the business plan (about 0.5 TND per m³ for a medium mill). In the demo, choosing a pack activates it without payment; a real launch adds a payment step (bank transfer or D17).</p>
+
+<h3>How the AI season plan works</h3>
+<ol>
+  <li><b>Exact numbers first, from code, not from AI.</b> Sonae's engine computes the volumes, tanker trips, hectares and groves needed, pond autonomy, safe spreading days (from last season's real Sfax weather), and every cost and income line in dinars.</li>
+  <li><b>Claude Opus writes the plan around those numbers:</b> 3 to 5 phases from mid-November to the end of February with dates, actions and the weather to expect, the main risks with how to avoid them, a dated checklist, and tips. It is told never to change a number.</li>
+  <li><b>Sonae checks the answer:</b> the phase shares are rescaled so the volumes always add up to the real totals.</li>
+  <li><b>It appears live on the page</b> with animations: headline, key figures that count up, cost and income bars, a clickable timeline of phases, risk cards, a checklist you can tick, and last season's weather. No PDF. Plans are saved, so you can reopen past ones.</li>
+</ol>
+<p class="small">A plan takes about 25 seconds and costs about 2 to 4 US cents of Opus credit. The API refuses new AI calls once the 20 USD budget is reached.</p>
+
+<h3>Database and security</h3>
+<ul>
+  <li><b>Database:</b> SQLite, built into Node (no server to install, one file in <code>apps/api/data/</code>, ignored by Git). The schema is plain SQL, so moving to PostgreSQL for production is easy.</li>
+  <li><b>Passwords:</b> hashed with scrypt and a random salt; never stored or logged in clear.</li>
+  <li><b>Sessions:</b> a random token per sign-in, valid 7 days; only its hash is stored. Suspending a user ends their sessions.</li>
+  <li><b>Roles:</b> every action checks the role (a mill can't open admin pages, a farmer can't edit a mill).</li>
+  <li><b>Limits:</b> sign-in and sign-up limited to 10 tries a minute; AI plans to 4 a minute; same error for wrong email or wrong password.</li>
+  <li><b>Demo accounts</b> (admin, mill owner, farmer) are created from <code>apps/api/.env</code>; their passwords live only there.</li>
+</ul>
+
+<h2>8. Who pays, and is it worth it?</h2>
 <table>
   <tr><th style="width:20%">Who</th><th style="width:30%">Pays</th><th>Why it's worth it</th></tr>
-  <tr><td><b>Maâsra</b> (main customer)</td><td>0.5 TND per m³: about 750 TND a season for a medium mill (1,500 m³). Plus the tanker transport it already pays today.</td><td>Ponds and fines cost it more. It also sells its grignon.</td></tr>
-  <tr><td><b>Farmer</b></td><td>A small seasonal fee, about 30 to 50 TND/ha</td><td>Free water and potassium: about 150 to 300 TND/ha of fertiliser saved.</td></tr>
+  <tr><td><b>Maâsra</b> (main customer)</td><td>Its pack: Essentiel 390 TND, Pro 950 TND (most mills), Coopérative 2,400 TND, about 0.5 TND per m³ overall. Plus the tanker transport it already pays today.</td><td>Ponds and fines cost it more. It also sells its grignon.</td></tr>
+  <tr><td><b>Farmer</b></td><td>Free (Voisin) or 35 TND/ha (Grove) to 55 TND/ha (Grove+)</td><td>Free water and potassium: about 150 to 300 TND/ha of fertiliser saved.</td></tr>
   <tr><td><b>Hammam, bakery, kiln</b></td><td>About 5 TND per tonne of grignon, as a commission</td><td>Cheaper than wood or gas, delivered on time.</td></tr>
   <tr><td><b>Exporter</b> (optional)</td><td>Yearly fee for clean-oil certificates</td><td>Sells better to EU buyers who ask for traceability.</td></tr>
 </table>
 <p><b>Rough launch budget</b> (one region, 20 mills, first year): about 58,000 TND, covered by prizes and grants (Startup Act, JICA, GIZ, EU). It pays for itself from about 25 to 40 mills, and Tunisia has more than a thousand.</p>
 <div class="box c small"><b>Be honest in the pitch:</b> the limits (50 m³/ha, distances, rain thresholds) are cautious defaults, still to check against the Tunisian decree. Fertiliser and price figures are estimates. Only numbers from our own simulation go on slides. The biggest business risk: mills that dump illegally won't pay unless inspections are real. Our answer is the passport, because it makes compliance visible and valuable (certified oil).</div>
 
-<h2>8. Technical advantages</h2>
+<h2>9. Technical advantages</h2>
 <table>
   <tr><th style="width:26%">Advantage</th><th>What it means in practice</th></tr>
   <tr><td><b>Works offline</b></td><td>The planner runs inside the phone and browser, not on a server. The plan, the 3D twin and the replay work in a field with no signal.</td></tr>
@@ -180,17 +224,19 @@
   <tr><td><b>Cheap to run</b></td><td>No sensors required to start: software, SMS and an optional GPS per tanker. One record on a low-cost network costs a fraction of a millime.</td></tr>
 </table>
 
-<h2>9. The 2-minute demo</h2>
+<h2>10. The 2-minute demo</h2>
 <ol>
   <li><b>Plan:</b> "Three mills are pressing, a storm is coming Wednesday." Show 640 m³ going out before the rain and "no pond spills". Tap a trip to show its reason, and show the farmer's SMS.</li>
   <li><b>Add rain</b> on Tuesday and watch the plan move the tankers to Monday.</li>
   <li><b>Twin:</b> play the week. Tankers drive, ponds drop, a grove darkens. Point at the red borders: "this grove is next to a well, so never". Press <b>Make it rain</b>: everything stops.</li>
   <li><b>Process:</b> tap step 4 (thin film), step 5 (the soil cross-section) and step 8 (the well engine on grignon gas).</li>
+  <li><b>Check:</b> try a sample lab report (Claude reads it in seconds), then ask Sonae a question in Derja.</li>
+  <li><b>Account:</b> sign in as the demo mill owner, open Pricing, then press <b>Generate my season plan</b> and walk through the animated plan.</li>
   <li><b>Yui:</b> live contract on Sepolia. Dispatch a 15 m³ load, confirm it, issue a certificate, type its number in "Verify".</li>
   <li><b>Replay:</b> a real season: "7,522 m³ into the wadis without Sonae, none with it."</li>
 </ol>
 
-<h2>10. Jury questions and how to answer</h2>
+<h2>11. Jury questions and how to answer</h2>
 <p class="small">Keep answers short: one sentence, then one fact. If you don't know, say so and say how you'd find out.</p>
 
 <h3>The idea</h3>
@@ -220,16 +266,22 @@
   <tr><td>Why SMS and not an app for farmers?</td><td>Many farmers have basic phones. SMS works everywhere, in Derja, with no data plan.</td></tr>
   <tr><td>Did you use AI?</td><td>The decisions come from a transparent, tested planner, not from AI, so every choice can be explained. Claude helped us build faster and powers optional assistant features.</td></tr>
   <tr><td>Is it secure? What about privacy?</td><td>Roles limit who can do what; money sits in escrow; keys are never in the code. On chain we store hashes and quantities, not personal data: farmer names and phones stay off chain.</td></tr>
+  <tr><td>Why SQLite and not MongoDB?</td><td>Our data is relational (users, their mill or farm, packs, plans), so SQL fits better than documents. SQLite is built into Node: no server to run for a demo or a first region, and the same SQL moves to PostgreSQL when we grow.</td></tr>
+  <tr><td>Can I trust an AI-generated cost plan?</td><td>The money and volumes are not from the AI: our engine computes them from your profile and real weather. Claude only writes the phases, risks and checklist around those numbers, and we rescale its phases to match the real totals.</td></tr>
+  <tr><td>How are accounts protected?</td><td>Passwords hashed with scrypt, session tokens stored only as hashes, role checks on every request, and rate limits on sign-in. Admins can't be created from the sign-up form.</td></tr>
+  <tr><td>Is anyone paying today?</td><td>No. In the demo a pack is activated without payment; a real launch adds bank transfer or D17 before activation.</td></tr>
   <tr><td>Can it scale?</td><td>One region (20 mills) costs about 58,000 TND to launch and breaks even around 25 mills; Tunisia has over a thousand. The software is the same for every region.</td></tr>
 </table>
 
-<h2>11. For the developers</h2>
+<h2>12. For the developers</h2>
 <table>
   <tr><th>Where</th><th>What</th></tr>
   <tr><td><code>packages/engine/src/zitoun.ts</code></td><td>The planner (<code>planZitoun</code>), Derja SMS, season replay. Tests in <code>packages/engine/test/zitoun.test.ts</code>.</td></tr>
   <tr><td><code>packages/shared/src/zitoun.ts</code></td><td>Types, default rules, the demo region (mills, groves, buyers, storm week).</td></tr>
   <tr><td><code>apps/web/src/pages/</code></td><td>Plan, Twin, Yui, Replay, Settings. 3D scene: <code>pages/twin/ZitounScene.tsx</code>. State: <code>lib/zitoun.ts</code>, <code>lib/scene.ts</code>.</td></tr>
   <tr><td><code>apps/web/src/pages/ProcessPage.tsx</code></td><td>The 9-step walkthrough. Steps and texts: <code>lib/process.ts</code>; 3D: <code>pages/twin/ProcessScene.tsx</code>.</td></tr>
+    <tr><td><code>apps/api/src/account.ts</code>, <code>auth.ts</code>, <code>db.ts</code></td><td>Sign-up, sign-in, roles, profiles, packs, admin overview; SQLite schema. Packs: <code>packs.ts</code>. Season plan (engine numbers + Opus): <code>season.ts</code>. Lab reader and Ask Sonae: <code>zitoun-ai.ts</code>.</td></tr>
+  <tr><td><code>apps/web/src/pages/</code> Auth, Account, Pricing, Check</td><td>The new user flow. Session: <code>lib/session.ts</code>; animated plan: <code>components/SeasonPlanView.tsx</code>.</td></tr>
   <tr><td><code>contracts/contracts/ZitounLedger.sol</code></td><td>The passport and grignon market (21 contract tests pass). Deploy: <code>npm --prefix contracts run deploy-zitoun:sepolia</code>.</td></tr>
   <tr><td><code>data/fetch-olive-season.mjs</code></td><td>Downloads the real season weather for the Replay.</td></tr>
 </table>

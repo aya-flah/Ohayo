@@ -9,13 +9,15 @@ import { DEMO_FARMERS, DEMO_GDA, demoForecast, demoOutages, demoPlots, toMs, Out
 import { ask, readNotice, BudgetExceededError } from './ai';
 import { spend } from './budget';
 import { readLab, zitounAsk } from './zitoun-ai';
+import { registerAccount } from './account';
+import { seedAccounts } from './auth';
 import { confirmDelivery, oracleReady } from './oracle';
 
 const app = Fastify({ logger: { level: 'info' }, bodyLimit: 6 * 1024 * 1024 });
 const origins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173,http://localhost:5174').split(',').map((s) => s.trim());
 
 await app.register(helmet);
-await app.register(cors, { origin: origins });
+await app.register(cors, { origin: origins, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], allowedHeaders: ['content-type', 'authorization'] });
 await app.register(rateLimit, { max: 120, timeWindow: '1 minute' });
 
 /** Sensitive actions need the shared bearer token (until full login lands). */
@@ -34,8 +36,12 @@ function demoInput(): PlanInput {
   return { gda: DEMO_GDA, farmers: DEMO_FARMERS, plots: demoPlots(nowMs), forecast: demoForecast(nowMs, 72, 1), outages: demoOutages(nowMs), now: DEMO_NOW };
 }
 
-app.setErrorHandler((error: Error & { statusCode?: number }, _req, reply) => {
+app.setErrorHandler((error: Error & { statusCode?: number; issues?: Array<{ message: string; path: Array<string | number> }> }, _req, reply) => {
   if (error instanceof BudgetExceededError) return reply.code(402).send({ error: error.message });
+  if (error.name === 'ZodError' && error.issues?.length) {
+    const i = error.issues[0]!;
+    return reply.code(400).send({ error: `${i.path.length ? `${i.path.join('.')}: ` : ''}${i.message}` });
+  }
   const status = error.statusCode && error.statusCode >= 400 ? error.statusCode : 500;
   if (status >= 500) app.log.error(error);
   return reply.code(status).send({ error: status >= 500 ? 'Something went wrong on the server.' : error.message });
@@ -134,6 +140,9 @@ app.post('/exchange/orders/:id/confirm', { config: { rateLimit: { max: 20, timeW
   const hash = await confirmDelivery(id, measured);
   return { ok: true, hash };
 });
+
+await registerAccount(app);
+await seedAccounts();
 
 const port = Number(process.env.PORT ?? 8787);
 await app.listen({ port, host: '0.0.0.0' });

@@ -7,6 +7,7 @@ import { useSonae } from '../lib/store';
 import { DEFAULT_CURSOR, poseFor, useFieldMode, useRegionState, useScene } from '../lib/scene';
 import { useZPlan } from '../lib/zitoun';
 import { useProcess } from '../lib/process';
+import { useSession } from '../lib/session';
 import { EASE } from './ui';
 
 const ZitounScene = lazy(() => import('../pages/twin/ZitounScene').then((m) => ({ default: m.ZitounScene })));
@@ -131,23 +132,42 @@ function StatusCluster({ compact = false }: { compact?: boolean }) {
           {!compact && <span className="text-ink">Offline · plan still works</span>}
         </span>
       )}
-      <span className={`chip num ${compact ? 'hidden sm:inline-flex' : ''}`} title="Margine in the mills' ponds" style={{ color: hot ? 'var(--cut)' : 'var(--margine)' }}>
+      <span className={`chip num whitespace-nowrap ${compact ? 'hidden sm:inline-flex' : ''}`} title="Margine in the mills' ponds" style={{ color: hot ? 'var(--cut)' : 'var(--margine)' }}>
         <span className="relative h-3.5 w-2 overflow-hidden rounded-[3px] border border-current">
           <motion.span className="absolute inset-x-0 bottom-0 bg-current" animate={{ height: `${pct}%` }} transition={{ duration: 0.6, ease: EASE }} />
         </span>
         <span className="text-ink">{compact ? `${pct}%` : `Ponds ${pct}%`}</span>
       </span>
-      <motion.span layout className="chip" style={{ color: state.blocked ? 'var(--water)' : 'var(--ok)' }} title="Can margine be spread now?">
+      <motion.span layout className="chip whitespace-nowrap" style={{ color: state.blocked ? 'var(--water)' : 'var(--ok)' }} title="Can margine be spread now?">
         {state.rain > 0 ? <IconDrop width={14} height={14} /> : <span className="dot" />}
         <span className="text-ink">{state.blocked ? (compact ? 'Paused' : state.rain > 0 ? 'Rain · paused' : 'Paused') : compact ? 'Spread' : 'Spreading OK'}</span>
       </motion.span>
       {!compact && (
-        <span className="chip num hidden xl:inline-flex">
+        <span className="chip num hidden whitespace-nowrap 2xl:inline-flex">
           <span className="text-ink-2">Day {state.day + 1}</span>
           <span className="text-ink">{hh}:00</span>
         </span>
       )}
     </div>
+  );
+}
+
+function AccountButton() {
+  const user = useSession((s) => s.user);
+  if (!user)
+    return (
+      <NavLink to="/login" onClick={() => tap()} className="glass glass-soft flex h-12 items-center whitespace-nowrap rounded-full px-4 text-[14.5px] font-semibold text-ink transition-transform duration-200 active:scale-95">
+        Sign in
+      </NavLink>
+    );
+  const tone = user.role === 'mill' ? 'var(--margine)' : user.role === 'farmer' ? 'var(--olive)' : 'var(--water)';
+  return (
+    <NavLink to="/account" onClick={() => tap()} className="glass glass-soft flex h-12 items-center gap-2 rounded-full pl-1.5 pr-3.5 transition-transform duration-200 active:scale-95" aria-label={`Your account: ${user.name}`}>
+      <span className="grid h-9 w-9 place-items-center rounded-full text-[13px] font-extrabold text-white" style={{ background: tone }}>
+        {user.name.slice(0, 2).toUpperCase()}
+      </span>
+      <span className="hidden max-w-[110px] truncate text-[14px] font-semibold sm:inline">{user.name}</span>
+    </NavLink>
   );
 }
 
@@ -370,6 +390,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="lg:hidden">
               <StatusCluster compact />
             </div>
+            <AccountButton />
             <NavLink to="/settings" onClick={() => tap()} className={({ isActive }) => `glass glass-soft grid h-12 w-12 place-items-center rounded-full transition-transform duration-200 active:scale-90 ${isActive ? 'text-[var(--water)]' : 'text-ink'}`} aria-label="Settings" title="Settings">
               <IconSettings width={21} height={21} />
             </NavLink>

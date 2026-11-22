@@ -7,6 +7,9 @@ const TwinPage = lazy(() => import('./pages/TwinPage'));
 const YuiPage = lazy(() => import('./pages/YuiPage'));
 const ProcessPage = lazy(() => import('./pages/ProcessPage'));
 const CheckPage = lazy(() => import('./pages/CheckPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
 const ReplayPage = lazy(() => import('./pages/ReplayPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
@@ -32,6 +35,10 @@ export default function App() {
           <Route path="/twin" element={<TwinPage />} />
           <Route path="/process" element={<ProcessPage />} />
           <Route path="/check" element={<CheckPage />} />
+          <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/yui" element={<YuiPage />} />
           <Route path="/replay" element={<ReplayPage />} />
           <Route path="/settings" element={<SettingsPage />} />
