@@ -9,7 +9,7 @@ import { useZPlan } from './zitoun';
  * 7-day plan to show (cursor in days: 1.5 = tomorrow at noon) and whether to force rain.
  * The camera pose follows the current route.
  */
-export type ScenePose = 'plan' | 'twin' | 'yui' | 'replay' | 'settings';
+export type ScenePose = 'plan' | 'twin' | 'process' | 'yui' | 'replay' | 'settings';
 
 interface SceneStore {
   cursor: number;
@@ -29,7 +29,7 @@ export const useScene = create<SceneStore>((set) => ({
 }));
 
 export const poseFor = (path: string): ScenePose =>
-  path.startsWith('/twin') ? 'twin' : path.startsWith('/yui') ? 'yui' : path.startsWith('/replay') ? 'replay' : path.startsWith('/settings') ? 'settings' : 'plan';
+  path.startsWith('/twin') ? 'twin' : path.startsWith('/process') ? 'process' : path.startsWith('/yui') ? 'yui' : path.startsWith('/replay') ? 'replay' : path.startsWith('/settings') ? 'settings' : 'plan';
 
 /* ── What the region looks like at one moment ───────────────────────── */
 

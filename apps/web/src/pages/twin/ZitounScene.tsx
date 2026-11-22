@@ -596,6 +596,7 @@ interface Pose {
 const POSES: Record<ScenePose, Pose> = {
   plan: { target: [0, 0, 0], r: 52, polar: 0.95, az: 0.55, shift: [0.2, 0.22], mobileShift: [0, 0.26], mobileR: 62 },
   twin: { target: [0, 0, -1], r: 46, polar: 0.92, az: 0.5, shift: [-0.04, -0.02], mobileShift: [0, -0.08], mobileR: 78 },
+  process: { target: [0, 0, 0], r: 52, polar: 0.95, az: 0.55, shift: [0, 0] },
   yui: { target: [-4, 0, -2], r: 40, polar: 1.0, az: -0.35, shift: [0.22, 0.12], mobileShift: [0, 0.24], mobileR: 56 },
   replay: { target: [0, 0, 0], r: 60, polar: 0.6, az: 1.0, shift: [0.2, 0.22], mobileShift: [0, 0.28], mobileR: 70 },
   settings: { target: [-10, 1, -7], r: 18, polar: 1.15, az: 1.4, shift: [0.24, 0.06], mobileShift: [0, 0.2], mobileR: 26 },

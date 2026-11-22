@@ -141,3 +141,11 @@ export const IconGauge = (p: P) => (
     <path d="M12 17l4-5" />
   </svg>
 );
+export const IconProcess = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 12a8 8 0 0 1 13.7-5.6L20 9" />
+    <path d="M20 4v5h-5" />
+    <path d="M20 12a8 8 0 0 1-13.7 5.6L4 15" />
+    <path d="M4 20v-5h5" />
+  </svg>
+);

@@ -1,18 +1,21 @@
 import { NavLink, useLocation } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
-import { IconDrop, IconMoon, IconPlan, IconReplay, IconSettings, IconSunMode, IconTwin, IconWifiOff, IconYui } from './Icons';
+import { IconDrop, IconMoon, IconPlan, IconProcess, IconReplay, IconSettings, IconSunMode, IconTwin, IconWifiOff, IconYui } from './Icons';
 import { useOnline, usePrefersReducedMotion, tap } from '../lib/device';
 import { useSonae } from '../lib/store';
 import { DEFAULT_CURSOR, poseFor, useFieldMode, useRegionState, useScene } from '../lib/scene';
 import { useZPlan } from '../lib/zitoun';
+import { useProcess } from '../lib/process';
 import { EASE } from './ui';
 
 const ZitounScene = lazy(() => import('../pages/twin/ZitounScene').then((m) => ({ default: m.ZitounScene })));
+const ProcessScene = lazy(() => import('../pages/twin/ProcessScene').then((m) => ({ default: m.ProcessScene })));
 
 const NAV = [
   { to: '/', label: 'Plan', jp: '計画', icon: IconPlan },
   { to: '/twin', label: 'Twin', jp: '双子', icon: IconTwin },
+  { to: '/process', label: 'Process', jp: '工程', icon: IconProcess },
   { to: '/yui', label: 'Yui', jp: '結', icon: IconYui },
   { to: '/replay', label: 'Replay', jp: '再生', icon: IconReplay },
   { to: '/settings', label: 'Settings', jp: '設定', icon: IconSettings },
@@ -29,7 +32,8 @@ function Backdrop() {
   const field = useFieldMode();
   const state = useRegionState();
   const { input, plan } = useZPlan();
-  const twin = pose === 'twin';
+  const step = useProcess((s) => s.step);
+  const twin = pose === 'twin' || pose === 'process';
   // Grignon heaps grow while mills press and shrink with each delivery.
   const grignonStock: Record<string, number> = {};
   for (const m of input.mills) {
@@ -47,7 +51,11 @@ function Backdrop() {
         <div className="absolute inset-0" style={{ background: field ? 'linear-gradient(180deg,#f3ead9,#faf8f5)' : 'radial-gradient(120% 80% at 70% 20%, #13304f 0%, #0b121e 55%, #060b14 100%)' }} />
         <Suspense fallback={null}>
           <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 1.6, ease: EASE } }}>
-            <ZitounScene input={input} plan={plan} state={state} grignonStock={grignonStock} reduced={reduced} pose={pose} interactive={twin} field={field} badges={twin} />
+            {pose === 'process' ? (
+              <ProcessScene step={step} reduced={reduced} field={field} />
+            ) : (
+              <ZitounScene input={input} plan={plan} state={state} grignonStock={grignonStock} reduced={reduced} pose={pose} interactive={twin} field={field} badges={twin} />
+            )}
           </motion.div>
         </Suspense>
       </div>
@@ -195,11 +203,11 @@ function DesktopNav() {
 function MobileDock() {
   return (
     <nav className="fixed inset-x-3 z-50 md:hidden" style={{ bottom: 'max(12px, env(safe-area-inset-bottom))' }} aria-label="Main">
-      <div className="glass glass-edge glass-strong grid grid-cols-5 rounded-[28px] p-1.5">
+      <div className="glass glass-edge glass-strong grid grid-cols-6 rounded-[28px] p-1.5">
         {NAV.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === '/'} onClick={() => tap()} className="relative">
             {({ isActive }) => (
-              <span className={`relative z-[1] flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[22px] text-[12px] font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2'}`}>
+              <span className={`relative z-[1] flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[22px] text-[11px] font-semibold transition-colors duration-300 ${isActive ? 'text-on-accent' : 'text-ink-2'}`}>
                 {isActive && (
                   <motion.span
                     layoutId="dock-liquid"
@@ -314,7 +322,7 @@ function Intro() {
 export function Shell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const theme = useSonae((s) => s.theme);
-  const twin = location.pathname.startsWith('/twin');
+  const twin = location.pathname.startsWith('/twin') || location.pathname.startsWith('/process');
   const idx = navIndex(location.pathname);
   const prevIdx = useRef(idx);
   const dir = idx - prevIdx.current;
